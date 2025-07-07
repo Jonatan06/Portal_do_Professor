@@ -1,0 +1,64 @@
+/* CSS específico para a página de portfólio */
+
+.project-section {
+    margin-bottom: 50px;
+}
+.project-section-title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--cor-primaria);
+    display: inline-block;
+}
+.project-item {
+    background-color: var(--cor-branco);
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-left: 5px solid var(--cor-primaria);
+    box-shadow: var(--sombra);
+}
+.project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+.project-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+.project-status {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.status-concluido { background-color: #e6f9f1; color: #198754; }
+.status-andamento { background-color: #fff8e1; color: #f57c00; }
+
+.project-description {
+    color: var(--cor-texto-secundario);
+    margin-bottom: 20px;
+    line-height: 1.7;
+}
+.project-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--cor-texto-secundario);
+}
+.project-tags span {
+    background-color: #e9ecef;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-right: 8px;
+    font-size: 0.8rem;
+}
+.project-link a {
+    color: var(--cor-primaria);
+    font-weight: 600;
+    text-decoration: none;
+}
