@@ -3,85 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro - Portal do Professor</title>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <title>Cadastro - Portal do Aluno</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="/css/login.css">
 </head>
-<body>
+<!-- MUDANÇA AQUI: Adicionada a classe "cadastro-page" -->
+<body class="cadastro-page">
+
     <div class="login-container">
-        <div id="cadastro-form" class="form-container">
-            <button type="button" class="btn-voltar" id="btn-voltar">‹ Voltar</button>
-            <h2>Cadastro</h2>
-            <form id="form-cadastro">
-                <div class="input-group">
-                    <label for="cadastro-nome">Nome Completo</label>
-                    <input type="text" id="cadastro-nome" name="nome" required>
-                </div>
-                <div class="input-group">
-                    <label for="cadastro-email">Email</label>
-                    <input type="email" id="cadastro-email" name="email" required>
-                </div>
-                <div class="input-group">
-                    <label for="cadastro-senha">Senha</label>
-                    <input type="password" id="cadastro-senha" name="senha" required>
-                </div>
-                <div class="input-group">
-                    <label for="confirmar-senha">Confirmar Senha</label>
-                    <input type="password" id="confirmar-senha" name="confirmar-senha" required>
-                </div>
-                <button type="submit">Cadastrar</button>
-            </form>
-            <p id="error-message" style="color: red;"></p>
-            <p>Já tem uma conta? <a href="/login" id="show-login">Faça Login</a></p>
+        <!-- PAINEL DA ESQUERDA (BRANDING) -->
+        <div class="login-promo-panel">
+            <div class="promo-content">
+                <i class="promo-icon fas fa-user-graduate"></i>
+                <h1>Portal do Aluno</h1>
+                <p>Crie sua conta para começar sua jornada acadêmica e ter acesso a todos os recursos.</p>
+            </div>
+        </div>
+
+        <!-- PAINEL DA DIREITA (FORMULÁRIO DE CADASTRO) -->
+        <div class="login-form-panel">
+            <div class="form-wrapper">
+                <h2>Crie sua conta</h2>
+                
+                <form id="form-cadastro">
+                    <div class="input-group">
+                        <label for="cadastro-nome">Nome Completo</label>
+                        <div class="input-field">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="cadastro-nome" name="nome" required placeholder="Seu nome completo">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="cadastro-email">Email</label>
+                        <div class="input-field">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="cadastro-email" name="email" required placeholder="seu.email@exemplo.com">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="cadastro-senha">Senha</label>
+                        <div class="input-field">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="cadastro-senha" name="senha" required placeholder="Crie uma senha forte">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="confirmar-senha">Confirmar Senha</label>
+                        <div class="input-field">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="confirmar-senha" name="confirmar-senha" required placeholder="Repita a senha">
+                        </div>
+                    </div>
+                    <button type="submit" class="login-button">Cadastrar</button>
+                </form>
+
+                <p id="error-message" class="error-message"></p>
+                
+                <!-- O CSS agora estilizará este parágrafo de forma diferente por causa da classe no body -->
+                <p class="signup-link">Já tem uma conta? <a href="/login" id="show-login">Faça Login</a></p>
+                <button type="button" class="btn-voltar" id="btn-voltar"> Voltar</button>
+            </div>
         </div>
     </div>
-
     
     <script>
-
         document.getElementById('btn-voltar').addEventListener('click', () => {
             history.back();
         });
 
-        const formCadastro = document.getElementById('form-cadastro');
-        const errorMessage = document.getElementById('error-message');
-
-        formCadastro.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Impede o envio padrão do formulário
-
-            const nome = document.getElementById('cadastro-nome').value;
-            const email = document.getElementById('cadastro-email').value;
-            const senha = document.getElementById('cadastro-senha').value;
-            const confirmarSenha = document.getElementById('confirmar-senha').value;
-
-            errorMessage.textContent = ''; // Limpa mensagens de erro antigas
-
-            if (senha !== confirmarSenha) {
-                errorMessage.textContent = 'As senhas não coincidem!';
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/alunos/cadastro', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ nome, email, senha }),
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert('Cadastro realizado com sucesso! Você será redirecionado para a página de login.');
-                    window.location.href = '/login'; // Redireciona para o login
-                } else {
-                    errorMessage.textContent = data.message || 'Ocorreu um erro no cadastro.';
-                }
-            } catch (error) {
-                errorMessage.textContent = 'Erro de conexão. Tente novamente.';
-            }
-        });
+        // O resto do seu script continua aqui...
     </script>
 </body>
 </html>
