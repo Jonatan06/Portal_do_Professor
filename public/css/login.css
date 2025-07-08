@@ -1,0 +1,174 @@
+/* public/css/login.css - Estilo profissional */
+
+:root {
+    --cor-primaria: #0d6efd;
+    --cor-fundo-promo: linear-gradient(45deg, #0d6efd, #0d47a1);
+    --cor-fundo-pagina: #f4f7fc;
+    --cor-fundo-card: #ffffff;
+    --cor-texto-claro: #ffffff;
+    --cor-texto-escuro: #343a40;
+    --cor-texto-secundario: #6c757d;
+    --cor-borda: #dee2e6;
+    --cor-erro: #dc3545;
+    --sombra-card: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--cor-fundo-pagina);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.login-container {
+    display: flex;
+    width: 100%;
+    max-width: 900px;
+    min-height: 550px;
+    background-color: var(--cor-fundo-card);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--sombra-card);
+}
+
+/* Painel da Esquerda (Promoção/Branding) */
+.login-promo-panel {
+    flex-basis: 45%;
+    background: var(--cor-fundo-promo);
+    color: var(--cor-texto-claro);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    text-align: center;
+}
+.promo-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+}
+.promo-content h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+.promo-content p {
+    font-size: 16px;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+/* Painel da Direita (Formulário) */
+.login-form-panel {
+    flex-basis: 55%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.form-wrapper {
+    width: 100%;
+    max-width: 350px;
+}
+
+.form-wrapper h2 {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--cor-texto-escuro);
+    margin-bottom: 10px;
+}
+.form-wrapper .subtitle {
+    font-size: 15px;
+    color: var(--cor-texto-secundario);
+    margin-bottom: 30px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+.input-group label {
+    display: block;
+    font-size: 14px;
+    color: var(--cor-texto-escuro);
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.input-field {
+    position: relative;
+}
+.input-field i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--cor-texto-secundario);
+}
+.input-field input {
+    width: 100%;
+    padding: 12px 15px 12px 40px; /* Espaço para o ícone */
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.2s ease-in-out;
+}
+.input-field input:focus {
+    outline: none;
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+.login-button {
+    display: block;
+    width: 100%;
+    margin-top: 30px;
+    padding: 14px;
+    border: none;
+    border-radius: 8px; 
+    background-color: var(--cor-primaria);
+    color: var(--cor-texto-claro);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.login-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(13, 110, 253, 0.3);
+}
+.login-button:active {
+    transform: translateY(-1px);
+}
+
+.error-message {
+    color: var(--cor-erro);
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+    min-height: 20px; /* Garante que o layout não pule quando a mensagem aparece */
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+        min-height: auto;
+    }
+    .login-promo-panel {
+        display: none; /* Em telas muito pequenas, escondemos o painel de promoção */
+    }
+    .login-form-panel {
+        padding: 30px;
+    }
+}

@@ -1,0 +1,104 @@
+/* public/css/portfolio.css */
+
+:root {
+    --cor-primaria: #0d6efd;
+    --cor-fundo-card: #ffffff;
+    --cor-texto-principal: #343a40;
+    --cor-texto-secundario: #6c757d;
+    --cor-borda: #dee2e6;
+    --cor-status-concluido-bg: #e6f9f1;
+    --cor-status-concluido-text: #198754;
+    --cor-status-andamento-bg: #fff8e1;
+    --cor-status-andamento-text: #f57c00;
+    --cor-perigo: #dc3545;
+    --cor-aviso: #ffc107;
+}
+
+/* --- Cabeçalho da Página Modificado --- */
+.page-header {
+    display: flex; /* Adicionado */
+    justify-content: space-between; /* Adicionado */
+    align-items: flex-start; /* Adicionado */
+    text-align: left; /* Adicionado */
+    margin-bottom: 40px;
+    background-color: var(--cor-fundo-card);
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid var(--cor-borda);
+}
+.page-header h1 { font-size: 32px; margin-bottom: 5px; }
+.page-header p { font-size: 16px; color: var(--cor-texto-secundario); }
+
+/* Botões */
+.btn-add-project {
+    background-color: var(--cor-status-concluido-text);
+    color: white;
+    margin-top: 20px;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+}
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid #ced4da;
+    color: #495057;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    flex-shrink: 0; /* Impede que o botão encolha */
+}
+.btn-outline:hover { background-color: #f8f9fa; border-color: #adb5bd; }
+
+/* Seções e Lista de Projetos */
+.project-section { margin-bottom: 50px; }
+.project-section h2 { font-size: 24px; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid var(--cor-borda); }
+.project-section h2 i { margin-right: 12px; color: var(--cor-primaria); }
+.empty-list-placeholder { color: var(--cor-texto-secundario); text-align: center; padding: 20px; background-color: var(--cor-fundo-card); border: 1px dashed var(--cor-borda); border-radius: 8px; }
+
+/* Estilos para o Card de Projeto */
+.project-item { display: flex; position: relative; padding-left: 20px; margin-bottom: 30px; }
+.timeline { position: absolute; left: 6px; top: 5px; bottom: -15px; width: 2px; background-color: var(--cor-borda); }
+.project-item:last-child .timeline { display: none; }
+.timeline .dot { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 14px; height: 14px; border-radius: 50%; background-color: #fff; border: 3px solid var(--cor-primaria); }
+.project-details { background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 20px; flex-grow: 1; margin-left: 20px; position: relative; transition: box-shadow 0.2s; }
+.project-details:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.project-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 5px; }
+.btn-icon { background: none; border: none; font-size: 16px; color: var(--cor-texto-secundario); cursor: pointer; padding: 5px; transition: color 0.2s; }
+.btn-icon.btn-edit:hover { color: var(--cor-aviso); }
+.btn-icon.btn-delete:hover { color: var(--cor-perigo); }
+.status-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 12px; margin-bottom: 10px; }
+.status-concluido { background-color: var(--cor-status-concluido-bg); color: var(--cor-status-concluido-text); }
+.status-andamento { background-color: var(--cor-status-andamento-bg); color: var(--cor-status-andamento-text); }
+.project-details h3 { font-size: 20px; margin-bottom: 8px; padding-right: 60px; }
+.project-details p { color: var(--cor-texto-secundario); margin-bottom: 15px; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+.tags span { background-color: #e9ecef; font-size: 12px; padding: 3px 10px; border-radius: 4px; }
+.meta-info { display: flex; align-items: center; gap: 20px; font-size: 14px; color: var(--cor-texto-secundario); border-top: 1px solid var(--cor-borda); padding-top: 15px; margin-top: 15px; }
+.meta-info i { margin-right: 5px; }
+.meta-info a { color: var(--cor-primaria); }
+
+/* Modal */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 1; transition: opacity 0.3s ease; }
+.modal-overlay.hidden { opacity: 0; pointer-events: none; }
+.modal-content { background: #fff; padding: 25px; border-radius: 8px; width: 90%; max-width: 650px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid var(--cor-borda); }
+.modal-header h2 { font-size: 20px; font-weight: 600; }
+.close-modal-btn { background: none; border: none; font-size: 28px; color: var(--cor-texto-secundario); cursor: pointer; line-height: 1; }
+.modal-body { padding-top: 25px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-weight: 500; font-size: 14px; margin-bottom: 8px; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--cor-borda); border-radius: 6px; font-size: 15px; font-family: 'Poppins', sans-serif; transition: border-color 0.2s, box-shadow 0.2s; }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--cor-primaria); box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15); }
+.form-row { display: flex; gap: 20px; align-items: flex-start; }
+.form-row .form-group { flex: 1; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding-top: 15px; border-top: 1px solid var(--cor-borda); margin-top: 10px; }
+.btn-save { background-color: var(--cor-primaria); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+.btn-cancel { background-color: #e9ecef; color: var(--cor-texto-principal); border: 1px solid #ced4da; padding: 10px 20px; border-radius: 6px; cursor: pointer; }

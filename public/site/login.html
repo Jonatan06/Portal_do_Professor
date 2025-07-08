@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Portal do Professor</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+    <style>
+        body {
+        background-image: url("https://media.tenor.com/iJfEXPavA8AAAAAM/zesty-cat-niklas.gif");
+        background-color: #cccccc;
+        }
+    </style>
+<body>
+    <div class="login-container">
+        <div id="login-form" class="form-container">
+            <button type="button" class="btn-voltar" id="btn-voltar">‹ Voltar</button>
+            <h2>Login</h2>
+            <form id="form-login">
+                <div class="input-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" name="email" required>
+                </div>
+                <div class="input-group">
+                    <label for="login-senha">Senha</label>
+                    <input type="password" id="login-senha" name="senha" required>
+                </div>
+                <button type="submit">Entrar</button>
+            </form>
+            <p id="error-message" style="color: red;"></p>
+            <p>Não tem uma conta? <a href="/cadastro" id="show-cadastro">Cadastre-se</a></p>
+        </div>
+    </div>
+
+    <script>
+
+        document.getElementById('btn-voltar').addEventListener('click', () => {
+            history.back();
+        });
+
+        const formLogin = document.getElementById('form-login');
+        const errorMessage = document.getElementById('error-message');
+
+        formLogin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('login-email').value;
+            const senha = document.getElementById('login-senha').value;
+
+            errorMessage.textContent = '';
+
+            try {
+                const response = await fetch('/api/alunos/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, senha }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Salva os dados do aluno no localStorage
+                    localStorage.setItem('alunoLogado', JSON.stringify(data.aluno)); 
+                    
+                    alert('Login bem-sucedido!');
+                    window.location.href = '/'; // Redireciona para a home
+                } else {
+                    errorMessage.textContent = data.message || 'Ocorreu um erro no login.';
+                }
+
+            } catch (error) {
+                errorMessage.textContent = 'Erro de conexão. Tente novamente.';
+            }
+        });
+    </script>
+</body>
+</html>
