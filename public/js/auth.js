@@ -1,47 +1,41 @@
-// public/js/auth.js (VERSÃO CORRIGIDA E LIMPA)
+// public/js/auth.js (PARA O PAINEL DO PROFESSOR)
 
-document.addEventListener('DOMContentLoaded', () => {
-    const nav = document.querySelector('.main-nav');
-    const alunoLogado = getAlunoLogado(); // Usa a função abaixo
+// Pega o token do localStorage
+function getToken() {
+    return localStorage.getItem('authToken');
+}
 
-    if (alunoLogado && nav) {
-        // Encontra o link de login do aluno para substituí-lo
-        const loginLink = nav.querySelector('a[href="/login"]'); // Corrigido para /login.html
-        
-        if (loginLink) {
-            // Remove o link de login
-            loginLink.remove();
+// Remove o token para fazer logout e redireciona para o login do admin
+function logout() {
+    localStorage.removeItem('authToken');
+    // IMPORTANTE: Mude 'index.html' para a sua página de login do PROFESSOR se for diferente
+    window.location.href = '/admin/login.html'; 
+}
 
-            // Cria o texto de boas-vindas
-            const welcomeText = document.createElement('span');
-            welcomeText.className = 'nav-welcome';
-            welcomeText.textContent = `Olá, ${alunoLogado.nome.split(' ')[0]}!`; // Mostra só o primeiro nome
-
-            // Cria o link de logout
-            const logoutLink = document.createElement('a');
-            logoutLink.href = '#';
-            logoutLink.textContent = 'Sair';
-            logoutLink.className = 'btn-logout';
-            logoutLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                localStorage.removeItem('alunoLogado');
-                alert('Você foi desconectado.');
-                window.location.href = '/'; // Volta para a home
-            });
-
-            // Adiciona os novos elementos ao menu
-            nav.appendChild(welcomeText);
-            nav.appendChild(logoutLink);
-        }
-    }
-});
-
-function getAlunoLogado() {
-    try {
-        return JSON.parse(localStorage.getItem('alunoLogado'));
-    } catch (e) {
-        // Se houver erro ao parsear, remove o item inválido
-        localStorage.removeItem('alunoLogado');
-        return null;
+// Função para proteger uma página. Deve ser chamada no início de cada script de página protegida.
+function protectPage() {
+    const token = getToken();
+    if (!token) {
+        // Se não houver token, redireciona para a página de login do professor
+        alert("Acesso negado. Por favor, faça o login.");
+        window.location.href = '/admin/login.html'; // Mude se o nome da sua página for outro
     }
 }
+
+// Esta parte intercepta TODAS as chamadas `fetch` do seu painel de admin
+// e adiciona automaticamente o token de autenticação no cabeçalho.
+// Isso é essencial para que suas requisições à API sejam autorizadas.
+const originalFetch = window.fetch;
+window.fetch = function (url, options) {
+    const token = getToken();
+    
+    const newOptions = options ? { ...options } : {};
+    newOptions.headers = newOptions.headers || {};
+    
+    // Adiciona o token ao cabeçalho para todas as requisições da API
+    if (token && url.startsWith('/api/')) {
+        newOptions.headers['x-auth-token'] = token; // Ou 'Authorization': `Bearer ${token}`
+    }
+
+    return originalFetch(url, newOptions);
+};

@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Falha ao buscar perfil.');
             const profile = await response.json();
 
-            document.getElementById('profile-photo').src = profile.imagem_url || '/assets/default-avatar.png';
+            document.getElementById('profile-photo').src = profile.imagem_url || '/uploads/images/default-avatar.png';
             document.getElementById('profile-name').textContent = profile.nome || 'Nome do Professor';
             document.getElementById('profile-title').textContent = profile.cargo || 'Cargo';
             document.getElementById('profile-bio').textContent = profile.biografia || 'Bem-vindo ao meu espaço digital.';

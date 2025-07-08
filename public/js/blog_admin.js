@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderPostItem = (post) => {
         const postDate = new Date(post.data_publicacao).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
-        const imageUrl = post.imagem_url || '/assets/default-image.png';
+        const imageUrl = post.imagem_url || '/public/images/default-image.png';
         return `
             <div class="post-item" data-id="${post.id}">
                 <img src="${imageUrl}" alt="Imagem do post" class="post-item-image" onerror="this.style.display='none'">

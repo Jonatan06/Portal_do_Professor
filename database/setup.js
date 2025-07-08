@@ -65,7 +65,7 @@ async function setupDatabase() {
     // --- Outras Tabelas ---
     await db.schema.dropTableIfExists('perfil');
     await db.schema.createTable('perfil', table => { table.increments('id').primary(); table.string('nome'); table.string('cargo'); table.string('email'); table.text('biografia'); table.string('imagem_url'); table.string('linkedin_url'); table.string('github_url'); table.string('lattes_url'); table.string('website_url'); });
-    await db('perfil').insert({ id: 1, nome: 'Ridis Pereira Ribeiro', cargo: 'Professor', email: 'RidisPereiraRibeiro@gmail.com', imagem_url: '/assets/default-avatar.png' });
+    await db('perfil').insert({ id: 1, nome: 'Ridis Pereira Ribeiro', cargo: 'Professor', email: 'RidisPereiraRibeiro@gmail.com', imagem_url: '/uploads/images/default-avatar.png' });
     console.log('✅ Tabela "perfil" criada.');
     
     await db.schema.dropTableIfExists('projetos');

@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Falha ao buscar perfil.');
             const profile = await response.json();
             
-            document.getElementById('profile-photo-sobre').src = profile.imagem_url || '/assets/default-avatar.png';
+            document.getElementById('profile-photo-sobre').src = profile.imagem_url || '/uploads/images/default-avatar.png';
             document.getElementById('profile-name-sobre').textContent = profile.nome || 'Nome do Professor';
             document.getElementById('profile-title-sobre').textContent = profile.cargo || '';
             document.getElementById('profile-bio-sobre').textContent = profile.biografia || 'Bem-vindo ao meu espaço digital.';
