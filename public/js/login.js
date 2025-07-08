@@ -2,6 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('login.js: Script carregado.');
     const loginForm = document.getElementById('login-form');
     const errorMessage = document.getElementById('error-message');
+    
+            document.getElementById('btn-voltar').addEventListener('click', () => {
+            history.back();
+        });
 
     if (!loginForm) {
         return console.error('login.js: ERRO - Formulário #login-form não encontrado no HTML.');
@@ -39,5 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('login.js: Ocorreu um erro na tentativa de login:', error);
             errorMessage.textContent = error.message;
         }
+        
     });
 });

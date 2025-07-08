@@ -1,18 +1,22 @@
-/* public/css/login.css - Estilo profissional */
+/* =================================================================
+   ARQUIVO DE ESTILO UNIFICADO PARA LOGIN E CADASTRO
+   ================================================================= */
 
+/* --- Definição de Variáveis de Cor --- */
 :root {
-    --cor-primaria: #0d6efd;
-    --cor-fundo-promo: linear-gradient(45deg, #0d6efd, #0d47a1);
-    --cor-fundo-pagina: #f4f7fc;
+    --cor-primaria: #007bff;
+    --cor-primaria-escura: #0056b3;
+    --cor-fundo-pagina: #f0f2f5;
     --cor-fundo-card: #ffffff;
     --cor-texto-claro: #ffffff;
-    --cor-texto-escuro: #343a40;
+    --cor-texto-escuro: #333;
     --cor-texto-secundario: #6c757d;
     --cor-borda: #dee2e6;
     --cor-erro: #dc3545;
-    --sombra-card: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --sombra-card: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
+/* --- Reset Básico e Corpo da Página --- */
 * {
     margin: 0;
     padding: 0;
@@ -29,42 +33,55 @@ body {
     padding: 20px;
 }
 
+/* --- Estrutura Principal --- */
 .login-container {
     display: flex;
     width: 100%;
-    max-width: 900px;
-    min-height: 550px;
+    max-width: 900px; 
+    min-height: 580px;
     background-color: var(--cor-fundo-card);
-    border-radius: 15px;
+    border-radius: 24px;
     overflow: hidden;
     box-shadow: var(--sombra-card);
 }
 
-/* Painel da Esquerda (Promoção/Branding) */
+/* Painel da Esquerda (Branding) */
 .login-promo-panel {
     flex-basis: 45%;
-    background: var(--cor-fundo-promo);
+    background-color: var(--cor-primaria);
     color: var(--cor-texto-claro);
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 40px;
     text-align: center;
 }
-.promo-icon {
-    font-size: 60px;
-    margin-bottom: 20px;
+
+.promo-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
+
+.promo-icon {
+    font-size: 50px; 
+    margin-bottom: 20px;
+    padding: 20px;   
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
 .promo-content h1 {
-    font-size: 28px;
+    font-size: 28px; 
     font-weight: 700;
     margin-bottom: 15px;
 }
+
 .promo-content p {
-    font-size: 16px;
+    font-size: 16px; 
     line-height: 1.6;
     opacity: 0.9;
+    max-width: 300px;
 }
 
 /* Painel da Direita (Formulário) */
@@ -73,29 +90,33 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 40px;
+    padding: 40px 50px;
 }
 
 .form-wrapper {
     width: 100%;
-    max-width: 350px;
+    max-width: 360px; 
+    text-align: center;
 }
 
 .form-wrapper h2 {
-    font-size: 26px;
+    font-size: 30px;
     font-weight: 600;
     color: var(--cor-texto-escuro);
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
+
 .form-wrapper .subtitle {
     font-size: 15px;
     color: var(--cor-texto-secundario);
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .input-group {
-    margin-bottom: 20px;
+    margin-bottom: 20px; 
+    text-align: left;
 }
+
 .input-group label {
     display: block;
     font-size: 14px;
@@ -107,35 +128,38 @@ body {
 .input-field {
     position: relative;
 }
+
 .input-field i {
     position: absolute;
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--cor-texto-secundario);
+    font-size: 16px;
 }
+
 .input-field input {
     width: 100%;
-    padding: 12px 15px 12px 40px; /* Espaço para o ícone */
+    padding: 13px 15px 13px 45px;
     border: 1px solid var(--cor-borda);
     border-radius: 8px;
     font-size: 15px;
     font-family: 'Poppins', sans-serif;
     transition: all 0.2s ease-in-out;
 }
+
 .input-field input:focus {
     outline: none;
     border-color: var(--cor-primaria);
-    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
 }
 
 .login-button {
     display: block;
     width: 100%;
-    margin-top: 30px;
     padding: 14px;
     border: none;
-    border-radius: 8px; 
+    border-radius: 8px;
     background-color: var(--cor-primaria);
     color: var(--cor-texto-claro);
     font-size: 16px;
@@ -144,31 +168,79 @@ body {
     transition: all 0.3s ease;
 }
 .login-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(13, 110, 253, 0.3);
-}
-.login-button:active {
-    transform: translateY(-1px);
+    background-color: var(--cor-primaria-escura);
 }
 
 .error-message {
     color: var(--cor-erro);
     text-align: center;
-    margin-top: 15px;
+    margin-top: 10px;
     font-size: 14px;
-    min-height: 20px; /* Garante que o layout não pule quando a mensagem aparece */
+    min-height: 20px; 
 }
 
-/* Responsividade para telas menores */
-@media (max-width: 768px) {
-    .login-container {
-        flex-direction: column;
-        min-height: auto;
-    }
+
+/* --- ESTILOS GERAIS PARA LINKS INFERIORES --- */
+
+.signup-link {
+    font-size: 14px; 
+    color: var(--cor-texto-secundario);
+    margin-top: 15px;
+    margin-bottom: 8px;
+}
+
+.signup-link a {
+    color: var(--cor-primaria);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+.btn-voltar {
+    background: none;
+    border: none;
+    color: var(--cor-texto-secundario);
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px; 
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.2s;
+    display: inline-block;
+    margin-top: 15px; /* <--- CORREÇÃO AQUI: Espaçamento padrão restaurado */
+}
+
+.btn-voltar:hover {
+    color: var(--cor-primaria);
+}
+
+
+/* --- AJUSTES ESPECÍFICOS PARA A PÁGINA DO ALUNO --- */
+/* Estas regras sobrescrevem as padrões quando a classe .aluno-login-page está presente no body */
+
+.aluno-login-page .signup-link {
+    margin-top: 12px;
+    margin-bottom: 5px;
+}
+
+/* Zera a margem superior padrão do botão Voltar na página do aluno */
+.aluno-login-page .btn-voltar {
+    margin-top: 0;
+}
+
+
+/* --- Responsividade --- */
+@media (max-width: 850px) {
     .login-promo-panel {
-        display: none; /* Em telas muito pequenas, escondemos o painel de promoção */
+        display: none; 
     }
     .login-form-panel {
-        padding: 30px;
+        flex-basis: 100%;
+    }
+    .login-container {
+        max-width: 450px;
+        min-height: auto;
     }
 }
