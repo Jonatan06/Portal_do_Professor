@@ -295,10 +295,6 @@ app.delete('/api/posts/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ message: "Erro ao apagar post." }); }
 });
 
-// =======================================================
-// ||           COLE ESTE CÓDIGO NO SEU SERVER.JS         ||
-// =======================================================
-
 // API: PEGAR UM POST ESPECÍFICO PELO ID
 app.get('/api/posts/:id', async (req, res) => {
     try {
