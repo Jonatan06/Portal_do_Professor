@@ -47,10 +47,6 @@ body {
     /* ANIMAÇÃO RESTAURADA */
     transition: transform 0.3s ease-out;
 }
-/* ANIMAÇÃO RESTAURADA */
-.login-container:hover {
-    transform: translateY(-5px);
-}
 
 /* --- Painel da Esquerda (Branding) --- */
 .login-promo-panel {
@@ -266,7 +262,7 @@ body {
 .btn-voltar {
     background: none;
     border: none;
-    color: var(--cor-texto-secundario);
+    color: var(--cor-primaria);
     font-family: 'Poppins', sans-serif;
     font-size: 16px;
     cursor: pointer;
@@ -277,8 +273,8 @@ body {
 }
 /* ANIMAÇÃO RESTAURADA */
 .btn-voltar:hover {
-    color: var(--cor-primaria);
-    transform: translateX(-5px);
+    text-decoration: underline;
+    color: var(--cor-primaria-escura);
 }
 
 /* Barra de Força da Senha */
@@ -334,7 +330,7 @@ body {
 /* --- ESTILOS ESPECÍFICOS PARA PÁGINA DE CADASTRO --- */
 /* (mantidos para consistência) */
 
-.cadastro-page .login-form-panel { padding: 30px 40px; }
+.cadastro-page .login-form-panel { padding: 3px 40px; }
 .cadastro-page .form-wrapper h2 { margin-bottom: 5px; }
 .cadastro-page .form-wrapper .subtitle { font-size: 15px; margin-bottom: 20px; }
 .cadastro-page .input-group { margin-bottom: 12px; }
