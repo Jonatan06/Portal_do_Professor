@@ -77,10 +77,51 @@ $ npm run dev
 
 ## 👥 Autores
 
-| [<img src="https://avatars.githubusercontent.com/u/SEU_USER_ID_AQUI?v=4" width=115><br><sub>Jonatan T.I</sub>](https://github.com/jonatan06) | [<img src="https://avatars.githubusercontent.com/u/SEU_USER_ID_AQUI?v=4" width=115><br><sub>Matheus de Oliveira</sub>](https://github.com/matheus4oliveira) |
-| :---: | :---: |
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Jonatan06">
+        <img src="https://github.com/Jonatan06.png?size=115" width="115px;" alt="Foto do Jonatan no GitHub"/><br>
+        <sub>
+          <b>Jonatan06</b>
+        </sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Mariajuliasants">
+        <img src="https://github.com/Mariajuliasants.png?size=115" width="115px;" alt="Foto da Maria Júlia Santos no GitHub"/><br>
+        <sub>
+          <b>Maria Júlia Santos</b>
+        </sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/matheusarruda001">
+        <img src="https://github.com/matheusarruda001.png?size=115" width="115px;" alt="Foto do Matheus Arruda no GitHub"/><br>
+        <sub>
+          <b>Matheus Arruda</b>
+        </sub>
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/matheus0liveir4">
+        <img src="https://github.com/matheus0liveir4.png?size=115" width="115px;" alt="Foto do Matheus de Oliveira no GitHub"/><br>
+        <sub>
+          <b>Matheus de Oliveira</b>
+        </sub>
+      </a>
+    </td>
+    <td align="center">
+      </td>
+     <td align="center">
+      </td>
+  </tr>
+</table>
 
 <br>
-Projeto desenvolvido como parte de trabalho acadêmico
+Projeto desenvolvido como parte de um trabalho acadêmico
 
 ---
+
