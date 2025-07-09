@@ -88,7 +88,7 @@ $ npm run dev
       <a href="https://github.com/Jonatan06">
         <img src="https://github.com/Jonatan06.png?size=115" width="115px;" alt="Foto do Jonatan no GitHub"/><br>
         <sub>
-          <b>Jonatan06</b>
+          <b>Jonatan Souza</b>
         </sub>
       </a>
     </td>
