@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Professor - Perfil</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/perfil.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-user-tie"></i>
+            <h1>Painel do Professor</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="dashboard.html"><i class="fas fa-home nav-icon"></i> <span>Dashboard</span></a></li>
+                <li><a href="perfil.html" class="active"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
+                <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
+                <li><a href="materiais.html"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
+                <li><a href="agenda.html"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
+                <li><a href="portfolio.html"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
+                <li><a href="contato.html"><i class="fas fa-envelope nav-icon"></i> <span>Contatos</span></a></li>
+                <li><a href="sobre.html"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
+            </ul>
+        </nav>
+        <a href="/" target="_blank" class="sidebar-view-public-btn">Ver Site Público</a>
+    </aside>
+
+    <div class="main-content-wrapper">
+        <header class="main-header">
+             <div class="header-greeting">
+                <h1>Meu Perfil</h1>
+                <p>Visualize e edite suas informações pessoais e profissionais.</p>
+            </div>
+            <div class="header-actions">
+                <a href="dashboard.html" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+                <a href="https://ribeiro.pro.br/moodle/" target="_blank" class="btn btn-moodle">
+                    <i class="fa-solid fa-graduation-cap"></i> Moodle
+                </a>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div class="profile-card">
+                <form id="profile-form">
+                    <div class="card-header">
+                        <h2>Informações do Perfil</h2>
+                        <button type="button" class="btn btn-primary edit-button" id="toggleEditButton">
+                            <i class="fa-solid fa-pencil"></i> Editar Perfil
+                        </button>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="profile-left">
+                            <div class="profile-picture-container">
+                                <div class="profile-picture">
+                                    <img src="/uploads/images/default-avatar.png" alt="Foto de Perfil" id="profile-image-preview">
+                                </div>
+                                <input type="file" id="profile-picture-input" name="profilePicture" accept="image/png, image/jpeg, image/gif" hidden>
+                                <button type="button" class="btn-change-picture" id="change-picture-button" title="Alterar foto de perfil">
+                                    <i class="fa-solid fa-camera"></i>
+                                </button>
+                                <button type="button" class="btn btn-save-picture" id="save-picture-button">Salvar Foto</button>
+                            </div>
+                            <section class="contact-info">
+                                <h3>Mini-Biografia</h3>
+                                <div class="form-group">
+                                    <textarea id="bio" name="bio" class="profile-input" placeholder="Escreva uma breve biografia..." disabled></textarea>
+                                </div>
+                            </section>
+                        </div>
+
+                        <div class="profile-right">
+                            <section class="basic-info">
+                                <h3>Informações Básicas</h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="nome">Nome Completo</label>
+                                        <input type="text" id="nome" name="nome" class="profile-input" disabled>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cargo">Título / Cargo</label>
+                                        <input type="text" id="cargo" name="cargo" class="profile-input" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email de Contato</label>
+                                    <input type="email" id="email" name="email" class="profile-input" disabled>
+                                </div>
+                            </section>
+
+                            <section class="social-media">
+                                <h3>Redes Sociais e Links</h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="linkedin1">LinkedIn</label>
+                                        <div class="input-with-icon">
+                                            <i class="fab fa-linkedin"></i>
+                                            <input type="url" id="linkedin1" name="linkedin_url" class="profile-input" placeholder="https://linkedin.com/in/..." disabled>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="github">Github</label>
+                                        <div class="input-with-icon">
+                                            <i class="fab fa-github"></i>
+                                            <input type="url" id="github" name="github_url" class="profile-input" placeholder="https://github.com/..." disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="lattes">Lattes</label>
+                                        <div class="input-with-icon">
+                                            <i class="fas fa-graduation-cap"></i>
+                                            <input type="url" id="lattes" name="lattes_url" class="profile-input" placeholder="http://lattes.cnpq.br/..." disabled>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="website">Website</label>
+                                        <div class="input-with-icon">
+                                            <i class="fas fa-globe"></i>
+                                            <input type="url" id="website" name="website_url" class="profile-input" placeholder="https://seu-site.com" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/perfil.js"></script>
+</body>
+</html>

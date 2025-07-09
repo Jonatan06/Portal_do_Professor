@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Professor - Agenda</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/agenda.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/layout.css"> 
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-user-tie"></i>
+                <h1>Painel do Professor</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-home nav-icon"></i> <span>Dashboard</span></a></li>
+                    <li><a href="perfil.html"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
+                    <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
+                    <li><a href="materiais.html"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
+                    <li><a href="agenda.html" class="active"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
+                    <li><a href="portfolio.html"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
+                    <li><a href="contato.html"><i class="fas fa-envelope nav-icon"></i> <span>Contatos</span></a></li>
+                    <li><a href="sobre.html"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
+                </ul>
+            </nav>
+            <a href="/" target="_blank" class="sidebar-view-public-btn">Ver Site Público</a>
+        </aside>
+
+        <div class="content-wrapper">
+            <main class="main-content">
+                <header class="main-header">
+                    <div class="header-greeting">
+                        <h2><i class='bx bxs-calendar'></i> Agenda do Professor</h2>
+                        <p>Visualize e gerencie seus compromissos.</p>
+                    </div>
+                    <div class="calendar-navigation">
+                        <button id="prev-month-btn" class="nav-btn"><i class='bx bx-chevron-left'></i></button>
+                        <div class="month-display" id="month-year-display"></div>
+                        <button id="next-month-btn" class="nav-btn"><i class='bx bx-chevron-right'></i></button>
+                    </div>
+                </header>
+
+                <div class="calendar-container">
+                    <div class="calendar-grid">
+                        <div class="day-header">DOM</div>
+                        <div class="day-header">SEG</div>
+                        <div class="day-header">TER</div>
+                        <div class="day-header">QUA</div>
+                        <div class="day-header">QUI</div>
+                        <div class="day-header">SEX</div>
+                        <div class="day-header">SÁB</div>
+                    </div>
+                    <div class="calendar-body" id="calendar-body"></div>
+                </div>
+            </main>
+
+            <aside class="events-sidebar">
+                <div class="events-header">
+                    <h3>Eventos do Mês</h3>
+                    <button class="btn btn-primary btn-add-event" id="add-event-sidebar-btn">
+                        <i class='bx bx-plus'></i> Adicionar
+                    </button>
+                </div>
+                <div class="events-list" id="events-list-container">
+                    <div class="no-events-placeholder">
+                        <i class='bx bx-calendar-x'></i>
+                        <span>Nenhum evento neste mês.</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+    
+    <div class="modal-overlay hidden" id="event-modal">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2 id="modal-title">Adicionar Evento</h2>
+                <button class="close-modal-btn" title="Fechar">×</button>
+            </header>
+            <form id="event-form">
+                <input type="hidden" id="event-id">
+                <div class="form-group"><label for="event-title">Título do Evento</label><input type="text" id="event-title" placeholder="Ex: Reunião Pedagógica" required></div>
+                <div class="form-group"><label for="event-date">Data</label><input type="date" id="event-date" required></div>
+                <div class="form-group">
+                    <label for="event-type">Tipo de Evento</label>
+                    <select id="event-type">
+                        <option value="reuniao">Reunião</option>
+                        <option value="prazo">Prazo de Entrega</option>
+                        <option value="aula">Aula Especial</option>
+                        <option value="pessoal">Pessoal</option>
+                    </select>
+                </div>
+                <footer class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="delete-event-btn" style="display: none; margin-right: auto;">Apagar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+    
+    <script src="/js/auth.js"></script>
+    <script src="/js/agenda.js"></script>
+</body>
+</html>

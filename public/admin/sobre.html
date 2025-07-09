@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre Mim - Portal do Professor</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/sobre.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-user-tie"></i>
+            <h1>Painel do Professor</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="dashboard.html"><i class="fas fa-home nav-icon"></i> <span>Dashboard</span></a></li>
+                <li><a href="perfil.html"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
+                <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
+                <li><a href="materiais.html"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
+                <li><a href="agenda.html"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
+                <li><a href="portfolio.html"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
+                <li><a href="contato.html"><i class="fas fa-envelope nav-icon"></i> <span>Contatos</span></a></li>
+                <li><a href="sobre.html" class="active"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
+            </ul>
+        </nav>
+        <a href="/" target="_blank" class="sidebar-view-public-btn">Ver Site Público</a>
+    </aside>
+
+    <main class="main-content-wrapper">
+        <div class="page-header">
+            <div class="header-content">
+                <h1><i class="fas fa-info-circle"></i> Sobre o Professor</h1>
+                <p>Informações, biografia, projetos e áreas de interesse.</p>
+            </div>
+            <a href="dashboard.html" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+            </a>
+        </div>
+
+        <div class="portfolio-layout">
+            <aside class="profile-nav-summary">
+                <ul>
+                    <li><a href="#perfil"><i class="fa-solid fa-user"></i> Sobre Mim</a></li>
+                    <li><a href="#formacao"><i class="fa-solid fa-graduation-cap"></i> Formação</a></li>
+                    <li><a href="#pesquisa"><i class="fa-solid fa-flask"></i> Projetos de Pesquisa</a></li>
+                    <li><a href="#ensino"><i class="fa-solid fa-chalkboard-teacher"></i> Projetos de Ensino</a></li>
+                    <li><a href="#extensao"><i class="fa-solid fa-hands-helping"></i> Projetos de Extensão</a></li>
+                    <li><a href="#interesses"><i class="fa-solid fa-star"></i> Áreas de Interesse</a></li>
+                </ul>
+            </aside>
+
+            <div class="portfolio-content">
+                <section id="perfil" class="profile-header">
+                    <img id="profile-photo-sobre" src="/uploads/images/default-avatar.png" alt="Foto do Professor" class="profile-photo">
+                    <h1 id="profile-name-sobre">Carregando...</h1>
+                    <h2 id="profile-title-sobre"></h2>
+                    <p id="profile-bio-sobre" class="profile-bio">
+                        Buscando informações do perfil...
+                    </p>
+                </section>
+
+                <section class="content-section" id="formacao">
+                    <h2 class="section-title"><i class="fa-solid fa-graduation-cap"></i>Formação Acadêmica</h2>
+                    <div class="info-block">
+                        <h3>Doutorado em Educação</h3>
+                        <h4>Universidade Federal de Exemplo (UFE), 2018 - 2022</h4>
+                    </div>
+                    <div class="info-block">
+                        <h3>Mestrado em Tecnologias da Informação</h3>
+                        <h4>Instituto de Tecnologia Avançada (ITA), 2016 - 2018</h4>
+                    </div>
+                </section>
+                
+                <section class="content-section project-section" id="pesquisa">
+                    <h2 class="section-title"><i class="fa-solid fa-flask"></i> Projetos de Pesquisa</h2>
+                </section>
+                
+                <section class="content-section project-section" id="ensino">
+                    <h2 class="section-title"><i class="fa-solid fa-chalkboard-teacher"></i> Projetos de Ensino</h2>
+                </section>
+
+                <section class="content-section project-section" id="extensao">
+                    <h2 class="section-title"><i class="fa-solid fa-hands-helping"></i> Projetos de Extensão</h2>
+                </section>
+
+                <section class="content-section" id="interesses">
+                    <h2 class="section-title"><i class="fa-solid fa-star"></i>Áreas de Interesse</h2>
+                    <ul class="interest-list">
+                        <li>Metodologias Ativas de Aprendizagem</li>
+                        <li>Tecnologias Educacionais Emergentes</li>
+                        <li>Design Instrucional para EAD</li>
+                        <li>Gamificação na Educação</li>
+                        <li>Avaliação Formativa</li>
+                        <li>Inclusão Digital</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/sobre.js"></script>
+</body>
+</html>
