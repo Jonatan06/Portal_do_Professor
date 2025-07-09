@@ -1,4 +1,5 @@
 const db = require('./db');
+const bcrypt = require('bcrypt');
 
 async function setupDatabase() {
   console.log('Iniciando a configuração completa do banco de dados...');
@@ -64,9 +65,12 @@ async function setupDatabase() {
 
     // --- Outras Tabelas ---
     await db.schema.dropTableIfExists('perfil');
-    await db.schema.createTable('perfil', table => { table.increments('id').primary(); table.string('nome'); table.string('cargo'); table.string('email'); table.text('biografia'); table.string('imagem_url'); table.string('linkedin_url'); table.string('github_url'); table.string('lattes_url'); table.string('website_url'); });
-    await db('perfil').insert({ id: 1, nome: 'Ridis Pereira Ribeiro', cargo: 'Professor', email: 'RidisPereiraRibeiro@gmail.com', imagem_url: '/uploads/images/default-avatar.png' });
+    await db.schema.createTable('perfil', table => { table.increments('id').primary(); table.string('nome'); table.string('cargo'); table.string('email').notNullable().unique(); table.string('senha').notNullable(); table.text('biografia'); table.string('imagem_url'); table.string('linkedin_url'); table.string('github_url'); table.string('lattes_url'); table.string('website_url'); });
+    const salt = await bcrypt.genSalt(10);
+    const senhaHashProfessor = await bcrypt.hash('123', salt);
+    await db('perfil').insert({ id: 1, nome: 'Ridis Pereira Ribeiro', cargo: 'Professor', email: 'professor@email.com', senha: senhaHashProfessor, imagem_url: '/uploads/images/default-avatar.png' });
     console.log('✅ Tabela "perfil" criada.');
+
     
     await db.schema.dropTableIfExists('projetos');
     await db.schema.createTable('projetos', table => { table.increments('id').primary(); table.string('titulo').notNullable(); table.text('descricao').notNullable(); table.string('categoria').notNullable(); table.string('status').notNullable(); table.string('periodo').notNullable(); table.string('tags'); table.string('link_externo'); });

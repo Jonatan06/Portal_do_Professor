@@ -11,6 +11,8 @@ const fs = require('fs');
 const db = require('./database/db'); // Conexão Knex com o banco de dados
 const multer = require('multer');   // Middleware para upload de arquivos
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken'); // <-- IMPORTE O JWT AQUI
+const JWT_SECRET = 'R!d1sRIbeir0';
 
 // --- 2. VERIFICAÇÃO INICIAL DO BANCO DE DADOS ---
 const dbPath = path.resolve(__dirname, 'database/portal.db');
@@ -131,11 +133,40 @@ app.post('/api/alunos/login', async (req, res) => {
 });
 
 // API: LOGIN
-app.post('/api/auth/login', (req, res) => {
-    if (req.body.email === 'professor@email.com' && req.body.senha === '123') {
-        res.json({ success: true, token: 'fake-jwt-token-for-final-test' });
-    } else {
-        res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
+app.post('/api/auth/login', async (req, res) => {
+    const { email, senha } = req.body;
+
+    if (!email || !senha) {
+        return res.status(400).json({ success: false, message: 'Email e senha são obrigatórios.' });
+    }
+
+    try {
+        const professor = await db('perfil').where({ email }).first();
+
+        // Se não encontrou o professor, retorna erro
+        if (!professor) {
+            return res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
+        }
+
+        // Compara a senha enviada com a senha criptografada no banco
+        const senhaCorreta = await bcrypt.compare(senha, professor.senha);
+
+        // Se a senha estiver incorreta, retorna erro
+        if (!senhaCorreta) {
+            return res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
+        }
+
+        const token = jwt.sign(
+            { id: professor.id, role: 'professor' }, 
+            JWT_SECRET,
+            { expiresIn: '8h' }                       // Tempo de expiração do token
+        );
+
+        res.json({ success: true, token: token });
+
+    } catch (err) {
+        console.error("Erro no login do professor:", err);
+        res.status(500).json({ success: false, message: 'Erro interno no servidor.' });
     }
 });
 
