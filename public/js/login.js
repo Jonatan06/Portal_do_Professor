@@ -45,32 +45,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
     });
-
-    // --- Lógica para Mostrar/Esconder Senha (Login do Professor) ---
-    const togglePassword = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('senha');
-
-    if (togglePassword && passwordInput) {
-        // Evento para mostrar/esconder o ícone baseado na digitação
-        passwordInput.addEventListener('input', () => {
-            if (passwordInput.value.length > 0) {
-                togglePassword.classList.add('show-password-toggle');
-            } else {
-                togglePassword.classList.remove('show-password-toggle');
-            }
-        });
-
-        // Evento para alternar a visibilidade da senha no clique
-        togglePassword.addEventListener('click', function () {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.classList.toggle('fa-eye');
-            this.classList.toggle('fa-eye-slash');
-        });
-
-        // Garante que o ícone esteja visível se o campo já tiver conteúdo ao carregar a página
-        if (passwordInput.value.length > 0) {
-            togglePassword.classList.add('show-password-toggle');
-        }
-    }
 });
