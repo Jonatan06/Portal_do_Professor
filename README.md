@@ -1,14 +1,16 @@
 # Portal do Professor 🎓
 
-![Capa do Projeto](https://i.imgur.com/your-image-here.png)  <p align="center">
+![Capa do Projeto](https://raw.githubusercontent.com/jonatan06/Portal_do_Professor/main/docs/images/dashboard-screenshot.png)
+
+<p align="center">
   Um portal acadêmico completo para gestão de conteúdo por parte do professor e acesso facilitado para os alunos.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/node-18.x-green.svg" alt="Node.js">
-  <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
-  <img src="https://img.shields.io/github/last-commit/jonatan06/Portal_do_Professor" alt="Last Commit">
-  <img src="https://img.shields.io/github/contributors/jonatan06/Portal_do_Professor" alt="Contributors">
+  <img src="https://img.shields.io/badge/status-em%20desenvolvimento-yellow" alt="Status do Projeto">
+  <img src="https://img.shields.io/badge/node.js-18.x-green" alt="Node.js">
+  <img src="https://img.shields.io/badge/backend-Express.js-blue" alt="Backend com Express.js">
+  <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="License">
 </p>
 
 ---
@@ -95,6 +97,8 @@ $ npm run dev
         </sub>
       </a>
     </td>
+  </tr>
+  <tr>
     <td align="center">
       <a href="https://github.com/matheusarruda001">
         <img src="https://github.com/matheusarruda001.png?size=115" width="115px;" alt="Foto do Matheus Arruda no GitHub"/><br>
@@ -103,8 +107,6 @@ $ npm run dev
         </sub>
       </a>
     </td>
-  </tr>
-  <tr>
     <td align="center">
       <a href="https://github.com/matheus0liveir4">
         <img src="https://github.com/matheus0liveir4.png?size=115" width="115px;" alt="Foto do Matheus de Oliveira no GitHub"/><br>
@@ -113,15 +115,14 @@ $ npm run dev
         </sub>
       </a>
     </td>
-    <td align="center">
-      </td>
-     <td align="center">
-      </td>
   </tr>
 </table>
 
 <br>
-Projeto desenvolvido como parte de um trabalho acadêmico
+Projeto desenvolvido como parte de um trabalho acadêmico da faculdade.
 
 ---
 
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE.md) para mais detalhes.
