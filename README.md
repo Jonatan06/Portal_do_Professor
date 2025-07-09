@@ -1,6 +1,6 @@
 # Portal do Professor 🎓
 
-![Capa do Projeto](https://raw.githubusercontent.com/jonatan06/Portal_do_Professor/main/docs/images/dashboard-screenshot.png)
+
 
 <p align="center">
   Um portal acadêmico completo para gestão de conteúdo por parte do professor e acesso facilitado para os alunos.
@@ -122,10 +122,8 @@ $ npm run dev
 </table>
 
 <br>
-Projeto desenvolvido como parte de um trabalho acadêmico da faculdade.
+Projeto desenvolvido como parte de um trabalho acadêmico de um curso técnico.
 
 ---
 
-## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE.md) para mais detalhes.
