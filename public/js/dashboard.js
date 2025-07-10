@@ -29,10 +29,10 @@ async function loadRecentActivity() {
 
     // Objeto de configuração para facilitar a renderização
     const activityConfig = {
-        post: { icon: 'fas fa-blog', color: 'icon-purple', text: (title) => `Novo post "${truncate(title)}" foi criado.` },
-        material: { icon: 'fas fa-folder', color: 'icon-orange', text: (title) => `Novo material "${truncate(title)}" foi adicionado.` },
-        evento: { icon: 'fas fa-calendar-alt', color: 'icon-blue', text: (title) => `Novo evento "${truncate(title)}" agendado.` },
-        projeto: { icon: 'fas fa-briefcase', color: 'icon-green', text: (title) => `Novo projeto "${truncate(title)}" foi adicionado.` }
+        post: { icon: 'fas fa-blog', color: 'icon-purple', link: 'blog_admin.html', text: (title) => `Novo post "${truncate(title)}" foi criado.` },
+        material: { icon: 'fas fa-folder', color: 'icon-orange', link: 'materiais.html', text: (title) => `Novo material "${truncate(title)}" foi adicionado.` },
+        evento: { icon: 'fas fa-calendar-alt', color: 'icon-blue', link: 'agenda.html', text: (title) => `Novo evento "${truncate(title)}" agendado.` },
+        projeto: { icon: 'fas fa-briefcase', color: 'icon-green', link: 'portfolio.html', text: (title) => `Novo projeto "${truncate(title)}" foi adicionado.` }
     };
 
     // Função auxiliar para cortar textos longos
@@ -57,12 +57,12 @@ async function loadRecentActivity() {
             if (!config) return; // Ignora tipos de atividade desconhecidos
 
             const itemHTML = `
-                <div class="activity-item">
+                <a href="${config.link}" class="activity-item">
                     <div class="activity-icon-wrapper ${config.color}">
                         <i class="fas ${config.icon}"></i>
                     </div>
                     <p>${config.text(activity.title)}</p>
-                </div>`;
+                </a>`;
             activityList.insertAdjacentHTML('beforeend', itemHTML);
         });
 
