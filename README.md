@@ -83,6 +83,18 @@ $ npm run dev
 ## 👥 Autores
 
 <table>
+
+<tr>
+    <td align="center">
+      <a href="https://github.com/Gustavo121428">
+        <img src="https://github.com/Gustavo121428.png?size=115" width="115px;" alt="Foto de Gustavo no GitHub"/><br>
+        <sub>
+          <b>Gustavo</b>
+        </sub>
+      </a>
+    </td>
+
+  
   <tr>
     <td align="center">
       <a href="https://github.com/Jonatan06">
