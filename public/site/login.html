@@ -85,13 +85,14 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    localStorage.setItem('alunoAuthToken', data.token); 
                     localStorage.setItem('alunoLogado', JSON.stringify(data.aluno)); 
+                    
                     alert('Login bem-sucedido!');
-                    window.location.href = '/'; 
+                    window.location.href = '/'; // Redireciona para a home ou outra página
                 } else {
                     errorMessage.textContent = data.message || 'Ocorreu um erro no login.';
                 }
-
             } catch (error) {
                 errorMessage.textContent = 'Erro de conexão. Tente novamente.';
             }

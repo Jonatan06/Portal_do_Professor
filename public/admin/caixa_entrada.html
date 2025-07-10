@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caixa de Entrada - Painel do Professor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/caixa_entrada.css">
+</head>
+<body>
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-user-tie"></i>
+                <h1>Painel do Professor</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-home nav-icon"></i> <span>Dashboard</span></a></li>
+                    <li><a href="perfil.html"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
+                    <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
+                    <li><a href="materiais.html"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
+                    <li><a href="agenda.html"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
+                    <li><a href="portfolio.html"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
+                    <li><a href="caixa_entrada.html" class="active"><i class="fas fa-envelope nav-icon"></i> <span>Contatos</span></a></li>
+                    <li><a href="sobre.html"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
+                </ul>
+            </nav>
+            <a href="/" target="_blank" class="sidebar-view-public-btn">Ver Site Público</a>
+        </aside>
+
+        <!-- ======================= Conteúdo Principal ======================= -->
+        <div class="main-wrapper">
+            <header class="main-header">
+                <h1 class="page-title">
+                    <i class="fas fa-inbox"></i>
+                    <span>Caixa de Entrada</span>
+                </h1>
+                <div class="header-actions">
+                    <span class="user-info">Professor</span>
+                    <a href="#" class="btn btn-secondary">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </a>
+                </div>
+            </header>
+
+            <main class="main-content">
+                <div class="inbox-layout">
+                    <!-- Lista de Mensagens -->
+                    <div class="message-list">
+                        <div class="list-header">
+                            <input type="text" id="search-input" placeholder="Buscar mensagens...">
+                        </div>
+                        <div class="list-body" id="message-list-body">
+                            <!-- Mensagens serão injetadas aqui pelo JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- Visualização da Mensagem -->
+                    <div class="message-view hidden" id="message-view-container">
+                        <div class="view-header">
+                            <div class="sender-details">
+                                <h3 id="message-subject"></h3>
+                                <p id="message-sender-details"></p>
+                            </div>
+                            <div class="view-actions">
+                                <button title="Responder" id="reply-btn"><i class="fas fa-reply"></i></button>
+                                <button title="Apagar" id="delete-btn"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="view-body" id="message-body-content">
+                            <!-- Conteúdo da mensagem injetado aqui -->
+                        </div>
+                        <div class="view-footer">
+                            <textarea id="reply-textarea" placeholder="Clique aqui para responder..."></textarea>
+                            <button class="btn btn-primary" id="send-reply-btn"><i class="fas fa-paper-plane"></i> Enviar</button>
+                        </div>
+                    </div>
+                    <!-- Placeholder para quando não há mensagens -->
+                     <div class="message-view-placeholder" id="placeholder-container">
+                        <i class="fas fa-envelope-open-text"></i>
+                        <p>Selecione uma mensagem para ler.</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    
+    <script src="/js/auth.js"></script>
+    <script src="/js/caixa_entrada.js"></script>
+</body>
+</html>
