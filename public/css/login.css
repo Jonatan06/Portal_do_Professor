@@ -191,6 +191,13 @@ body {
     color: var(--cor-primaria);
 }
 
+.forget{
+    text-decoration: none;
+    color: #007bff;
+
+}
+
+
 /* --- FIM DOS ESTILOS CORRIGIDOS --- */
 
 .login-button {
