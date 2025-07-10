@@ -65,10 +65,10 @@
 .activity-icon-wrapper { width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; }
 .activity-icon-wrapper i { font-size: 16px; }
 .activity-item p { margin: 0; color: #34495e; font-size: 14px; }
-.icon-green { background-color: #2ecc71; }
-.icon-blue { background-color: #3498db; }
-.icon-orange { background-color: #f39c12; }
-.icon-purple { background-color: #9b59b6; }
+.icon-green { background: linear-gradient(45deg, #27ae60, #2ecc71); }
+.icon-blue { background: linear-gradient(45deg, #2980b9, #3498db);; }
+.icon-orange { background: linear-gradient(45deg, #d35400, #e67e22); }
+.icon-purple { background: linear-gradient(45deg, #8e44ad, #9b59b6);; }
 
 /* Próximos Eventos */
 #events-list { display: flex; flex-direction: column; gap: 15px; }

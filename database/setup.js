@@ -73,9 +73,9 @@ async function setupDatabase() {
 
     
     await db.schema.dropTableIfExists('projetos');
-    await db.schema.createTable('projetos', table => { table.increments('id').primary(); table.string('titulo').notNullable(); table.text('descricao').notNullable(); table.string('categoria').notNullable(); table.string('status').notNullable(); table.string('periodo').notNullable(); table.string('tags'); table.string('link_externo'); });
-    await db('projetos').insert([ { titulo: 'Metodologias Ativas', descricao: 'Investigação sobre a eficácia das metodologias.', categoria: 'pesquisa', status: 'concluido', periodo: '2022-2024' } ]);
-    console.log('✅ Tabela "projetos" criada.');
+    await db.schema.createTable('projetos', table => { table.increments('id').primary(); table.string('titulo').notNullable(); table.text('descricao').notNullable(); table.string('categoria').notNullable(); table.string('status').notNullable(); table.string('periodo').notNullable(); table.string('tags'); table.string('link_externo'); table.timestamp('data_criacao').defaultTo(db.fn.now());});
+    await db('projetos').insert([ { titulo: 'Metodologias Ativas', descricao: 'Investigação sobre a eficácia das metodologias.', categoria: 'pesquisa', status: 'concluido', periodo: '2022-2024' }]);
+    console.log('✅ Tabela "projetos" criada.');console.log('✅ Tabela "projetos" criada.');
 
     await db.schema.dropTableIfExists('eventos');
     await db.schema.createTable('eventos', table => { table.increments('id').primary(); table.string('title').notNullable(); table.string('date').notNullable(); table.string('type').notNullable(); });

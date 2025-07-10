@@ -21,28 +21,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function loadRecentActivity() {
-        const activities = [
-            { icon: 'fa-plus-circle', color: 'icon-green', text: 'Novo projeto "Metodologias Ativas" foi adicionado.' },
-            { icon: 'fa-calendar-check', color: 'icon-blue', text: 'Novo evento "Reunião Pedagógica" agendado.' },
-            { icon: 'fa-pen-alt', color: 'icon-orange', text: 'Post "O que torna a interface do Nubank..." foi criado.' },
-            { icon: 'fa-user-edit', color: 'icon-purple', text: 'Seu perfil foi atualizado com sucesso.' },
-        ];
-        const activityList = document.getElementById('activity-list');
-        if (!activityList) return;
-        activityList.innerHTML = '';
+    // Em public/js/dashboard.js
+
+async function loadRecentActivity() {
+    const activityList = document.getElementById('activity-list');
+    if (!activityList) return;
+
+    // Objeto de configuração para facilitar a renderização
+    const activityConfig = {
+        post: { icon: 'fas fa-blog', color: 'icon-purple', text: (title) => `Novo post "${truncate(title)}" foi criado.` },
+        material: { icon: 'fas fa-folder', color: 'icon-orange', text: (title) => `Novo material "${truncate(title)}" foi adicionado.` },
+        evento: { icon: 'fas fa-calendar-alt', color: 'icon-blue', text: (title) => `Novo evento "${truncate(title)}" agendado.` },
+        projeto: { icon: 'fas fa-briefcase', color: 'icon-green', text: (title) => `Novo projeto "${truncate(title)}" foi adicionado.` }
+    };
+
+    // Função auxiliar para cortar textos longos
+    function truncate(text, length = 25) {
+        return text.length > length ? text.substring(0, length) + '...' : text;
+    }
+
+    try {
+        const response = await fetch('/api/dashboard/recent-activity');
+        if (!response.ok) throw new Error('Falha ao buscar atividades.');
+        const activities = await response.json();
+
+        activityList.innerHTML = ''; // Limpa a lista antiga
+
+        if (activities.length === 0) {
+            activityList.innerHTML = '<p>Nenhuma atividade recente encontrada.</p>';
+            return;
+        }
 
         activities.forEach(activity => {
+            const config = activityConfig[activity.type];
+            if (!config) return; // Ignora tipos de atividade desconhecidos
+
             const itemHTML = `
                 <div class="activity-item">
-                    <div class="activity-icon-wrapper ${activity.color}">
-                        <i class="fas ${activity.icon}"></i>
+                    <div class="activity-icon-wrapper ${config.color}">
+                        <i class="fas ${config.icon}"></i>
                     </div>
-                    <p>${activity.text}</p>
+                    <p>${config.text(activity.title)}</p>
                 </div>`;
             activityList.insertAdjacentHTML('beforeend', itemHTML);
         });
+
+    } catch (error) {
+        console.error("Erro ao carregar atividade recente:", error);
+        activityList.innerHTML = '<p style="color:red;">Erro ao carregar atividades.</p>';
     }
+}
 
     async function loadUpcomingEvents() {
         const eventsList = document.getElementById('events-list');
@@ -82,4 +110,13 @@ document.addEventListener('DOMContentLoaded', () => {
     loadStats();
     loadRecentActivity();
     loadUpcomingEvents();
+
+
+const logoutButton = document.getElementById('logout-button');
+    if(logoutButton) {
+        logoutButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            logout(); // A função logout() vem do seu auth.js
+        });
+    }
 });

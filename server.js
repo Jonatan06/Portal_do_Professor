@@ -311,7 +311,7 @@ app.post('/api/posts', imageUpload.single('imagem'), async (req, res) => {
     try {
         const { titulo, conteudo, categoria, external_url } = req.body;
         const imagem_url = req.file ? `/${path.relative('public', req.file.path).replace(/\\/g, "/")}` : null;
-        const postData = { titulo, conteudo, categoria, imagem_url, external_url, data_publicacao: new Date().toISOString() };  
+        const postData = { titulo, conteudo, categoria, imagem_url, external_url: new Date().toISOString() };  
         const [id] = await db('posts').insert(postData).returning('id');
         const newId = typeof id === 'object' ? id[Object.keys(id)[0]] : id;
         res.status(201).json(await db('posts').where({ id: newId }).first());
@@ -382,6 +382,48 @@ app.post('/api/posts/:id/comments', async (req, res) => {
 });
 
 // API: DASHBOARD
+app.get('/api/dashboard/recent-activity', async (req, res) => {
+    try {
+        const limit = 5; // Quantidade de itens a buscar por tabela
+
+        // 1. Busca os itens mais recentes de cada tabela, já padronizando os campos
+        const posts = await db('posts')
+            .select('titulo as title', 'data_publicacao as date', db.raw("'post' as type"))
+            .orderBy('data_publicacao', 'desc')
+            .limit(limit);
+
+        const materiais = await db('materiais')
+            .select('titulo as title', 'data_upload as date', db.raw("'material' as type"))
+            .orderBy('data_upload', 'desc')
+            .limit(limit);
+
+        const projetos = await db('projetos')
+            .select('titulo as title', 'data_criacao as date', db.raw("'projeto' as type"))
+            .orderBy('data_criacao', 'desc')
+            .limit(limit);
+
+        const eventos = await db('eventos')
+            .select('title as title', 'date as date', db.raw("'evento' as type"))
+            .orderBy('date', 'desc')
+            .limit(limit);
+        
+        // 2. Junta todos os resultados em um único array
+        const allActivities = [...posts, ...materiais, ...projetos, ...eventos];
+
+        // 3. Ordena o array combinado pela data, do mais recente para o mais antigo
+        allActivities.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // 4. Pega apenas os 4 itens mais recentes do resultado final
+        const recentActivities = allActivities.slice(0, 4);
+
+        res.json(recentActivities);
+
+    } catch (err) {
+        console.error("Erro ao buscar atividade recente:", err);
+        res.status(500).json({ message: "Erro ao buscar atividades." });
+    }
+});
+
 app.get('/api/dashboard/stats', async (req, res) => {
     try {
         const posts = await db('posts').count('id as count').first();
