@@ -216,6 +216,24 @@ app.post('/api/profile/picture', authenticateProfessor, imageUpload.single('prof
     console.error("ERRO DETALHADO ao fazer upload da foto de perfil:", err); res.status(500).json({ message: `Erro interno ao processar a imagem: ${err.message}` }); }
 });
 
+app.get('/api/public-profile', async (req, res) => {
+    try {
+        // Busca o perfil do professor com ID = 1, como você pediu.
+        const profile = await db('perfil').where({ id: 1 }).first();
+
+        if (profile) {
+            // Remove a senha antes de enviar os dados para o frontend!
+            delete profile.senha; 
+            res.json(profile);
+        } else {
+            res.status(404).json({ message: "Perfil principal não encontrado." });
+        }
+    } catch (err) {
+        console.error("Erro ao buscar perfil público:", err);
+        res.status(500).json({ message: "Erro ao buscar perfil." });
+    }
+});
+
 // API: MENSAGENS
 // Rota para o ALUNO enviar uma mensagem (protegida)
 app.post('/api/mensagens', authenticateAluno, async (req, res) => {
