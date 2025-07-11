@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carregando Projeto... - Portal do Professor</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="/css/layout_publico.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <link rel="stylesheet" href="/css/portfolio-detalhe.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="container header-container">
+            <div class="logo"><a href="/">Portal do Professor</a></div>
+            <nav class="main-nav">
+                <a href="/sobre">Sobre</a>
+                <a href="/blog">Blog</a>
+                <a href="/portfolio" class="active">Portfólio</a>
+                <a href="/materiais-de-aula">Materiais</a>
+                <a href="/contato">Contato</a>
+                <a href="/admin" class="btn-login">Área do Professor</a>
+                <a href="/login" class="btn-login">Login do Aluno</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-wrapper container">
+        <a href="/portfolio" class="btn-back"><i class="fas fa-arrow-left"></i> Voltar ao Portfólio</a>
+        
+        <div id="project-detail-container">
+            <div class="loading-spinner"></div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 Portal do Professor. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/colorthief@2.3.2/dist/color-thief.umd.js"></script>
+    
+    <script src="/js/portfolio-detalhe.js" type="module"></script>
+</body>
+</html>

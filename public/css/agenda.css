@@ -112,13 +112,11 @@ body {
 .modal-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
 .modal-header h2 { font-weight: 600; font-size: 1.2rem; }
 .close-modal-btn { background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--text-secondary); line-height: 1; }
-.form-group { margin-bottom: 15px; }
+.form-group { margin-bottom: 15px; margin-top: 15px;}
 .form-group label { display: block; font-weight: 500; font-size: 0.9rem; margin-bottom: 8px; }
 #event-form input, #event-form select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem; font-family: 'Poppins', sans-serif; }
 #event-form input:focus, #event-form select:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 3px var(--light-blue-bg); }
-.modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-
-/* ESTILO ADICIONADO PARA O BOTÃO VOLTAR */
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }/* ESTILO ADICIONADO PARA O BOTÃO VOLTAR */
 .btn-outline {
     background-color: transparent;
     border: 1px solid var(--border-color);

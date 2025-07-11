@@ -1,6 +1,6 @@
 // ===============================================
 // ||           PORTAL DO PROFESSOR             ||
-// ||              SERVER.JS (FINAL)            ||
+// ||         SERVER.JS (VERSÃO FINAL)          ||
 // ===============================================
 
 // --- 1. IMPORTAÇÃO DOS MÓDULOS ---
@@ -8,10 +8,10 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
-const db = require('./database/db'); // Conexão Knex com o banco de dados
-const multer = require('multer');   // Middleware para upload de arquivos
+const db = require('./database/db');
+const multer = require('multer');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken'); // <-- IMPORTE O JWT AQUI
+const jwt = require('jsonwebtoken');
 const authenticateProfessor = require('./middleware/authenticateProfessor');
 const JWT_SECRET = 'R!d1sRIbeir0';
 const authenticateAluno = require('./middleware/authenticateAluno');
@@ -22,7 +22,7 @@ const dbPath = path.resolve(__dirname, 'database/portal.db');
 if (!fs.existsSync(dbPath)) {
     console.error("\n[ERRO CRÍTICO] O arquivo de banco de dados 'portal.db' não foi encontrado!");
     console.error("Execute o comando 'npm run db:setup' para criar e configurar o banco de dados antes de iniciar o servidor.\n");
-    process.exit(1); // Encerra o processo se o DB não existir
+    process.exit(1);
 }
 
 // --- 3. CONFIGURAÇÃO DO MULTER PARA UPLOAD DE ARQUIVOS ---
@@ -42,7 +42,7 @@ const createMulterStorage = (destination) => {
 
 const imageUpload = multer({ storage: createMulterStorage('uploads/images') });
 const materialUpload = multer({ storage: createMulterStorage('uploads/materiais') });
-
+const portfolioMediaUpload = multer({ storage: createMulterStorage('uploads/portfolio') });
 
 // --- 4. INICIALIZAÇÃO DO EXPRESS ---
 const app = express();
@@ -62,32 +62,18 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 // ROTA DE CADASTRO DE ALUNO
 app.post('/api/alunos/cadastro', async (req, res) => {
     const { nome, email, senha } = req.body;
-
-    // Validação básica
     if (!nome || !email || !senha) {
         return res.status(400).json({ success: false, message: 'Todos os campos são obrigatórios.' });
     }
-
     try {
-        // Verificar se o e-mail já existe
         const alunoExistente = await db('alunos').where({ email }).first();
         if (alunoExistente) {
             return res.status(409).json({ success: false, message: 'Este e-mail já está cadastrado.' });
         }
-
-        // Criptografar a senha
         const salt = await bcrypt.genSalt(10);
         const senhaHash = await bcrypt.hash(senha, salt);
-
-        // Inserir o novo aluno no banco de dados
-        const [id] = await db('alunos').insert({
-            nome,
-            email,
-            senha: senhaHash
-        }).returning('id');
-
+        const [id] = await db('alunos').insert({ nome, email, senha: senhaHash }).returning('id');
         res.status(201).json({ success: true, message: 'Cadastro realizado com sucesso!', alunoId: id });
-
     } catch (err) {
         console.error("Erro no cadastro do aluno:", err);
         res.status(500).json({ success: false, message: 'Erro interno no servidor. Tente novamente.' });
@@ -97,84 +83,52 @@ app.post('/api/alunos/cadastro', async (req, res) => {
 // ROTA DE LOGIN DE ALUNO
 app.post('/api/alunos/login', async (req, res) => {
     const { email, senha } = req.body;
-
     if (!email || !senha) {
         return res.status(400).json({ success: false, message: 'Email e senha são obrigatórios.' });
     }
-
     try {
-        // Procurar o aluno pelo e-mail
         const aluno = await db('alunos').where({ email }).first();
-
-        // Se o aluno não for encontrado, ou a senha estiver errada
         if (!aluno) {
             return res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
         }
-
-        // Comparar a senha enviada com a senha criptografada no banco
         const senhaCorreta = await bcrypt.compare(senha, aluno.senha);
-
         if (!senhaCorreta) {
             return res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
         }
-
-        // Login bem-sucedido 
         const token = jwt.sign(
             { id: aluno.id, nome: aluno.nome, email: aluno.email, role: 'aluno' },
-            JWT_SECRET_ALUNO, // Use a chave secreta do aluno
+            JWT_SECRET_ALUNO,
             { expiresIn: '8h' }
         );
-
-        // 2. Envie o token na resposta
         res.json({
             success: true,
             message: 'Login bem-sucedido!',
-            token: token, // Envie o token
-            aluno: {      // Você pode continuar enviando o objeto 'aluno' para compatibilidade
-                id: aluno.id,
-                nome: aluno.nome,
-                email: aluno.email
-            }
+            token: token,
+            aluno: { id: aluno.id, nome: aluno.nome, email: aluno.email }
         });
-
     } catch (err) {
         console.error("Erro no login do aluno:", err);
         res.status(500).json({ success: false, message: 'Erro interno no servidor. Tente novamente.' });
     }
 });
 
-// API: LOGIN
+// API: LOGIN PROFESSOR
 app.post('/api/auth/login', async (req, res) => {
     const { email, senha } = req.body;
-
     if (!email || !senha) {
         return res.status(400).json({ success: false, message: 'Email e senha são obrigatórios.' });
     }
-
     try {
         const professor = await db('perfil').where({ email }).first();
-
-        // Se não encontrou o professor, retorna erro
         if (!professor) {
             return res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
         }
-
-        // Compara a senha enviada com a senha criptografada no banco
         const senhaCorreta = await bcrypt.compare(senha, professor.senha);
-
-        // Se a senha estiver incorreta, retorna erro
         if (!senhaCorreta) {
             return res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
         }
-
-        const token = jwt.sign(
-            { id: professor.id, role: 'professor' }, 
-            JWT_SECRET,
-            { expiresIn: '8h' }                       // Tempo de expiração do token
-        );
-
+        const token = jwt.sign({ id: professor.id, role: 'professor' }, JWT_SECRET, { expiresIn: '8h' });
         res.json({ success: true, token: token });
-
     } catch (err) {
         console.error("Erro no login do professor:", err);
         res.status(500).json({ success: false, message: 'Erro interno no servidor.' });
@@ -193,7 +147,6 @@ app.get('/api/profile', authenticateProfessor, async (req, res) => {
 app.put('/api/profile', authenticateProfessor, async (req, res) => {
     try {
         delete req.body.imagem_url;
-        // Garante que um professor só possa editar o seu próprio perfil
         const count = await db('perfil').where('id', req.professor.id).update(req.body);
         if (count > 0) {
             const updatedProfile = await db('perfil').where('id', req.professor.id).first();
@@ -208,22 +161,20 @@ app.post('/api/profile/picture', authenticateProfessor, imageUpload.single('prof
     if (!req.file) { return res.status(400).json({ message: 'Nenhum arquivo de imagem enviado.' }); }
     try {
         const imagem_url = `/uploads/images/${req.file.filename}`;
-        // Garante que a foto seja atualizada no perfil do professor logado
         await db('perfil').where('id', req.professor.id).update({ imagem_url });
         const updatedProfile = await db('perfil').where('id', req.professor.id).first();
         res.json(updatedProfile);
     } catch (err) {
-    console.error("ERRO DETALHADO ao fazer upload da foto de perfil:", err); res.status(500).json({ message: `Erro interno ao processar a imagem: ${err.message}` }); }
+        console.error("ERRO DETALHADO ao fazer upload da foto de perfil:", err);
+        res.status(500).json({ message: `Erro interno ao processar a imagem: ${err.message}` });
+    }
 });
 
 app.get('/api/public-profile', async (req, res) => {
     try {
-        // Busca o perfil do professor com ID = 1, como você pediu.
         const profile = await db('perfil').where({ id: 1 }).first();
-
         if (profile) {
-            // Remove a senha antes de enviar os dados para o frontend!
-            delete profile.senha; 
+            delete profile.senha;
             res.json(profile);
         } else {
             res.status(404).json({ message: "Perfil principal não encontrado." });
@@ -235,23 +186,14 @@ app.get('/api/public-profile', async (req, res) => {
 });
 
 // API: MENSAGENS
-// Rota para o ALUNO enviar uma mensagem (protegida)
 app.post('/api/mensagens', authenticateAluno, async (req, res) => {
     const { assunto, corpo } = req.body;
-    const { id, nome, email } = req.aluno; // Dados do token
-
+    const { id, nome, email } = req.aluno;
     if (!assunto || !corpo) {
         return res.status(400).json({ message: "Assunto e corpo da mensagem são obrigatórios." });
     }
-
     try {
-        const novaMensagem = {
-            aluno_id: id,
-            remetente_nome: nome,
-            remetente_email: email,
-            assunto,
-            corpo
-        };
+        const novaMensagem = { aluno_id: id, remetente_nome: nome, remetente_email: email, assunto, corpo };
         await db('mensagens').insert(novaMensagem);
         res.status(201).json({ success: true, message: 'Mensagem enviada com sucesso!' });
     } catch (err) {
@@ -260,40 +202,26 @@ app.post('/api/mensagens', authenticateAluno, async (req, res) => {
     }
 });
 
-// Rota para o PROFESSOR buscar todas as mensagens (protegida)
 app.get('/api/mensagens', authenticateProfessor, async (req, res) => {
     try {
         const mensagens = await db('mensagens').select('*').orderBy('data_envio', 'desc');
         res.json(mensagens);
-    } catch (err) {
-        res.status(500).json({ message: "Erro ao buscar mensagens." });
-    }
+    } catch (err) { res.status(500).json({ message: "Erro ao buscar mensagens." }); }
 });
 
-// Rota para o PROFESSOR marcar uma mensagem como lida (protegida)
 app.put('/api/mensagens/:id/read', authenticateProfessor, async (req, res) => {
     try {
-        const { id } = req.params;
-        await db('mensagens').where({ id }).update({ lida: true });
+        await db('mensagens').where({ id: req.params.id }).update({ lida: true });
         res.status(200).json({ success: true, message: 'Mensagem marcada como lida.' });
-    } catch (err) {
-        res.status(500).json({ message: "Erro ao atualizar mensagem." });
-    }
+    } catch (err) { res.status(500).json({ message: "Erro ao atualizar mensagem." }); }
 });
 
-// Rota para o PROFESSOR apagar uma mensagem (protegida)
 app.delete('/api/mensagens/:id', authenticateProfessor, async (req, res) => {
     try {
-        const { id } = req.params;
-        const count = await db('mensagens').where({ id }).del();
-        if (count > 0) {
-            res.status(204).send();
-        } else {
-            res.status(404).json({ message: "Mensagem não encontrada." });
-        }
-    } catch (err) {
-        res.status(500).json({ message: "Erro ao apagar mensagem." });
-    }
+        const count = await db('mensagens').where({ id: req.params.id }).del();
+        if (count > 0) res.status(204).send();
+        else res.status(404).json({ message: "Mensagem não encontrada." });
+    } catch (err) { res.status(500).json({ message: "Erro ao apagar mensagem." }); }
 });
 
 // API: MATERIAIS
@@ -308,7 +236,6 @@ app.post('/api/materiais', materialUpload.single('materialFile'), async (req, re
     try {
         const { titulo, descricao, categoria, link_externo } = req.body;
         let materialData = { titulo, descricao, categoria, link_externo };
-
         if (req.file) {
             materialData = {
                 ...materialData,
@@ -320,12 +247,10 @@ app.post('/api/materiais', materialUpload.single('materialFile'), async (req, re
         } else if (!link_externo) {
             return res.status(400).json({ message: "É necessário enviar um arquivo ou um link externo." });
         }
-        
         const [id] = await db('materiais').insert(materialData).returning('id');
         const newId = typeof id === 'object' ? id[Object.keys(id)[0]] : id;
         const newMaterial = await db('materiais').where({ id: newId }).first();
         res.status(201).json(newMaterial);
-
     } catch (err) {
         console.error("Erro ao adicionar material:", err);
         res.status(500).json({ message: "Erro ao salvar material." });
@@ -336,21 +261,13 @@ app.delete('/api/materiais/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const material = await db('materiais').where({ id }).first();
-
-        if (!material) {
-            return res.status(404).json({ message: "Material não encontrado." });
-        }
-
+        if (!material) return res.status(404).json({ message: "Material não encontrado." });
         if (material.caminho_arquivo) {
             const filePath = path.join(__dirname, 'public', material.caminho_arquivo);
-            if (fs.existsSync(filePath)) {
-                fs.unlinkSync(filePath);
-            }
+            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
         }
-
         await db('materiais').where({ id }).del();
         res.status(204).send();
-
     } catch (err) {
         console.error("Erro ao apagar material:", err);
         res.status(500).json({ message: "Erro ao apagar material." });
@@ -359,29 +276,113 @@ app.delete('/api/materiais/:id', async (req, res) => {
 
 // API: PROJETOS (Portfólio)
 app.get('/api/projetos', async (req, res) => {
-  try {
-    res.json(await db('projetos').select('*').orderBy('id', 'desc'));
-  } catch (err) { res.status(500).json({ message: "Erro ao buscar projetos." }); }
+    try {
+        res.json(await db('projetos').select('*').orderBy('id', 'desc'));
+    } catch (err) { res.status(500).json({ message: "Erro ao buscar projetos." }); }
 });
-app.post('/api/projetos', async (req, res) => {
-  try {
-    const [id] = await db('projetos').insert(req.body).returning('id');
-    const newId = typeof id === 'object' ? id[Object.keys(id)[0]] : id;
-    res.status(201).json(await db('projetos').where({ id: newId }).first());
-  } catch (err) { res.status(500).json({ message: "Erro ao adicionar projeto." }); }
+
+app.post('/api/projetos', portfolioMediaUpload.array('fotos', 10), async (req, res) => {
+    const { titulo, descricao, categoria, status, periodo, tags, link_externo } = req.body;
+    const trx = await db.transaction();
+    try {
+        const [projetoResult] = await trx('projetos').insert({
+            titulo, descricao, categoria, status, periodo, tags, link_externo
+        }).returning('id');
+        const projetoId = typeof projetoResult === 'object' ? projetoResult.id : projetoResult;
+        if (req.files && req.files.length > 0) {
+            const medias = req.files.map(file => ({
+                caminho_arquivo: `/${path.relative('public', file.path).replace(/\\/g, "/")}`,
+                tipo_midia: 'imagem',
+                projeto_id: projetoId
+            }));
+            await trx('portfolio_media').insert(medias);
+        }
+        await trx.commit();
+        const novoProjeto = await db('projetos').where({ id: projetoId }).first();
+        res.status(201).json(novoProjeto);
+    } catch (err) {
+        await trx.rollback();
+        console.error("Erro ao adicionar projeto:", err);
+        res.status(500).json({ message: "Erro ao salvar projeto." });
+    }
 });
+
+app.post('/api/projetos/:id', portfolioMediaUpload.array('fotos', 10), async (req, res) => {
+    const { id } = req.params;
+    const { titulo, descricao, categoria, status, periodo, tags, link_externo } = req.body;
+    const trx = await db.transaction();
+    try {
+        await trx('projetos').where({ id }).update({
+            titulo, descricao, categoria, status, periodo, tags, link_externo
+        });
+        if (req.files && req.files.length > 0) {
+            const medias = req.files.map(file => ({
+                caminho_arquivo: `/${path.relative('public', file.path).replace(/\\/g, "/")}`,
+                tipo_midia: 'imagem',
+                projeto_id: id
+            }));
+            await trx('portfolio_media').insert(medias);
+        }
+        await trx.commit();
+        const projetoAtualizado = await db('projetos').where({ id }).first();
+        res.status(200).json(projetoAtualizado);
+    } catch (err) {
+        await trx.rollback();
+        console.error("Erro ao atualizar projeto:", err);
+        res.status(500).json({ message: "Erro ao atualizar projeto." });
+    }
+});
+
+app.get('/api/projetos/:id/detalhes', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const projeto = await db('projetos').where({ id }).first();
+        if (!projeto) return res.status(404).json({ message: "Projeto não encontrado." });
+        const midias = await db('portfolio_media').where({ projeto_id: id });
+        projeto.midias = midias;
+        res.json(projeto);
+    } catch (err) {
+        console.error("Erro ao buscar detalhes do projeto:", err);
+        res.status(500).json({ message: "Erro ao buscar detalhes do projeto." });
+    }
+});
+
 app.delete('/api/projetos/:id', async (req, res) => {
-  try {
-    const count = await db('projetos').where('id', req.params.id).del();
-    if (count > 0) res.status(204).send();
-    else res.status(404).json({ message: "Projeto não encontrado." });
-  } catch (err) { res.status(500).json({ message: "Erro ao apagar projeto." }); }
+    const { id } = req.params;
+    const trx = await db.transaction();
+    try {
+        const midiasParaApagar = await trx('portfolio_media').where({ projeto_id: id });
+        if (midiasParaApagar.length > 0) {
+            midiasParaApagar.forEach(media => {
+                if (media.caminho_arquivo.startsWith('/uploads/')) {
+                    const filePath = path.join(__dirname, 'public', media.caminho_arquivo);
+                    if (fs.existsSync(filePath)) {
+                        fs.unlinkSync(filePath);
+                    }
+                }
+            });
+        }
+        await trx('portfolio_media').where({ projeto_id: id }).del();
+        const count = await trx('projetos').where({ id }).del();
+        await trx.commit();
+        if (count > 0) {
+            res.status(204).send();
+        } else {
+            res.status(404).json({ message: "Projeto não encontrado." });
+        }
+    } catch (err) {
+        await trx.rollback();
+        console.error("Erro ao apagar projeto e suas mídias:", err);
+        res.status(500).json({ message: "Erro ao apagar projeto." });
+    }
 });
+
 
 // API: EVENTOS (Agenda)
 app.get('/api/eventos', async (req, res) => {
     try { res.json(await db('eventos').select('*').orderBy('date', 'asc')); } catch (err) { res.status(500).json({ message: "Erro ao buscar eventos." }); }
 });
+
 app.post('/api/eventos', async (req, res) => {
     try {
         const [id] = await db('eventos').insert(req.body).returning('id');
@@ -389,6 +390,7 @@ app.post('/api/eventos', async (req, res) => {
         res.status(201).json(await db('eventos').where({ id: newId }).first());
     } catch (err) { res.status(500).json({ message: "Erro ao adicionar evento." }); }
 });
+
 app.delete('/api/eventos/:id', async (req, res) => {
     try {
         const count = await db('eventos').where('id', req.params.id).del();
@@ -400,16 +402,18 @@ app.delete('/api/eventos/:id', async (req, res) => {
 app.get('/api/posts', async (req, res) => {
     try { res.json(await db('posts').select('*').orderBy('data_publicacao', 'desc')); } catch (err) { res.status(500).json({ message: "Erro ao buscar posts." }); }
 });
+
 app.post('/api/posts', imageUpload.single('imagem'), async (req, res) => {
     try {
         const { titulo, conteudo, categoria, external_url } = req.body;
         const imagem_url = req.file ? `/${path.relative('public', req.file.path).replace(/\\/g, "/")}` : null;
-        const postData = { titulo, conteudo, categoria, imagem_url, external_url: new Date().toISOString() };  
+        const postData = { titulo, conteudo, categoria, imagem_url, external_url };
         const [id] = await db('posts').insert(postData).returning('id');
         const newId = typeof id === 'object' ? id[Object.keys(id)[0]] : id;
         res.status(201).json(await db('posts').where({ id: newId }).first());
     } catch (err) { res.status(500).json({ message: "Erro ao salvar post." }); }
 });
+
 app.delete('/api/posts/:id', async (req, res) => {
     try {
         const post = await db('posts').where({ id: req.params.id }).first();
@@ -419,55 +423,34 @@ app.delete('/api/posts/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ message: "Erro ao apagar post." }); }
 });
 
-// API: PEGAR UM POST ESPECÍFICO PELO ID
 app.get('/api/posts/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-        const post = await db('posts').where({ id }).first(); // .first() pega o primeiro resultado
-
-        if (post) {
-            res.json(post);
-        } else {
-            // Se o post com esse ID não for encontrado, retorne 404
-            res.status(404).json({ message: "Post não encontrado." });
-        }
+        const post = await db('posts').where({ id: req.params.id }).first();
+        if (post) res.json(post);
+        else res.status(404).json({ message: "Post não encontrado." });
     } catch (err) {
         console.error("Erro ao buscar post por ID:", err);
         res.status(500).json({ message: "Erro interno no servidor." });
     }
 });
 
-// API: PEGAR E ENVIAR COMENTÁRIOS DE UM POST
+// API: COMENTÁRIOS
 app.get('/api/posts/:id/comments', async (req, res) => {
     try {
-        const { id } = req.params;
-        const comments = await db('comentarios').where({ post_id: id }).orderBy('data_publicacao', 'asc');
+        const comments = await db('comentarios').where({ post_id: req.params.id }).orderBy('data_publicacao', 'asc');
         res.json(comments);
-    } catch (err) {
-        res.status(500).json({ message: "Erro ao buscar comentários." });
-    }
+    } catch (err) { res.status(500).json({ message: "Erro ao buscar comentários." }); }
 });
 
 app.post('/api/posts/:id/comments', async (req, res) => {
     try {
-        const { id } = req.params;
-        const { autor, conteudo } = req.body; // Aceita 'autor' se for enviado
-
-        if (!conteudo) {
-            return res.status(400).json({ message: "O conteúdo do comentário é obrigatório." });
-        }
-
-        const newComment = {
-            post_id: id,
-            conteudo: conteudo,
-            autor: autor || 'Anônimo' // Usa 'Anônimo' se nenhum autor for fornecido
-        };
-
+        const { autor, conteudo } = req.body;
+        if (!conteudo) return res.status(400).json({ message: "O conteúdo do comentário é obrigatório." });
+        const newComment = { post_id: req.params.id, conteudo: conteudo, autor: autor || 'Anônimo' };
         const [commentId] = await db('comentarios').insert(newComment).returning('id');
         const newId = typeof commentId === 'object' ? commentId[Object.keys(commentId)[0]] : commentId;
         const result = await db('comentarios').where({ id: newId }).first();
         res.status(201).json(result);
-
     } catch (err) {
         console.error("Erro ao adicionar comentário:", err);
         res.status(500).json({ message: "Erro ao salvar comentário." });
@@ -477,40 +460,15 @@ app.post('/api/posts/:id/comments', async (req, res) => {
 // API: DASHBOARD
 app.get('/api/dashboard/recent-activity', async (req, res) => {
     try {
-        const limit = 5; // Quantidade de itens a buscar por tabela
-
-        // 1. Busca os itens mais recentes de cada tabela, já padronizando os campos
-        const posts = await db('posts')
-            .select('titulo as title', 'data_publicacao as date', db.raw("'post' as type"))
-            .orderBy('data_publicacao', 'desc')
-            .limit(limit);
-
-        const materiais = await db('materiais')
-            .select('titulo as title', 'data_upload as date', db.raw("'material' as type"))
-            .orderBy('data_upload', 'desc')
-            .limit(limit);
-
-        const projetos = await db('projetos')
-            .select('titulo as title', 'data_criacao as date', db.raw("'projeto' as type"))
-            .orderBy('data_criacao', 'desc')
-            .limit(limit);
-
-        const eventos = await db('eventos')
-            .select('title as title', 'date as date', db.raw("'evento' as type"))
-            .orderBy('date', 'desc')
-            .limit(limit);
-        
-        // 2. Junta todos os resultados em um único array
+        const limit = 5;
+        const posts = await db('posts').select('titulo as title', 'data_publicacao as date', db.raw("'post' as type")).orderBy('data_publicacao', 'desc').limit(limit);
+        const materiais = await db('materiais').select('titulo as title', 'data_upload as date', db.raw("'material' as type")).orderBy('data_upload', 'desc').limit(limit);
+        const projetos = await db('projetos').select('titulo as title', 'data_criacao as date', db.raw("'projeto' as type")).orderBy('data_criacao', 'desc').limit(limit);
+        const eventos = await db('eventos').select('title as title', 'date as date', db.raw("'evento' as type")).orderBy('date', 'desc').limit(limit);
         const allActivities = [...posts, ...materiais, ...projetos, ...eventos];
-
-        // 3. Ordena o array combinado pela data, do mais recente para o mais antigo
         allActivities.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        // 4. Pega apenas os 4 itens mais recentes do resultado final
         const recentActivities = allActivities.slice(0, 4);
-
         res.json(recentActivities);
-
     } catch (err) {
         console.error("Erro ao buscar atividade recente:", err);
         res.status(500).json({ message: "Erro ao buscar atividades." });
@@ -526,6 +484,7 @@ app.get('/api/dashboard/stats', async (req, res) => {
         res.json({ posts: posts.count, projetos: projetos.count, eventos: eventos.count, materiais: materiais.count });
     } catch (err) { res.status(500).json({ message: "Erro ao buscar estatísticas." }); }
 });
+
 app.get('/api/dashboard/upcoming-events', async (req, res) => {
     try {
         const today = new Date().toISOString().split('T')[0];
@@ -552,24 +511,22 @@ app.get('/portfolio', (req, res) => res.sendFile(path.join(__dirname, 'public', 
 app.get('/materiais-de-aula', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'materiais.html')));
 app.get('/contato', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'contato.html')));
 
-// NOVA ROTA PARA O DETALHE DO POST
+// ROTA PARA DETALHES
 app.get('/post', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'post.html')));
+app.get('/portfolio-detalhe', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'site', 'portfolio-detalhe.html'));
+});
 
 // ROTA PARA O PAINEL DE ADMIN
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin', 'index.html'));
 });
-
-// Middleware para servir as páginas do admin
 app.use('/admin', express.static(path.join(__dirname, 'public/admin')));
 
-
 // ROTA CATCH-ALL (deve ser a última)
-// Redireciona qualquer rota não encontrada para a página inicial pública
 app.get('*', (req, res) => {
     res.redirect('/');
 });
-
 
 // INICIALIZAÇÃO DO SERVIDOR
 app.listen(PORT, () => { console.log(`🚀 Servidor rodando em: http://localhost:${PORT}`); });

@@ -1,64 +1,115 @@
-/* CSS específico para a página de portfólio */
+/* CSS específico para a galeria de portfólio pública */
 
 .project-section {
     margin-bottom: 50px;
 }
+
 .project-section-title {
     font-size: 2rem;
+    font-weight: 600;
     margin-bottom: 30px;
     padding-bottom: 10px;
     border-bottom: 2px solid var(--cor-primaria);
     display: inline-block;
 }
-.project-item {
+
+.project-section-title i {
+    margin-right: 10px;
+}
+
+/* Grid para organizar os cards */
+.project-grid {
+    display: grid;
+    /* Cria colunas responsivas: no mínimo 350px, mas se ajustam para preencher o espaço */
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+}
+
+/* Estilo do Card de Projeto */
+.project-card {
+    display: flex;
+    flex-direction: column;
     background-color: var(--cor-branco);
+    border: 1px solid var(--cor-borda);
+    border-left: 5px solid var(--cor-primaria);
     border-radius: 8px;
     padding: 25px;
-    margin-bottom: 20px;
-    border-left: 5px solid var(--cor-primaria);
+    text-decoration: none; /* Remove sublinhado do link */
+    color: var(--cor-texto-principal);
     box-shadow: var(--sombra);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
-.project-header {
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.project-card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    gap: 10px;
 }
-.project-title {
-    font-size: 1.5rem;
+
+.project-card-title {
+    font-size: 1.4rem;
     font-weight: 600;
+    margin: 0;
+    color: var(--cor-texto-principal);
 }
-.project-status {
-    padding: 5px 12px;
+
+.project-card-status {
+    padding: 4px 12px;
     border-radius: 15px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     white-space: nowrap;
+    flex-shrink: 0;
 }
+
 .status-concluido { background-color: #e6f9f1; color: #198754; }
 .status-andamento { background-color: #fff8e1; color: #f57c00; }
 
-.project-description {
+.project-card-summary {
     color: var(--cor-texto-secundario);
-    margin-bottom: 20px;
     line-height: 1.7;
+    flex-grow: 1; /* Faz a descrição ocupar o espaço disponível, empurrando o rodapé para baixo */
+    margin-bottom: 20px;
 }
-.project-footer {
+
+.project-card-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    color: var(--cor-texto-secundario);
+    border-top: 1px solid var(--cor-borda);
+    padding-top: 15px;
+    margin-top: auto; /* Alinha o rodapé na base do card */
+}
+
+.project-card-category {
+    font-weight: 500;
+    text-transform: capitalize;
+    background-color: #e9ecef;
+    padding: 3px 10px;
+    border-radius: 4px;
+}
+
+.empty-list-placeholder {
+    border-style: solid; 
+    border-color: var(--cor-borda);
+    border-width: 2px;
+    text-align: center;
+    padding: 40px;
+    border-radius: 8px;
     color: var(--cor-texto-secundario);
 }
-.project-tags span {
-    background-color: #e9ecef;
-    padding: 4px 10px;
-    border-radius: 4px;
-    margin-right: 8px;
-    font-size: 0.8rem;
-}
-.project-link a {
-    color: var(--cor-primaria);
-    font-weight: 600;
-    text-decoration: none;
+
+.empty-list-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
 }

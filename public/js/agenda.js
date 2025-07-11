@@ -78,23 +78,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function openModal(dateStr = null, eventData = null) {
-        eventForm.reset();
-        deleteEventBtn.style.display = 'none';
-        if (eventData) {
-            modalTitle.textContent = "Editar Evento";
-            document.getElementById('event-id').value = eventData.id;
-            document.getElementById('event-title').value = eventData.title;
-            document.getElementById('event-date').value = eventData.date.split('T')[0];
-            document.getElementById('event-type').value = eventData.type;
-            deleteEventBtn.style.display = 'block';
-        } else {
-            modalTitle.textContent = "Adicionar Evento";
-            document.getElementById('event-id').value = '';
-            document.getElementById('event-date').value = dateStr || new Date().toISOString().split('T')[0];
+    // CÓDIGO NOVO (PARA COLAR NO LUGAR DO ANTIGO)
+function openModal(dateStr = null, eventData = null) {
+    eventForm.reset();
+    deleteEventBtn.style.display = 'none';
+    
+    const eventDateInput = document.getElementById('event-date');
+    const today = new Date().toISOString().split('T')[0];
+
+    // Define a data mínima como hoje para o seletor de data
+    eventDateInput.min = today;
+
+    if (eventData) {
+        modalTitle.textContent = "Editar Evento";
+        document.getElementById('event-id').value = eventData.id;
+        document.getElementById('event-title').value = eventData.title;
+        const eventDate = eventData.date.split('T')[0];
+        eventDateInput.value = eventDate;
+        document.getElementById('event-type').value = eventData.type;
+        deleteEventBtn.style.display = 'block';
+        
+        // Permite editar um evento passado, mas não permite movê-lo para outra data passada
+        if (eventDate < today) {
+            eventDateInput.min = eventDate;
         }
-        modal.classList.remove('hidden');
+
+    } else {
+        modalTitle.textContent = "Adicionar Evento";
+        document.getElementById('event-id').value = '';
+        
+        // Se o usuário clicar em um dia passado no calendário, o modal abrirá com a data de hoje.
+        // Caso contrário, usa a data clicada ou a data de hoje como padrão.
+        const defaultDate = (dateStr && dateStr < today) ? today : (dateStr || today);
+        eventDateInput.value = defaultDate;
     }
+    modal.classList.remove('hidden');
+}
 
     const closeModal = () => modal.classList.add('hidden');
 
