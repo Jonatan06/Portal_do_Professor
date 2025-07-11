@@ -8,8 +8,8 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
-const db = require('./database/db'); // Conexão Knex com o banco de dados
-const multer = require('multer');   // Middleware para upload de arquivos
+const db = require('./database/db');
+const multer = require('multer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const authenticateProfessor = require('./middleware/authenticateProfessor');
@@ -22,7 +22,7 @@ const dbPath = path.resolve(__dirname, 'database/portal.db');
 if (!fs.existsSync(dbPath)) {
     console.error("\n[ERRO CRÍTICO] O arquivo de banco de dados 'portal.db' não foi encontrado!");
     console.error("Execute o comando 'npm run db:setup' para criar e configurar o banco de dados antes de iniciar o servidor.\n");
-    process.exit(1); // Encerra o processo se o DB não existir
+    process.exit(1);
 }
 
 // --- 3. CONFIGURAÇÃO DO MULTER PARA UPLOAD DE ARQUIVOS ---
@@ -43,7 +43,6 @@ const createMulterStorage = (destination) => {
 const imageUpload = multer({ storage: createMulterStorage('uploads/images') });
 const materialUpload = multer({ storage: createMulterStorage('uploads/materiais') });
 const portfolioMediaUpload = multer({ storage: createMulterStorage('uploads/portfolio') });
-
 
 // --- 4. INICIALIZAÇÃO DO EXPRESS ---
 const app = express();
@@ -308,50 +307,31 @@ app.post('/api/projetos', portfolioMediaUpload.array('fotos', 10), async (req, r
     }
 });
 
-// Adicione esta rota completa ao seu server.js
-
-app.delete('/api/projetos/:id', async (req, res) => {
+app.post('/api/projetos/:id', portfolioMediaUpload.array('fotos', 10), async (req, res) => {
     const { id } = req.params;
-    const trx = await db.transaction(); // Inicia uma transação para segurança
-
+    const { titulo, descricao, categoria, status, periodo, tags, link_externo } = req.body;
+    const trx = await db.transaction();
     try {
-        // 1. Encontrar todas as mídias associadas ao projeto
-        const midiasParaApagar = await trx('portfolio_media').where({ projeto_id: id });
-
-        // 2. Apagar os arquivos físicos do servidor
-        if (midiasParaApagar.length > 0) {
-            midiasParaApagar.forEach(media => {
-                // Previne que apague arquivos fora da pasta de uploads
-                if (media.caminho_arquivo.startsWith('/uploads/')) {
-                    const filePath = path.join(__dirname, 'public', media.caminho_arquivo);
-                    if (fs.existsSync(filePath)) {
-                        fs.unlinkSync(filePath); // Apaga o arquivo
-                    }
-                }
-            });
+        await trx('projetos').where({ id }).update({
+            titulo, descricao, categoria, status, periodo, tags, link_externo
+        });
+        if (req.files && req.files.length > 0) {
+            const medias = req.files.map(file => ({
+                caminho_arquivo: `/${path.relative('public', file.path).replace(/\\/g, "/")}`,
+                tipo_midia: 'imagem',
+                projeto_id: id
+            }));
+            await trx('portfolio_media').insert(medias);
         }
-        
-        // 3. Apagar os registros da tabela de mídias
-        await trx('portfolio_media').where({ projeto_id: id }).del();
-
-        // 4. Finalmente, apagar o projeto principal
-        const count = await trx('projetos').where({ id }).del();
-
-        await trx.commit(); // Confirma todas as operações se tudo deu certo
-
-        if (count > 0) {
-            res.status(204).send(); // Sucesso, sem conteúdo para retornar
-        } else {
-            res.status(404).json({ message: "Projeto não encontrado." });
-        }
-
+        await trx.commit();
+        const projetoAtualizado = await db('projetos').where({ id }).first();
+        res.status(200).json(projetoAtualizado);
     } catch (err) {
-        await trx.rollback(); // Desfaz todas as operações em caso de erro
-        console.error("Erro ao apagar projeto e suas mídias:", err);
-        res.status(500).json({ message: "Erro ao apagar projeto." });
+        await trx.rollback();
+        console.error("Erro ao atualizar projeto:", err);
+        res.status(500).json({ message: "Erro ao atualizar projeto." });
     }
 });
-
 
 app.get('/api/projetos/:id/detalhes', async (req, res) => {
     try {
@@ -367,46 +347,36 @@ app.get('/api/projetos/:id/detalhes', async (req, res) => {
     }
 });
 
-// Em server.js, dentro da seção de API: PROJETOS
-
-// NOVA ROTA para ATUALIZAR (editar) um projeto existente
-app.post('/api/projetos/:id', portfolioMediaUpload.array('fotos', 10), async (req, res) => {
+app.delete('/api/projetos/:id', async (req, res) => {
     const { id } = req.params;
-    const { titulo, descricao, categoria, status, periodo, tags, link_externo } = req.body;
     const trx = await db.transaction();
-
     try {
-        // 1. Atualiza os dados de texto do projeto
-        await trx('projetos').where({ id }).update({
-            titulo,
-            descricao,
-            categoria,
-            status,
-            periodo,
-            tags,
-            link_externo
-        });
-
-        // 2. Se novas fotos foram enviadas, adiciona-as
-        if (req.files && req.files.length > 0) {
-            const medias = req.files.map(file => ({
-                caminho_arquivo: `/${path.relative('public', file.path).replace(/\\/g, "/")}`,
-                tipo_midia: 'imagem',
-                projeto_id: id
-            }));
-            await trx('portfolio_media').insert(medias);
+        const midiasParaApagar = await trx('portfolio_media').where({ projeto_id: id });
+        if (midiasParaApagar.length > 0) {
+            midiasParaApagar.forEach(media => {
+                if (media.caminho_arquivo.startsWith('/uploads/')) {
+                    const filePath = path.join(__dirname, 'public', media.caminho_arquivo);
+                    if (fs.existsSync(filePath)) {
+                        fs.unlinkSync(filePath);
+                    }
+                }
+            });
         }
-
+        await trx('portfolio_media').where({ projeto_id: id }).del();
+        const count = await trx('projetos').where({ id }).del();
         await trx.commit();
-        const projetoAtualizado = await db('projetos').where({ id }).first();
-        res.status(200).json(projetoAtualizado);
-
+        if (count > 0) {
+            res.status(204).send();
+        } else {
+            res.status(404).json({ message: "Projeto não encontrado." });
+        }
     } catch (err) {
         await trx.rollback();
-        console.error("Erro ao atualizar projeto:", err);
-        res.status(500).json({ message: "Erro ao atualizar projeto." });
+        console.error("Erro ao apagar projeto e suas mídias:", err);
+        res.status(500).json({ message: "Erro ao apagar projeto." });
     }
-}); // <-- Este fechamento estava faltando no seu exemplo
+});
+
 
 // API: EVENTOS (Agenda)
 app.get('/api/eventos', async (req, res) => {

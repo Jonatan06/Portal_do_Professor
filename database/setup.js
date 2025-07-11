@@ -76,22 +76,6 @@ async function setupDatabase() {
     });
     console.log('✅ Tabela "mensagens" criada com sucesso.');
 
-
-
-    // Em database/setup.js
-
-// ... (outras tabelas)
-
-// --- Tabela de Mídias do Portfólio (NOVA) ---
-await db.schema.dropTableIfExists('portfolio_media');
-await db.schema.createTable('portfolio_media', table => {
-  table.increments('id').primary();
-  table.string('caminho_arquivo').notNullable();
-  table.string('tipo_midia').notNullable(); // Ex: 'imagem' ou 'video'
-  table.integer('projeto_id').unsigned().notNullable().references('id').inTable('projetos').onDelete('CASCADE');
-});
-console.log('✅ Tabela "portfolio_media" criada com sucesso.');
-
     // --- Outras Tabelas ---
     await db.schema.dropTableIfExists('perfil');
     await db.schema.createTable('perfil', table => { table.increments('id').primary(); table.string('nome'); table.string('cargo'); table.string('email').notNullable().unique(); table.string('senha').notNullable(); table.text('biografia'); table.string('imagem_url'); table.string('linkedin_url'); table.string('github_url'); table.string('lattes_url'); table.string('website_url'); });

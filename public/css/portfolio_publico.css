@@ -50,6 +50,7 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 15px;
+    gap: 10px;
 }
 
 .project-card-title {
@@ -66,7 +67,6 @@
     font-weight: 600;
     white-space: nowrap;
     flex-shrink: 0;
-    margin-left: 10px;
 }
 
 .status-concluido { background-color: #e6f9f1; color: #198754; }
@@ -92,7 +92,24 @@
 
 .project-card-category {
     font-weight: 500;
+    text-transform: capitalize;
     background-color: #e9ecef;
     padding: 3px 10px;
     border-radius: 4px;
+}
+
+.empty-list-placeholder {
+    border-style: solid; 
+    border-color: var(--cor-borda);
+    border-width: 2px;
+    text-align: center;
+    padding: 40px;
+    border-radius: 8px;
+    color: var(--cor-texto-secundario);
+}
+
+.empty-list-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
 }

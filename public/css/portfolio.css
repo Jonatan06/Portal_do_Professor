@@ -14,7 +14,7 @@
     --cor-aviso: #ffc107;
 }
 
-/* --- Cabeçalho da Página Modificado --- */
+/* --- Cabeçalho da Página --- */
 .page-header {
     display: flex;
     justify-content: space-between;
@@ -53,7 +53,7 @@
     align-items: center;
     gap: 8px;
     transition: all 0.2s;
-    flex-shrink: 0; /* Impede que o botão encolha */
+    flex-shrink: 0;
 }
 .btn-outline:hover { background-color: #f8f9fa; border-color: #adb5bd; }
 
@@ -61,7 +61,7 @@
 .project-section { margin-bottom: 50px; }
 .project-section h2 { font-size: 24px; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid var(--cor-borda); }
 .project-section h2 i { margin-right: 12px; color: var(--cor-primaria); }
-.empty-list-placeholder { color: var(--cor-texto-secundario); text-align: center; padding: 20px; background-color: var(--cor-fundo-card); border: 1px dashed var(--cor-borda); border-radius: 8px; }
+.empty-list-placeholder { color: var(--cor-texto-secundario); text-align: center; padding: 20px; background-color: #f8f9fa; border: 1px dashed var(--cor-borda); border-radius: 8px; }
 
 /* Estilos para o Card de Projeto */
 .project-item { display: flex; position: relative; padding-left: 20px; margin-bottom: 30px; }
@@ -70,15 +70,16 @@
 .timeline .dot { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 14px; height: 14px; border-radius: 50%; background-color: #fff; border: 3px solid var(--cor-primaria); }
 .project-details { background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 20px; flex-grow: 1; margin-left: 20px; position: relative; transition: box-shadow 0.2s; }
 .project-details:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-.project-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 5px; }
+.project-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; align-items: center;}
 .btn-icon { background: none; border: none; font-size: 16px; color: var(--cor-texto-secundario); cursor: pointer; padding: 5px; transition: color 0.2s; }
-.btn-icon.btn-edit:hover { color: var(--cor-aviso); }
+.project-actions a { color: var(--cor-texto-secundario); }
+.project-actions a:hover, .btn-icon.btn-edit:hover { color: var(--cor-aviso); }
 .btn-icon.btn-delete:hover { color: var(--cor-perigo); }
 .status-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 12px; margin-bottom: 10px; }
 .status-concluido { background-color: var(--cor-status-concluido-bg); color: var(--cor-status-concluido-text); }
 .status-andamento { background-color: var(--cor-status-andamento-bg); color: var(--cor-status-andamento-text); }
-.project-details h3 { font-size: 20px; margin-bottom: 8px; padding-right: 60px; }
-.project-details p { color: var(--cor-texto-secundario); margin-bottom: 15px; }
+.project-details h3 { font-size: 20px; margin-bottom: 8px; padding-right: 80px; }
+.project-details p { color: var(--cor-texto-secundario); margin-bottom: 15px; line-height: 1.6; }
 .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
 .tags span { background-color: #e9ecef; font-size: 12px; padding: 3px 10px; border-radius: 4px; }
 .meta-info { display: flex; align-items: center; gap: 20px; font-size: 14px; color: var(--cor-texto-secundario); border-top: 1px solid var(--cor-borda); padding-top: 15px; margin-top: 15px; }
@@ -93,12 +94,10 @@
     padding: 25px; 
     border-radius: 8px; 
     width: 90%; 
-    max-width: 650px; 
+    max-width: 700px; /* Aumentado para dar mais espaço ao editor */
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    
-    /* === CORREÇÃO APLICADA AQUI === */
-    max-height: 90vh; /* Define uma altura máxima de 90% da altura da tela */
-    overflow-y: auto; /* Adiciona a barra de rolagem vertical apenas se necessário */
+    max-height: 90vh;
+    overflow-y: auto;
 }
 .modal-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid var(--cor-borda); }
 .modal-header h2 { font-size: 20px; font-weight: 600; }
@@ -113,3 +112,13 @@
 .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding-top: 15px; border-top: 1px solid var(--cor-borda); margin-top: 10px; }
 .btn-save { background-color: var(--cor-primaria); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
 .btn-cancel { background-color: #e9ecef; color: var(--cor-texto-principal); border: 1px solid #ced4da; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+
+/* Estilos para o editor TinyMCE e FilePond para que se integrem bem */
+.tox-tinymce {
+    border-radius: 6px !important;
+    border: 1px solid var(--cor-borda) !important;
+}
+
+.filepond--root {
+    font-family: 'Poppins', sans-serif;
+}

@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const projectsContainer = document.getElementById('project-sections-container');
     
     // --- INICIALIZAÇÃO DAS BIBLIOTECAS ---
+
+    // FilePond para upload de imagens
     FilePond.registerPlugin(FilePondPluginImagePreview);
     const inputElement = document.querySelector('#project-photos');
     const pond = FilePond.create(inputElement, {
@@ -21,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         storeAsFile: true,
     });
 
+    // TinyMCE para o editor de texto rico
     tinymce.init({
         selector: 'textarea#project-description',
         plugins: 'lists link image media table code help wordcount',
@@ -133,12 +136,14 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         
         const id = document.getElementById('project-id')?.value;
-        const url = id ? `${API_URL}/${id}` : API_URL; // Define a URL correta para criar ou editar
+        const url = id ? `${API_URL}/${id}` : API_URL;
 
         const formData = new FormData();
         formData.append('titulo', document.getElementById('project-title').value);
+        
         const descricaoConteudo = tinymce.get('project-description').getContent();
         formData.append('descricao', descricaoConteudo);
+
         formData.append('categoria', document.getElementById('project-category').value);
         formData.append('status', document.getElementById('project-status').value);
         formData.append('tags', document.getElementById('project-tags').value);
@@ -151,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const response = await fetch(url, {
-                method: 'POST', // Usamos POST tanto para criar quanto para atualizar
+                method: 'POST',
                 body: formData,
             });
 

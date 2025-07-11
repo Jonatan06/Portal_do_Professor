@@ -46,7 +46,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Falha ao carregar projetos.');
             const projetos = await response.json();
 
-            // Organiza os projetos por categoria
+            if (projetos.length === 0) {
+                portfolioContainer.innerHTML = `
+                    <div class="empty-list-placeholder" style="border-style: solid; padding: 40px;">
+                        <i class="fas fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>Nenhum projeto foi publicado no momento. Crie um no painel de administrador!</p>
+                    </div>
+                `;
+                return;
+            }
+
             const categories = {
                 pesquisa: { title: 'Projetos de Pesquisa', icon: 'fa-flask', projects: [] },
                 ensino: { title: 'Projetos de Ensino', icon: 'fa-chalkboard-teacher', projects: [] },
@@ -59,9 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             
-            portfolioContainer.innerHTML = ''; // Limpa o container
+            portfolioContainer.innerHTML = '';
 
-            // Renderiza cada seção de categoria com seus cards
             for (const catKey in categories) {
                 const category = categories[catKey];
                 if (category.projects.length > 0) {
