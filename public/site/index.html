@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal do Professor</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/layout_publico.css">
+    <link rel="stylesheet" href="/css/sobre_publico.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-container">
+            <div class="logo"><a href="/">Portal do Professor</a></div>
+            <nav class="main-nav">
+                <a href="/sobre" class="active">Sobre</a>
+                <a href="/blog">Blog</a>
+                <a href="/portfolio">Portfólio</a>
+                <a href="/materiais-de-aula">Materiais</a>
+                <a href="/contato">Contato</a>
+                <a href="/admin" class="btn-login">Área do Professor</a>
+                <a href="/login" class="btn-login">Login do Aluno</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-wrapper container">
+        <section class="profile-header">
+            <img id="profile-photo" src="/uploads/images/default-avatar.png" alt="Foto do Professor" class="profile-photo">
+            <h1 id="profile-name">Carregando...</h1>
+            <h2 id="profile-title"></h2>
+            <p id="profile-bio" class="profile-bio"></p>
+            <div id="profile-social-links" class="social-links"></div>
+        </section>
+
+        <section class="quick-nav">
+            <a href="/blog" class="nav-card">
+                <i class="fas fa-blog"></i>
+                <h3>Blog & Notícias</h3>
+                <p>Veja os últimos artigos e publicações.</p>
+            </a>
+            <a href="/portfolio" class="nav-card">
+                <i class="fas fa-briefcase"></i>
+                <h3>Portfólio de Projetos</h3>
+                <p>Explore os projetos desenvolvidos.</p>
+            </a>
+            <a href="/materiais-de-aula" class="nav-card">
+                <i class="fas fa-folder-open"></i>
+                <h3>Materiais de Aula</h3>
+                <p>Acesse e baixe os materiais disponíveis.</p>
+            </a>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 Portal do Professor. Todos os direitos reservados.</p>
+    </footer>
+    
+    <style>
+
+    </style>
+    <script src="/js/auth_aluno.js"></script>
+    <script src="/js/sobre_publico.js"></script>
+</body>
+</html>
