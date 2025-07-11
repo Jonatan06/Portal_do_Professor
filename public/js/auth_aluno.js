@@ -1,4 +1,27 @@
-// public/js/auth.js (VERSÃO CORRIGIDA E LIMPA)
+function getAlunoToken() {
+    return localStorage.getItem('alunoAuthToken');
+}
+
+// Pega o objeto com os dados do aluno (para UI).
+function getAlunoLogado() {
+    try {
+        return JSON.parse(localStorage.getItem('alunoLogado'));
+    } catch (e) {
+        localStorage.removeItem('alunoLogado');
+        return null;
+    }
+}
+
+const originalFetch = window.fetch;
+window.fetch = function (url, options) {
+    const token = getAlunoToken();
+    const newOptions = options ? { ...options } : {};
+    newOptions.headers = newOptions.headers || {};
+    if (token && url.startsWith('/api/')) {
+        newOptions.headers['x-auth-token'] = token;
+    }
+    return originalFetch(url, newOptions); 
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     const nav = document.querySelector('.main-nav');
@@ -25,7 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutLink.addEventListener('click', (e) => {
                 e.preventDefault();
                 localStorage.removeItem('alunoLogado');
+<<<<<<< HEAD
                 window.location.href = '/'; // Volta para a home
+=======
+                localStorage.removeItem('alunoAuthToken'); // <-- CORREÇÃO APLICADA
+                alert('Você foi desconectado.');
+                window.location.href = '/';
+>>>>>>> 168de462f34bcf838ded4a4ebc0b4dad4b2320a3
             });
 
             // Adiciona os novos elementos ao menu
@@ -34,13 +63,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
-
-function getAlunoLogado() {
-    try {
-        return JSON.parse(localStorage.getItem('alunoLogado'));
-    } catch (e) {
-        // Se houver erro ao parsear, remove o item inválido
-        localStorage.removeItem('alunoLogado');
-        return null;
-    }
-}

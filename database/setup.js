@@ -62,12 +62,26 @@ async function setupDatabase() {
     });
     console.log('✅ Tabela "materiais" criada com sucesso.');
 
+    // --- Tabela de Mensagens (NOVO) ---
+    await db.schema.dropTableIfExists('mensagens');
+    await db.schema.createTable('mensagens', table => {
+        table.increments('id').primary();
+        table.integer('aluno_id').unsigned().notNullable().references('id').inTable('alunos').onDelete('CASCADE');
+        table.string('remetente_nome').notNullable();
+        table.string('remetente_email').notNullable();
+        table.string('assunto').notNullable();
+        table.text('corpo').notNullable();
+        table.timestamp('data_envio').defaultTo(db.fn.now());
+        table.boolean('lida').defaultTo(false); // Para saber se o professor já leu
+    });
+    console.log('✅ Tabela "mensagens" criada com sucesso.');
 
     // --- Outras Tabelas ---
     await db.schema.dropTableIfExists('perfil');
     await db.schema.createTable('perfil', table => { table.increments('id').primary(); table.string('nome'); table.string('cargo'); table.string('email').notNullable().unique(); table.string('senha').notNullable(); table.text('biografia'); table.string('imagem_url'); table.string('linkedin_url'); table.string('github_url'); table.string('lattes_url'); table.string('website_url'); });
     const salt = await bcrypt.genSalt(10);
     const senhaHashProfessor = await bcrypt.hash('123', salt);
+    await db('perfil').insert({ id: 2, nome: 'Matheus de Oliveira', cargo: 'Professor', email: 'matheus12@gmail.com', senha: senhaHashProfessor, imagem_url: '/uploads/images/default-avatar.png' });
     await db('perfil').insert({ id: 1, nome: 'Ridis Pereira Ribeiro', cargo: 'Professor', email: 'professor@email.com', senha: senhaHashProfessor, imagem_url: '/uploads/images/default-avatar.png' });
     console.log('✅ Tabela "perfil" criada.');
 

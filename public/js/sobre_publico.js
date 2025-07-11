@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadProfileData() {
         try {
-            const response = await fetch('/api/profile');
+            const response = await fetch('/api/public-profile'); 
             if (!response.ok) throw new Error('Falha ao buscar perfil.');
             const profile = await response.json();
 

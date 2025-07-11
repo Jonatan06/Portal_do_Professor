@@ -12,7 +12,10 @@ const db = require('./database/db'); // Conexão Knex com o banco de dados
 const multer = require('multer');   // Middleware para upload de arquivos
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken'); // <-- IMPORTE O JWT AQUI
+const authenticateProfessor = require('./middleware/authenticateProfessor');
 const JWT_SECRET = 'R!d1sRIbeir0';
+const authenticateAluno = require('./middleware/authenticateAluno');
+const JWT_SECRET_ALUNO = 'R!d1sRIbeir0!';
 
 // --- 2. VERIFICAÇÃO INICIAL DO BANCO DE DADOS ---
 const dbPath = path.resolve(__dirname, 'database/portal.db');
@@ -116,10 +119,18 @@ app.post('/api/alunos/login', async (req, res) => {
         }
 
         // Login bem-sucedido 
+        const token = jwt.sign(
+            { id: aluno.id, nome: aluno.nome, email: aluno.email, role: 'aluno' },
+            JWT_SECRET_ALUNO, // Use a chave secreta do aluno
+            { expiresIn: '8h' }
+        );
+
+        // 2. Envie o token na resposta
         res.json({
             success: true,
             message: 'Login bem-sucedido!',
-            aluno: { //OBJETO ADICIONADO
+            token: token, // Envie o token
+            aluno: {      // Você pode continuar enviando o objeto 'aluno' para compatibilidade
                 id: aluno.id,
                 nome: aluno.nome,
                 email: aluno.email
@@ -171,36 +182,118 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // API: PERFIL
-app.get('/api/profile', async (req, res) => {
+app.get('/api/profile', authenticateProfessor, async (req, res) => {
     try {
-        const profile = await db('perfil').first();
+        const profile = await db('perfil').where({ id: req.professor.id }).first();
         if (profile) res.json(profile);
         else res.status(404).json({ message: "Perfil não encontrado." });
     } catch (err) { res.status(500).json({ message: "Erro ao buscar perfil." }); }
 });
-app.put('/api/profile', async (req, res) => {
+
+app.put('/api/profile', authenticateProfessor, async (req, res) => {
     try {
         delete req.body.imagem_url;
-        const count = await db('perfil').where('id', 1).update(req.body);
-        if (count > 0) res.json(await db('perfil').where('id', 1).first());
-        else res.status(404).json({ message: "Perfil não encontrado." });
+        // Garante que um professor só possa editar o seu próprio perfil
+        const count = await db('perfil').where('id', req.professor.id).update(req.body);
+        if (count > 0) {
+            const updatedProfile = await db('perfil').where('id', req.professor.id).first();
+            res.json(updatedProfile);
+        } else {
+            res.status(404).json({ message: "Perfil não encontrado." });
+        }
     } catch (err) { res.status(500).json({ message: "Erro ao salvar perfil." }); }
 });
-app.post('/api/profile/picture', imageUpload.single('profilePicture'), async (req, res) => {
+
+app.post('/api/profile/picture', authenticateProfessor, imageUpload.single('profilePicture'), async (req, res) => {
     if (!req.file) { return res.status(400).json({ message: 'Nenhum arquivo de imagem enviado.' }); }
     try {
-        const currentProfile = await db('perfil').where('id', 1).first();
-        if (currentProfile && currentProfile.imagem_url) {
-            const oldImagePath = path.join(__dirname, 'public', currentProfile.imagem_url);
-            if (!currentProfile.imagem_url.includes('default-avatar.png') && fs.existsSync(oldImagePath)) {
-                fs.unlinkSync(oldImagePath);
-            }
-        }
         const imagem_url = `/uploads/images/${req.file.filename}`;
-        await db('perfil').where('id', 1).update({ imagem_url });
-        const updatedProfile = await db('perfil').where('id', 1).first();
+        // Garante que a foto seja atualizada no perfil do professor logado
+        await db('perfil').where('id', req.professor.id).update({ imagem_url });
+        const updatedProfile = await db('perfil').where('id', req.professor.id).first();
         res.json(updatedProfile);
-    } catch (err) { console.error("ERRO DETALHADO ao fazer upload da foto de perfil:", err); res.status(500).json({ message: `Erro interno ao processar a imagem: ${err.message}` }); }
+    } catch (err) {
+    console.error("ERRO DETALHADO ao fazer upload da foto de perfil:", err); res.status(500).json({ message: `Erro interno ao processar a imagem: ${err.message}` }); }
+});
+
+app.get('/api/public-profile', async (req, res) => {
+    try {
+        // Busca o perfil do professor com ID = 1, como você pediu.
+        const profile = await db('perfil').where({ id: 1 }).first();
+
+        if (profile) {
+            // Remove a senha antes de enviar os dados para o frontend!
+            delete profile.senha; 
+            res.json(profile);
+        } else {
+            res.status(404).json({ message: "Perfil principal não encontrado." });
+        }
+    } catch (err) {
+        console.error("Erro ao buscar perfil público:", err);
+        res.status(500).json({ message: "Erro ao buscar perfil." });
+    }
+});
+
+// API: MENSAGENS
+// Rota para o ALUNO enviar uma mensagem (protegida)
+app.post('/api/mensagens', authenticateAluno, async (req, res) => {
+    const { assunto, corpo } = req.body;
+    const { id, nome, email } = req.aluno; // Dados do token
+
+    if (!assunto || !corpo) {
+        return res.status(400).json({ message: "Assunto e corpo da mensagem são obrigatórios." });
+    }
+
+    try {
+        const novaMensagem = {
+            aluno_id: id,
+            remetente_nome: nome,
+            remetente_email: email,
+            assunto,
+            corpo
+        };
+        await db('mensagens').insert(novaMensagem);
+        res.status(201).json({ success: true, message: 'Mensagem enviada com sucesso!' });
+    } catch (err) {
+        console.error("Erro ao enviar mensagem:", err);
+        res.status(500).json({ message: "Erro interno ao enviar mensagem." });
+    }
+});
+
+// Rota para o PROFESSOR buscar todas as mensagens (protegida)
+app.get('/api/mensagens', authenticateProfessor, async (req, res) => {
+    try {
+        const mensagens = await db('mensagens').select('*').orderBy('data_envio', 'desc');
+        res.json(mensagens);
+    } catch (err) {
+        res.status(500).json({ message: "Erro ao buscar mensagens." });
+    }
+});
+
+// Rota para o PROFESSOR marcar uma mensagem como lida (protegida)
+app.put('/api/mensagens/:id/read', authenticateProfessor, async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db('mensagens').where({ id }).update({ lida: true });
+        res.status(200).json({ success: true, message: 'Mensagem marcada como lida.' });
+    } catch (err) {
+        res.status(500).json({ message: "Erro ao atualizar mensagem." });
+    }
+});
+
+// Rota para o PROFESSOR apagar uma mensagem (protegida)
+app.delete('/api/mensagens/:id', authenticateProfessor, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const count = await db('mensagens').where({ id }).del();
+        if (count > 0) {
+            res.status(204).send();
+        } else {
+            res.status(404).json({ message: "Mensagem não encontrada." });
+        }
+    } catch (err) {
+        res.status(500).json({ message: "Erro ao apagar mensagem." });
+    }
 });
 
 // API: MATERIAIS

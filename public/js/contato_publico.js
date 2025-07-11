@@ -27,22 +27,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DE ENVIO DO FORMULÁRIO ---
-    contactForm.addEventListener('submit', (e) => {
-        e.preventDefault(); 
-        console.log('Formulário enviado (simulação)');
-        
-        // Simulação de envio bem-sucedido
-        if (successMessage) {
-            successMessage.classList.remove('hidden');
+contactForm.addEventListener('submit', async (e) => { // Adicione 'async'
+    e.preventDefault(); 
+    
+    const assunto = document.getElementById('subject').value;
+    const corpo = document.getElementById('message').value;
+
+    try {
+        const response = await fetch('/api/mensagens', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ assunto, corpo })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Erro ao enviar a mensagem.");
         }
-        // Limpa apenas os campos que o usuário preencheu
+
+        // Sucesso!
+        if (successMessage) successMessage.classList.remove('hidden');
         document.getElementById('subject').value = '';
         document.getElementById('message').value = '';
 
         setTimeout(() => {
-            if (successMessage) {
-                successMessage.classList.add('hidden');
-            }
-        }, 5000); 
-    });
+            if (successMessage) successMessage.classList.add('hidden');
+        }, 5000);
+
+    } catch (error) {
+        alert(error.message); // Mostra o erro para o usuário
+    }
+});
 });
