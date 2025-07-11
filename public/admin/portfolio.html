@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfólio de Projetos - Portal do Professor</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/portfolio.css"> 
+    <script src="https://cdn.tiny.cloud/1/e8exq13u9kfiizce08p5pswh3vfeggk90iyldcnjr5cr1cf0/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-user-tie"></i>
+            <h1>Painel do Professor</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="dashboard.html"><i class="fas fa-home nav-icon"></i> <span>Dashboard</span></a></li>
+                <li><a href="perfil.html"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
+                <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
+                <li><a href="materiais.html"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
+                <li><a href="agenda.html"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
+                <li><a href="portfolio.html" class="active"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
+                <li><a href="caixa_entrada.html"><i class="fas fa-envelope nav-icon"></i> <span>Contatos</span></a></li>
+                <li><a href="sobre.html"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
+            </ul>
+        </nav>
+        <a href="/" target="_blank" class="sidebar-view-public-btn">Ver Site Público</a>
+    </aside>
+
+    <main class="main-content-wrapper">
+        <div class="page-header">
+            <div class="header-content">
+                <h1><i class="fa-solid fa-briefcase"></i> Portfólio de Projetos</h1>
+                <p>Conheça e gerencie os projetos de pesquisa, ensino e extensão desenvolvidos.</p>
+                <button class="btn btn-add-project"><i class="fa-solid fa-plus"></i> Adicionar Novo Projeto</button>
+            </div>
+            <a href="dashboard.html" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+            </a>
+        </div>
+        
+        <div id="project-sections-container">
+            </div>
+    </main>
+
+    <div class="modal-overlay hidden" id="project-modal">
+         <div class="modal-content">
+            <header class="modal-header">
+                <h2 id="modal-title">Adicionar Novo Projeto</h2>
+                <button class="close-modal-btn" title="Fechar">×</button>
+            </header>
+            <div class="modal-body">
+                <form id="project-form">
+                    <div class="form-group">
+                        <label for="project-title">Título do Projeto</label>
+                        <input type="text" id="project-title" name="titulo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="project-description">Descrição</label>
+                        <textarea id="project-description" name="descricao" rows="4"></textarea>
+                    </div>
+                     <div class="form-group">
+                        <label for="project-photos">Fotos do Projeto (Arraste ou Clique para Adicionar)</label>
+                        <input type="file" id="project-photos" name="fotos" multiple>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="project-category">Categoria</label>
+                            <select id="project-category" name="categoria" required>
+                                <option value="" disabled selected>Selecione...</option>
+                                <option value="pesquisa">Pesquisa</option>
+                                <option value="ensino">Ensino</option>
+                                <option value="extensao">Extensão</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="project-status">Status</label>
+                            <select id="project-status" name="status" required>
+                                <option value="andamento">Em Andamento</option>
+                                <option value="concluido">Concluído</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="project-tags">Tags (separadas por vírgula)</label>
+                        <input type="text" id="project-tags" name="tags" placeholder="Ex: Educação, Pedagogia, Pesquisa">
+                    </div>
+                    <div class="form-row">
+                         <div class="form-group">
+                            <label for="project-period">Período</label>
+                            <input type="text" id="project-period" name="periodo" placeholder="Ex: 2023 - 2024" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="project-link">Link Externo (opcional)</label>
+                            <input type="url" id="project-link" name="link_externo" placeholder="https://...">
+                        </div>
+                    </div>
+                    <footer class="modal-footer">
+                        <button type="button" class="btn btn-cancel">Cancelar</button>
+                        <button type="submit" class="btn btn-save">Salvar Projeto</button>
+                    </footer>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/auth.js"></script>
+
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+    
+    <script src="/js/portfolio.js"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materiais de Aula - Portal do Professor</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/materiais.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-user-tie"></i>
+            <h1>Painel do Professor</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-home nav-icon"></i> <span>Dashboard</span></a></li>
+                    <li><a href="perfil.html"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
+                    <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
+                    <li><a href="materiais.html" class="active"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
+                    <li><a href="agenda.html"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
+                    <li><a href="portfolio.html"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
+                    <li><a href="caixa_entrada.html"><i class="fas fa-envelope nav-icon"></i> <span>Contatos</span></a></li>
+                    <li><a href="sobre.html"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
+            </ul>
+        </nav>
+        <a href="/" target="_blank" class="sidebar-view-public-btn">Ver Site Público</a>
+    </aside>
+
+    <main class="main-content-wrapper">
+        <div class="page-header">
+            <div class="header-content">
+                <h1><i class="fa-solid fa-folder-open"></i> Materiais de Aula</h1>
+                <p>Acesse e gerencie slides, apostilas, exercícios e outros recursos.</p>
+            </div>
+            <a href="dashboard.html" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+            </a>
+        </div>
+        <button class="btn btn-add-material"><i class="fa-solid fa-plus"></i> Adicionar Novo Material</button>
+        <div class="filter-tabs">
+            <a href="#" class="tab-link active" data-filter="todos">Todos</a>
+            <a href="#" class="tab-link" data-filter="slides">Slides</a>
+            <a href="#" class="tab-link" data-filter="apostilas">Apostilas</a>
+            <a href="#" class="tab-link" data-filter="exercicios">Exercícios</a>
+            <a href="#" class="tab-link" data-filter="videos">Vídeos</a>
+            <a href="#" class="tab-link" data-filter="outros">Outros</a>
+        </div>
+        <div class="materials-container"></div>
+    </main>
+
+    <div class="modal-overlay hidden" id="material-modal">
+        <div class="modal-content">
+            <header class="modal-header"><h2 id="modal-title">Adicionar Novo Material</h2><button class="close-modal-btn" title="Fechar">×</button></header>
+            <div class="modal-body">
+                <form id="material-form">
+                    <input type="hidden" id="material-id" name="id">
+                    <div class="form-group"><label for="material-title">Título do Material</label><input type="text" id="material-title" name="titulo" placeholder="Ex: Slides da Aula 5" required></div>
+                    <div class="form-group"><label for="material-description">Descrição</label><textarea id="material-description" name="descricao" rows="3" placeholder="Uma breve descrição..." required></textarea></div>
+                    <div class="form-group"><label for="material-category">Categoria</label><select id="material-category" name="categoria" required><option value="" disabled selected>Selecione...</option><option value="slides">Slides</option><option value="apostilas">Apostilas</option><option value="exercicios">Exercícios</option><option value="videos">Vídeos</option><option value="outros">Outros</option></select></div>
+                    <div class="form-group">
+                        <label for="material-file">Arquivo do Material</label>
+                        <div class="file-upload-wrapper"><input type="file" id="material-file" name="materialFile" class="file-input"><label for="material-file" class="file-label"><i class="fa-solid fa-cloud-arrow-up"></i><span class="file-label-text">Clique para escolher...</span></label></div>
+                        <small>Deixe em branco se for apenas um link.</small>
+                    </div>
+                    <div class="form-group"><label for="material-link">Ou insira um Link Externo</label><input type="url" id="material-link" name="link_externo" placeholder="https://..."></div>
+                    <footer class="modal-footer"><button type="button" class="btn btn-cancel" id="cancel-btn">Cancelar</button><button type="submit" class="btn btn-save" id="save-btn">Salvar</button></footer>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="/js/auth.js"></script>
+    <script src="/js/materiais.js"></script>
+</body>
+</html>
