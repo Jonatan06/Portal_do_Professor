@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+<<<<<<< HEAD
+=======
+
+>>>>>>> d0e4a8b664ad6bbef5d8022befabca3e29fbb11a
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Professor - Agenda</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+<<<<<<< HEAD
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,6 +19,16 @@
     <link rel="stylesheet" href="/css/tooltip.css"> </head>
 <body>
     <div id="toast-container"></div>
+=======
+    <link rel="stylesheet" href="/css/agenda.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/layout.css">
+</head>
+
+<body>
+>>>>>>> d0e4a8b664ad6bbef5d8022befabca3e29fbb11a
 
     <div class="app-container">
         <aside class="sidebar">
@@ -49,6 +64,10 @@
                         <button id="next-month-btn" class="nav-btn"><i class='bx bx-chevron-right'></i></button>
                     </div>
                 </header>
+<<<<<<< HEAD
+=======
+
+>>>>>>> d0e4a8b664ad6bbef5d8022befabca3e29fbb11a
                 <div class="calendar-container">
                     <div class="calendar-grid">
                         <div class="day-header">DOM</div>
@@ -59,10 +78,17 @@
                         <div class="day-header">SEX</div>
                         <div class="day-header">SÁB</div>
                     </div>
+<<<<<<< HEAD
                     <div class="calendar-body" id="calendar-body">
                         </div>
                 </div>
             </main>
+=======
+                    <div class="calendar-body" id="calendar-body"></div>
+                </div>
+            </main>
+
+>>>>>>> d0e4a8b664ad6bbef5d8022befabca3e29fbb11a
             <aside class="events-sidebar">
                 <div class="events-header">
                     <h3>Eventos do Mês</h3>
@@ -71,7 +97,15 @@
                     </button>
                 </div>
                 <div class="events-list" id="events-list-container">
+<<<<<<< HEAD
                     </div>
+=======
+                    <div class="no-events-placeholder">
+                        <i class='bx bx-calendar-x'></i>
+                        <span>Nenhum evento neste mês.</span>
+                    </div>
+                </div>
+>>>>>>> d0e4a8b664ad6bbef5d8022befabca3e29fbb11a
             </aside>
         </div>
     </div>
@@ -84,8 +118,15 @@
             </header>
             <form id="event-form">
                 <input type="hidden" id="event-id">
+<<<<<<< HEAD
                 <div class="form-group"><label for="event-title">Título do Evento</label><input type="text" id="event-title" placeholder="Ex: Reunião Pedagógica" required></div>
                 <div class="form-group"><label for="event-date">Data</label><input type="date" id="event-date" required></div>
+=======
+                <div class="form-group"><label for="event-title">Título do Evento</label><input type="text"
+                        id="event-title" placeholder="Ex: Reunião Pedagógica" required></div>
+                <div class="form-group"><label for="event-date">Data</label><input type="date" id="event-date" required>
+                </div>
+>>>>>>> d0e4a8b664ad6bbef5d8022befabca3e29fbb11a
                 <div class="form-group">
                     <label for="event-type">Tipo de Evento</label>
                     <select id="event-type">
@@ -94,14 +135,24 @@
                         <option value="aula">Aula Especial</option>
                         <option value="pessoal">Pessoal</option>
                     </select>
+<<<<<<< HEAD
                 </div>
                 <footer class="modal-footer">
                     <button type="button" class="btn btn-danger" id="delete-event-btn" style="display: none; margin-right: auto;">Apagar</button>
+=======
+                    <div class="form-group"><label for="event-observation">Observação</label><input type="text"
+                                id="event-observation" placeholder="Ex: Motivos"></div>
+                </div>
+                <footer class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="delete-event-btn"
+                        style="display: none; margin-right: auto;">Apagar</button>
+>>>>>>> d0e4a8b664ad6bbef5d8022befabca3e29fbb11a
                     <button type="submit" class="btn btn-primary">Salvar</button>
                 </footer>
             </form>
         </div>
     </div>
+<<<<<<< HEAD
     
     <div id="confirmation-modal" class="modal-overlay hidden">
         <div class="confirmation-modal-content">
@@ -118,4 +169,11 @@
     <script src="/js/tooltip.js"></script> <script src="/js/auth.js"></script>
     <script src="/js/agenda.js"></script>
 </body>
+=======
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/agenda.js"></script>
+</body>
+
+>>>>>>> d0e4a8b664ad6bbef5d8022befabca3e29fbb11a
 </html>
