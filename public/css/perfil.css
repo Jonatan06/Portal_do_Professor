@@ -106,12 +106,11 @@
 }
 
 .btn-save-picture {
-    display: none; /* Inicialmente oculto */
+    display: flex; /* Inicialmente oculto */
     width: calc(100% - 20px);
     position: absolute;
     bottom: -15px;
     left: 50%;
-    transform: translateX(-50%);
     padding: 8px 15px;
     font-size: 14px;
     background-color: #198754;
@@ -120,6 +119,7 @@
     border-radius: 6px;
     cursor: pointer;
     z-index: 10;
+    
 }
 
 .contact-info h3, .basic-info h3, .social-media h3 {

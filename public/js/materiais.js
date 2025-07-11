@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="btn-icon btn-delete" title="Apagar"><i class="fa-solid fa-trash"></i></button>
                     </div>
                     <a href="${accessLink}" ${targetAttribute} ${downloadAttribute} class="btn btn-download">
-                        <i class="fa-solid fa-download"></i> Acessar
+                        <i class="fa-solid fa-download"></i> Baixar
                     </a>
                 </div>
             </article>`;

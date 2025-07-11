@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutLink.addEventListener('click', (e) => {
                 e.preventDefault();
                 localStorage.removeItem('alunoLogado');
-                alert('Você foi desconectado.');
                 window.location.href = '/'; // Volta para a home
             });
 

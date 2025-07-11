@@ -194,9 +194,12 @@ body {
 .forget{
     text-decoration: none;
     color: #007bff;
-
 }
 
+.forget:hover{
+    text-decoration: underline;
+    color: var(--cor-primaria-escura);
+}
 
 /* --- FIM DOS ESTILOS CORRIGIDOS --- */
 
