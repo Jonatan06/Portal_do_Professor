@@ -63,38 +63,76 @@
 .project-section h2 i { margin-right: 12px; color: var(--cor-primaria); }
 .empty-list-placeholder { color: var(--cor-texto-secundario); text-align: center; padding: 20px; background-color: #f8f9fa; border: 1px dashed var(--cor-borda); border-radius: 8px; }
 
-/* Estilos para o Card de Projeto */
-.project-item { display: flex; position: relative; padding-left: 20px; margin-bottom: 30px; }
-.timeline { position: absolute; left: 6px; top: 5px; bottom: -15px; width: 2px; background-color: var(--cor-borda); }
-.project-item:last-child .timeline { display: none; }
-.timeline .dot { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 14px; height: 14px; border-radius: 50%; background-color: #fff; border: 3px solid var(--cor-primaria); }
-.project-details { background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 20px; flex-grow: 1; margin-left: 20px; position: relative; transition: box-shadow 0.2s; }
-.project-details:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-.project-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; align-items: center;}
-.btn-icon { background: none; border: none; font-size: 16px; color: var(--cor-texto-secundario); cursor: pointer; padding: 5px; transition: color 0.2s; }
-.project-actions a { color: var(--cor-texto-secundario); }
+/* --- NOVO LAYOUT DO CARD DE PROJETO (FLEXBOX) --- */
+.project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px; /* Espaçamento entre os cards */
+}
+
+.project-item {
+    display: flex; /* Cria o layout de duas colunas */
+    background-color: var(--cor-fundo-card);
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    padding: 20px;
+    gap: 20px; /* Espaço entre a imagem e o conteúdo */
+    align-items: flex-start; /* Alinha o topo da imagem com o topo do texto */
+    transition: box-shadow 0.2s ease-in-out;
+}
+.project-item:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+}
+
+.project-item-cover-image {
+    width: 280px;  /* Largura fixa para a imagem */
+    height: 170px; /* Altura fixa para a imagem */
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0; /* Impede que a imagem seja esmagada */
+}
+
+.project-details {
+    flex-grow: 1; /* Faz esta área ocupar o resto do espaço */
+    position: relative; /* Contexto para os botões de ação */
+    padding-top: 35px; /* Empurra o conteúdo para baixo para dar espaço aos botões */
+}
+
+.project-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: 8px;
+}
+.btn-icon { background: none; border: 1px solid transparent; width: 32px; height: 32px; display:flex; align-items:center; justify-content:center; border-radius: 50%; font-size: 14px; color: var(--cor-texto-secundario); cursor: pointer; transition: all 0.2s; }
+.btn-icon:hover { background-color: #f0f0f0; border-color: #ddd; }
+.project-actions a { color: var(--cor-texto-secundario); text-decoration: none; }
 .project-actions a:hover, .btn-icon.btn-edit:hover { color: var(--cor-aviso); }
 .btn-icon.btn-delete:hover { color: var(--cor-perigo); }
+
 .status-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 12px; margin-bottom: 10px; }
 .status-concluido { background-color: var(--cor-status-concluido-bg); color: var(--cor-status-concluido-text); }
 .status-andamento { background-color: var(--cor-status-andamento-bg); color: var(--cor-status-andamento-text); }
-.project-details h3 { font-size: 20px; margin-bottom: 8px; padding-right: 80px; }
+
+.project-details h3 { font-size: 20px; margin-top: 0; margin-bottom: 8px; }
 .project-details p { color: var(--cor-texto-secundario); margin-bottom: 15px; line-height: 1.6; }
 .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
 .tags span { background-color: #e9ecef; font-size: 12px; padding: 3px 10px; border-radius: 4px; }
 .meta-info { display: flex; align-items: center; gap: 20px; font-size: 14px; color: var(--cor-texto-secundario); border-top: 1px solid var(--cor-borda); padding-top: 15px; margin-top: 15px; }
 .meta-info i { margin-right: 5px; }
-.meta-info a { color: var(--cor-primaria); }
+.meta-info a { color: var(--cor-primaria); text-decoration: none; }
+.meta-info a:hover { text-decoration: underline; }
 
-/* Modal */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 1; transition: opacity 0.3s ease; }
+/* Modal (sem alterações) */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
 .modal-overlay.hidden { opacity: 0; pointer-events: none; }
 .modal-content { 
     background: #fff; 
     padding: 25px; 
     border-radius: 8px; 
     width: 90%; 
-    max-width: 700px; /* Aumentado para dar mais espaço ao editor */
+    max-width: 700px; 
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     max-height: 90vh;
     overflow-y: auto;
@@ -105,7 +143,8 @@
 .modal-body { padding-top: 25px; }
 .form-group { margin-bottom: 20px; }
 .form-group label { display: block; font-weight: 500; font-size: 14px; margin-bottom: 8px; }
-.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--cor-borda); border-radius: 6px; font-size: 15px; font-family: 'Poppins', sans-serif; transition: border-color 0.2s, box-shadow 0.2s; }
+.form-group input, .form-group textarea, .form-group select, .form-control-file { width: 100%; padding: 10px; border: 1px solid var(--cor-borda); border-radius: 6px; font-size: 15px; font-family: 'Poppins', sans-serif; transition: border-color 0.2s, box-shadow 0.2s; }
+.form-control-file { padding: 0; }
 .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--cor-primaria); box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15); }
 .form-row { display: flex; gap: 20px; align-items: flex-start; }
 .form-row .form-group { flex: 1; }
@@ -121,4 +160,11 @@
 
 .filepond--root {
     font-family: 'Poppins', sans-serif;
+}
+.img-preview {
+    max-width: 100%;
+    height: auto;
+    margin-top: 15px;
+    border-radius: 6px;
+    border: 1px solid var(--cor-borda);
 }

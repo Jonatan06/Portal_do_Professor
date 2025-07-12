@@ -11,7 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalTitle = document.getElementById('modal-title');
     const projectsContainer = document.getElementById('project-sections-container');
     
-    // --- INICIALIZAÇÃO DAS BIBLIOTECAS ---
+    const coverImageInput = document.getElementById('project-cover-image');
+    const coverImagePreview = document.getElementById('cover-image-preview');
+
     FilePond.registerPlugin(FilePondPluginImagePreview);
     const inputElement = document.querySelector('#project-photos');
     const pond = FilePond.create(inputElement, {
@@ -35,6 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
         pond.removeFiles();
         tinymce.get('project-description').setContent('');
         modalTitle.textContent = 'Adicionar Novo Projeto';
+        coverImagePreview.style.display = 'none';
+        coverImagePreview.src = '#';
+
         const existingIdField = document.getElementById('project-id');
         if (existingIdField) existingIdField.remove();
         modal.classList.remove('hidden');
@@ -67,6 +72,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('project-period').value = projectDetails.periodo;
             document.getElementById('project-link').value = projectDetails.link_externo || '';
             tinymce.get('project-description').setContent(projectDetails.descricao || '');
+
+            if (projectDetails.imagem_capa_url) {
+                coverImagePreview.src = projectDetails.imagem_capa_url;
+                coverImagePreview.style.display = 'block';
+            } else {
+                coverImagePreview.style.display = 'none';
+                coverImagePreview.src = '#';
+            }
 
             modal.classList.remove('hidden');
         } catch (error) {
@@ -104,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- RENDERIZAÇÃO E LÓGICA DA API ---
-    // ATUALIZADO com data-tooltip
+    // ATUALIZADO: Nova estrutura HTML para o card
     function createProjectHTML(data) {
         const statusClass = data.status === 'concluido' ? 'status-concluido' : 'status-andamento';
         const categoryText = data.categoria.charAt(0).toUpperCase() + data.categoria.slice(1);
@@ -113,12 +126,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const tagsHTML = tagsArray.map(tag => `<span>${tag.trim()}</span>`).join('');
         const linkHTML = data.link_externo ? `<a href="${data.link_externo}" target="_blank" rel="noopener noreferrer" data-tooltip="Ver link externo"><i class="fa-solid fa-external-link-alt"></i></a>` : '';
         const detailLink = `<a href="/portfolio-detalhe?id=${data.id}" target="_blank" data-tooltip="Ver página do projeto"><i class="fa-solid fa-eye"></i></a>`;
-
         const cleanDescription = (data.descricao || '').replace(/<[^>]*>?/gm, ' ');
+        
+        const imageUrl = data.imagem_capa_url || '/uploads/images/default-image.png';
 
         return `
             <article class="project-item" data-id="${data.id}" data-title="${data.titulo}">
-                <div class="timeline"><div class="dot"></div></div>
+                <img src="${imageUrl}" alt="Capa do projeto ${data.titulo}" class="project-item-cover-image">
                 <div class="project-details">
                     <div class="project-actions">
                         ${detailLink}
@@ -137,7 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </article>`;
     }
     
-    // ATUALIZADO com chamada para initTooltips()
     async function fetchAndRenderProjects() {
         try {
             const response = await fetch(API_URL);
@@ -151,7 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const sectionHTML = `<section class="project-section" id="${catKey}"><h2><i class="fa-solid ${category.icon}"></i> ${category.title}</h2><div class="project-list">${category.projects.length > 0 ? category.projects.map(createProjectHTML).join('') : '<p class="empty-list-placeholder">Nenhum projeto nesta categoria ainda.</p>'}</div></section>`;
                 projectsContainer.insertAdjacentHTML('beforeend', sectionHTML);
             }
-            // Chama a inicialização dos tooltips após renderizar o conteúdo
             initTooltips();
         } catch (error) {
             console.error("Erro ao renderizar projetos:", error);
@@ -168,15 +180,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = new FormData();
         formData.append('titulo', document.getElementById('project-title').value);
-        
-        const descricaoConteudo = tinymce.get('project-description').getContent();
-        formData.append('descricao', descricaoConteudo);
-
+        formData.append('descricao', tinymce.get('project-description').getContent());
         formData.append('categoria', document.getElementById('project-category').value);
         formData.append('status', document.getElementById('project-status').value);
         formData.append('tags', document.getElementById('project-tags').value);
         formData.append('periodo', document.getElementById('project-period').value);
         formData.append('link_externo', document.getElementById('project-link').value);
+
+        if (coverImageInput.files[0]) {
+            formData.append('imagem_capa', coverImageInput.files[0]);
+        }
 
         pond.getFiles().forEach(fileItem => {
             formData.append('fotos', fileItem.file);
@@ -246,6 +259,18 @@ document.addEventListener('DOMContentLoaded', () => {
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
     projectForm.addEventListener('submit', handleFormSubmit);
     projectsContainer.addEventListener('click', handleContainerClick);
+
+    coverImageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                coverImagePreview.src = event.target.result;
+                coverImagePreview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
 
     // --- INICIALIZAÇÃO ---
     fetchAndRenderProjects();

@@ -43,6 +43,12 @@ const createMulterStorage = (destination) => {
 const imageUpload = multer({ storage: createMulterStorage('uploads/images') });
 const materialUpload = multer({ storage: createMulterStorage('uploads/materiais') });
 const portfolioMediaUpload = multer({ storage: createMulterStorage('uploads/portfolio') });
+// Novo handler que aceita um campo 'imagem_capa' e um campo 'fotos'
+const projectFormHandler = portfolioMediaUpload.fields([
+    { name: 'imagem_capa', maxCount: 1 },
+    { name: 'fotos', maxCount: 10 }
+]);
+
 
 // --- 4. INICIALIZAÇÃO DO EXPRESS ---
 const app = express();
@@ -185,6 +191,36 @@ app.get('/api/public-profile', async (req, res) => {
     }
 });
 
+// --- NOVAS ROTAS PARA A PÁGINA SOBRE ---
+app.get('/api/sobre', async (req, res) => {
+    try {
+        const sobreConteudos = await db('sobre_conteudo').select('*');
+        const sobreObjeto = sobreConteudos.reduce((obj, item) => {
+            obj[item.secao] = item.conteudo;
+            return obj;
+        }, {});
+        res.json(sobreObjeto);
+    } catch (err) {
+        console.error("Erro ao buscar conteúdo da página Sobre:", err);
+        res.status(500).json({ message: "Erro ao buscar conteúdo." });
+    }
+});
+
+app.put('/api/sobre', authenticateProfessor, async (req, res) => {
+    const { formacao, interesses } = req.body;
+    const trx = await db.transaction();
+    try {
+        await trx('sobre_conteudo').where('secao', 'formacao').update({ conteudo: formacao });
+        await trx('sobre_conteudo').where('secao', 'interesses').update({ conteudo: interesses });
+        await trx.commit();
+        res.status(200).json({ success: true, message: 'Página "Sobre" atualizada com sucesso!' });
+    } catch (err) {
+        await trx.rollback();
+        console.error("Erro ao atualizar conteúdo da página Sobre:", err);
+        res.status(500).json({ message: "Erro ao atualizar conteúdo." });
+    }
+});
+
 // API: MENSAGENS
 app.post('/api/mensagens', authenticateAluno, async (req, res) => {
     const { assunto, corpo } = req.body;
@@ -281,22 +317,31 @@ app.get('/api/projetos', async (req, res) => {
     } catch (err) { res.status(500).json({ message: "Erro ao buscar projetos." }); }
 });
 
-app.post('/api/projetos', portfolioMediaUpload.array('fotos', 10), async (req, res) => {
+app.post('/api/projetos', projectFormHandler, async (req, res) => {
     const { titulo, descricao, categoria, status, periodo, tags, link_externo } = req.body;
     const trx = await db.transaction();
     try {
+        let capaUrl = null;
+        if (req.files && req.files.imagem_capa) {
+            capaUrl = `/${path.relative('public', req.files.imagem_capa[0].path).replace(/\\/g, "/")}`;
+        }
+
         const [projetoResult] = await trx('projetos').insert({
-            titulo, descricao, categoria, status, periodo, tags, link_externo
+            titulo, descricao, categoria, status, periodo, tags, link_externo,
+            imagem_capa_url: capaUrl
         }).returning('id');
+
         const projetoId = typeof projetoResult === 'object' ? projetoResult.id : projetoResult;
-        if (req.files && req.files.length > 0) {
-            const medias = req.files.map(file => ({
+        
+        if (req.files && req.files.fotos) {
+            const medias = req.files.fotos.map(file => ({
                 caminho_arquivo: `/${path.relative('public', file.path).replace(/\\/g, "/")}`,
                 tipo_midia: 'imagem',
                 projeto_id: projetoId
             }));
             await trx('portfolio_media').insert(medias);
         }
+
         await trx.commit();
         const novoProjeto = await db('projetos').where({ id: projetoId }).first();
         res.status(201).json(novoProjeto);
@@ -307,22 +352,28 @@ app.post('/api/projetos', portfolioMediaUpload.array('fotos', 10), async (req, r
     }
 });
 
-app.post('/api/projetos/:id', portfolioMediaUpload.array('fotos', 10), async (req, res) => {
+app.post('/api/projetos/:id', projectFormHandler, async (req, res) => {
     const { id } = req.params;
     const { titulo, descricao, categoria, status, periodo, tags, link_externo } = req.body;
     const trx = await db.transaction();
     try {
-        await trx('projetos').where({ id }).update({
-            titulo, descricao, categoria, status, periodo, tags, link_externo
-        });
-        if (req.files && req.files.length > 0) {
-            const medias = req.files.map(file => ({
+        const updateData = { titulo, descricao, categoria, status, periodo, tags, link_externo };
+
+        if (req.files && req.files.imagem_capa) {
+            updateData.imagem_capa_url = `/${path.relative('public', req.files.imagem_capa[0].path).replace(/\\/g, "/")}`;
+        }
+
+        await trx('projetos').where({ id }).update(updateData);
+        
+        if (req.files && req.files.fotos) {
+            const medias = req.files.fotos.map(file => ({
                 caminho_arquivo: `/${path.relative('public', file.path).replace(/\\/g, "/")}`,
                 tipo_midia: 'imagem',
                 projeto_id: id
             }));
             await trx('portfolio_media').insert(medias);
         }
+
         await trx.commit();
         const projetoAtualizado = await db('projetos').where({ id }).first();
         res.status(200).json(projetoAtualizado);
@@ -332,6 +383,7 @@ app.post('/api/projetos/:id', portfolioMediaUpload.array('fotos', 10), async (re
         res.status(500).json({ message: "Erro ao atualizar projeto." });
     }
 });
+
 
 app.get('/api/projetos/:id/detalhes', async (req, res) => {
     try {
@@ -380,22 +432,50 @@ app.delete('/api/projetos/:id', async (req, res) => {
 
 // API: EVENTOS (Agenda)
 app.get('/api/eventos', async (req, res) => {
-    try { res.json(await db('eventos').select('*').orderBy('date', 'asc')); } catch (err) { res.status(500).json({ message: "Erro ao buscar eventos." }); }
+    try { 
+        res.json(await db('eventos').select('*').orderBy('date', 'asc')); 
+    } catch (err) { 
+        res.status(500).json({ message: "Erro ao buscar eventos." }); 
+    }
 });
 
 app.post('/api/eventos', async (req, res) => {
     try {
-        const [id] = await db('eventos').insert(req.body).returning('id');
+        const { title, date, type, cor, observacao, time } = req.body;
+        const [id] = await db('eventos').insert({ title, date, type, cor, observacao, time }).returning('id');
         const newId = typeof id === 'object' ? id[Object.keys(id)[0]] : id;
         res.status(201).json(await db('eventos').where({ id: newId }).first());
-    } catch (err) { res.status(500).json({ message: "Erro ao adicionar evento." }); }
+    } catch (err) { 
+        console.error("Erro ao adicionar evento:", err);
+        res.status(500).json({ message: "Erro ao adicionar evento." }); 
+    }
+});
+
+app.put('/api/eventos/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, date, type, cor, observacao, time } = req.body;
+        const count = await db('eventos').where({ id }).update({ title, date, type, cor, observacao, time });
+        
+        if (count > 0) {
+            res.status(200).json(await db('eventos').where({ id }).first());
+        } else {
+            res.status(404).json({ message: "Evento não encontrado." });
+        }
+    } catch (err) {
+        console.error("Erro ao atualizar evento:", err);
+        res.status(500).json({ message: "Erro ao atualizar evento." });
+    }
 });
 
 app.delete('/api/eventos/:id', async (req, res) => {
     try {
         const count = await db('eventos').where('id', req.params.id).del();
-        if (count > 0) res.status(204).send(); else res.status(404).json({ message: "Evento não encontrado." });
-    } catch (err) { res.status(500).json({ message: "Erro ao apagar evento." }); }
+        if (count > 0) res.status(204).send(); 
+        else res.status(404).json({ message: "Evento não encontrado." });
+    } catch (err) { 
+        res.status(500).json({ message: "Erro ao apagar evento." }); 
+    }
 });
 
 // API: POSTS (Blog)

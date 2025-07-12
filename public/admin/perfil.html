@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/perfil.css">
     <link rel="stylesheet" href="/css/toast.css">
-    <link rel="stylesheet" href="/css/tooltip.css"> </head>
+    <link rel="stylesheet" href="/css/tooltip.css">
+</head>
 <body>
     <div id="toast-container"></div>
 
@@ -21,14 +22,14 @@
         </div>
         <nav class="sidebar-nav">
             <ul>
-                    <li><a href="dashboard.html"><i class="fas fa-home nav-icon"></i> <span>Dashboard</span></a></li>
-                    <li><a href="perfil.html" class="active"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
-                    <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
-                    <li><a href="materiais.html"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
-                    <li><a href="agenda.html"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
-                    <li><a href="portfolio.html"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
-                    <li><a href="caixa_entrada.html"><i class="fas fa-envelope nav-icon"></i> <span>Contatos</span></a></li>
-                    <li><a href="sobre.html"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
+                <li><a href="dashboard.html"><i class="fas fa-home nav-icon"></i> <span>Dashboard</span></a></li>
+                <li><a href="perfil.html" class="active"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
+                <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
+                <li><a href="materiais.html"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
+                <li><a href="agenda.html"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
+                <li><a href="portfolio.html"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
+                <li><a href="caixa_entrada.html"><i class="fas fa-envelope nav-icon"></i> <span>Contatos</span></a></li>
+                <li><a href="sobre.html"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
             </ul>
         </nav>
         <a href="/" target="_blank" class="sidebar-view-public-btn">Ver Site Público</a>
@@ -70,7 +71,6 @@
                                 <button type="button" class="btn-change-picture" id="change-picture-button" data-tooltip="Alterar foto de perfil">
                                     <i class="fa-solid fa-camera"></i>
                                 </button>
-                                <button type="button" class="btn btn-save-picture" id="save-picture-button" style="display: none;">Salvar Foto</button>
                             </div>
                             <section class="contact-info">
                                 <h3>Mini-Biografia</h3>
@@ -104,14 +104,14 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="linkedin1">LinkedIn</label>
-                                        <div class="input-with-icon">
+                                        <div class="input-with-icon" id="linkedin-container" data-url="">
                                             <i class="fab fa-linkedin"></i>
                                             <input type="url" id="linkedin1" name="linkedin_url" class="profile-input" placeholder="https://linkedin.com/in/..." disabled>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="github">Github</label>
-                                        <div class="input-with-icon">
+                                        <div class="input-with-icon" id="github-container" data-url="">
                                             <i class="fab fa-github"></i>
                                             <input type="url" id="github" name="github_url" class="profile-input" placeholder="https://github.com/..." disabled>
                                         </div>
@@ -120,14 +120,14 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="lattes">Lattes</label>
-                                        <div class="input-with-icon">
+                                        <div class="input-with-icon" id="lattes-container" data-url="">
                                             <i class="fas fa-graduation-cap"></i>
                                             <input type="url" id="lattes" name="lattes_url" class="profile-input" placeholder="http://lattes.cnpq.br/..." disabled>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="website">Website</label>
-                                        <div class="input-with-icon">
+                                        <div class="input-with-icon" id="website-container" data-url="">
                                             <i class="fas fa-globe"></i>
                                             <input type="url" id="website" name="website_url" class="profile-input" placeholder="https://seu-site.com" disabled>
                                         </div>
@@ -142,7 +142,8 @@
     </div>
 
     <script src="/js/toast.js"></script>
-    <script src="/js/tooltip.js"></script> <script src="/js/auth.js"></script>
+    <script src="/js/tooltip.js"></script> 
+    <script src="/js/auth.js"></script>
     <script src="/js/perfil.js"></script>
 </body>
 </html>

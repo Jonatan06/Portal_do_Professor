@@ -4,36 +4,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!portfolioContainer) return;
 
-    // Função para remover tags HTML e criar um resumo do texto
     const createSummary = (htmlContent, maxLength = 150) => {
         if (!htmlContent) return 'Clique para ver os detalhes do projeto.';
-        // 1. Remove todas as tags HTML para ter um texto puro
         const plainText = htmlContent.replace(/<[^>]*>?/gm, ' ');
-        // 2. Remove espaços extras e quebras de linha
         const cleanText = plainText.replace(/\s+/g, ' ').trim();
-        // 3. Corta o texto no tamanho máximo e adiciona "..."
         if (cleanText.length > maxLength) {
             return cleanText.substring(0, maxLength) + '...';
         }
         return cleanText;
     };
 
-    // Nova função para criar um "card" de projeto
+    // ATUALIZADO para incluir a imagem de capa
     const createProjectHTML = (data) => {
         const summary = createSummary(data.descricao);
         const statusClass = data.status === 'concluido' ? 'status-concluido' : 'status-andamento';
         const statusText = data.status === 'concluido' ? 'Concluído' : 'Em Andamento';
+        
+        // NOVO: Define a URL da imagem de capa ou uma imagem padrão
+        const imageUrl = data.imagem_capa_url || '/uploads/images/default-image.png';
 
         return `
             <a href="/portfolio-detalhe?id=${data.id}" class="project-card">
-                <div class="project-card-header">
-                    <h3 class="project-card-title">${data.titulo}</h3>
-                    <span class="project-card-status ${statusClass}">${statusText}</span>
-                </div>
-                <p class="project-card-summary">${summary}</p>
-                <div class="project-card-footer">
-                    <span class="project-card-category">${data.categoria}</span>
-                    <span class="project-card-period">${data.periodo}</span>
+                <div class="project-card-image" style="background-image: url('${imageUrl}')"></div>
+                <div class="project-card-content">
+                    <div class="project-card-header">
+                        <h3 class="project-card-title">${data.titulo}</h3>
+                        <span class="project-card-status ${statusClass}">${statusText}</span>
+                    </div>
+                    <p class="project-card-summary">${summary}</p>
+                    <div class="project-card-footer">
+                        <span class="project-card-category">${data.categoria}</span>
+                        <span class="project-card-period">${data.periodo}</span>
+                    </div>
                 </div>
             </a>
         `;

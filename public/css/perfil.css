@@ -1,7 +1,7 @@
 /* public/css/perfil.css */
 
 /* O layout geral (sidebar, etc.) vem do /css/layout.css */
-.main-content-wrapper { padding: 0; } /* Remove padding para o header ocupar toda a largura */
+.main-content-wrapper { padding: 0; } 
 
 .main-header {
     display: flex;
@@ -26,7 +26,7 @@
 .content-area {
     padding: 30px;
     background-color: #f4f7fc;
-    min-height: calc(100vh - 71px); /* Altura da tela menos o header */
+    min-height: calc(100vh - 71px);
 }
 
 .profile-card {
@@ -58,7 +58,7 @@
 
 .profile-left {
     flex: 0 0 220px;
-    text-align: center; /* Centraliza o conteúdo */
+    text-align: center;
 }
 
 .profile-picture-container {
@@ -105,29 +105,12 @@
     transform: scale(1.1);
 }
 
-.btn-save-picture {
-    display: flex; /* Inicialmente oculto */
-    width: calc(100% - 20px);
-    position: absolute;
-    bottom: -15px;
-    left: 50%;
-    padding: 8px 15px;
-    font-size: 14px;
-    background-color: #198754;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    z-index: 10;
-    
-}
-
 .contact-info h3, .basic-info h3, .social-media h3 {
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 20px;
     color: #34495e;
-    text-align: left; /* Alinha os títulos à esquerda */
+    text-align: left;
 }
 
 .profile-right {
@@ -137,7 +120,6 @@
 .form-group { margin-bottom: 20px; }
 .form-group label { display: block; font-size: 14px; color: #7f8c8d; margin-bottom: 8px; text-align: left; }
 
-/* Estilo para os campos de formulário normais (sem ícone) */
 .profile-input {
     width: 100%;
     padding: 12px 15px;
@@ -151,26 +133,25 @@ textarea.profile-input {
     min-height: 150px;
     resize: vertical;
 }
-.profile-input:disabled {
+
+/* Estilo dos campos quando estão em modo de VISUALIZAÇÃO */
+.view-mode .profile-input {
     background-color: #f8f9fa;
     color: #343a40;
-    cursor: default;
     border-color: #f8f9fa;
-    -webkit-text-fill-color: #343a40;
-    opacity: 1;
 }
-.profile-input:not(:disabled) {
+
+/* Estilo dos campos quando estão em modo de EDIÇÃO */
+.edit-mode .profile-input {
     background-color: #ffffff;
     border-color: #ced4da;
 }
-.profile-input:focus {
+.edit-mode .profile-input:focus {
     outline: none;
     border-color: #0d6efd;
     box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
 }
 
-
-/* NOVOS ESTILOS PARA INPUT COM ÍCONE */
 .input-with-icon {
     display: flex;
     align-items: center;
@@ -192,31 +173,32 @@ textarea.profile-input {
     border-right: 1px solid #ced4da;
 }
 
-/* Ajusta o input que está dentro do container */
 .input-with-icon .profile-input {
     border: none !important;
     flex-grow: 1;
     padding-left: 15px;
-    box-shadow: none !important; /* Remove sombra interna no focus */
-}
-.input-with-icon .profile-input:disabled {
-    background-color: #f8f9fa;
+    box-shadow: none !important;
 }
 
-/* Efeitos de Hover e Focus no container */
-.input-with-icon:has(.profile-input:not(:disabled):hover) {
-    border-color: #adb5bd;
-}
-.input-with-icon:has(.profile-input:focus) {
+.edit-mode .input-with-icon:focus-within {
     border-color: #0d6efd;
     box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
 }
-.input-with-icon:has(.profile-input:focus) i {
+.edit-mode .input-with-icon:focus-within i {
     color: #0d6efd;
 }
-.input-with-icon:has(.profile-input:disabled) {
+
+/* Estilo do link em modo de VISUALIZAÇÃO */
+.view-mode .input-with-icon {
+    cursor: pointer;
     background-color: #f8f9fa;
-    border-color: #f8f9fa;
+}
+.view-mode .input-with-icon .profile-input {
+    cursor: pointer;
+}
+.view-mode .input-with-icon:hover {
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
 }
 
 .form-row {

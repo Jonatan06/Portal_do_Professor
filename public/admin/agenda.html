@@ -10,35 +10,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/agenda.css">
+    <link rel="stylesheet" href="/css/agenda_custom.css">
     <link rel="stylesheet" href="/css/toast.css">
-    <link rel="stylesheet" href="/css/tooltip.css"> </head>
+    <link rel="stylesheet" href="/css/tooltip.css">
+</head>
 <body>
     <div id="toast-container"></div>
 
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-user-tie"></i>
-                <h1>Painel do Professor</h1>
-            </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li><a href="dashboard.html"><i class="fas fa-home nav-icon"></i> <span>Dashboard</span></a></li>
-                    <li><a href="perfil.html"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
-                    <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
-                    <li><a href="materiais.html"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
-                    <li><a href="agenda.html" class="active"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
-                    <li><a href="portfolio.html"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
-                    <li><a href="caixa_entrada.html"><i class="fas fa-envelope nav-icon"></i> <span>Contatos</span></a></li>
-                    <li><a href="sobre.html"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
-                </ul>
-            </nav>
-            <a href="/" target="_blank" class="sidebar-view-public-btn">Ver Site Público</a>
-        </aside>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-user-tie"></i>
+            <h1>Painel do Professor</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="dashboard.html"><i class="fas fa-home nav-icon"></i> <span>Dashboard</span></a></li>
+                <li><a href="perfil.html"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
+                <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
+                <li><a href="materiais.html"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
+                <li><a href="agenda.html" class="active"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
+                <li><a href="portfolio.html"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
+                <li><a href="caixa_entrada.html"><i class="fas fa-envelope nav-icon"></i> <span>Contatos</span></a></li>
+                <li><a href="sobre.html"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
+            </ul>
+        </nav>
+        <a href="/" target="_blank" class="sidebar-view-public-btn">Ver Site Público</a>
+    </aside>
 
-        <div class="content-wrapper">
-            <main class="main-content">
-                <header class="main-header">
+    <main class="main-content-wrapper">
+        <div class="agenda-container">
+            <div class="calendar-main">
+                <header class="agenda-header">
                     <div class="header-greeting">
                         <h2><i class='bx bxs-calendar'></i> Agenda do Professor</h2>
                         <p>Visualize e gerencie seus compromissos.</p>
@@ -49,8 +51,9 @@
                         <button id="next-month-btn" class="nav-btn"><i class='bx bx-chevron-right'></i></button>
                     </div>
                 </header>
-                <div class="calendar-container">
-                    <div class="calendar-grid">
+
+                <div class="calendar-grid-container">
+                    <div class="calendar-grid-header">
                         <div class="day-header">DOM</div>
                         <div class="day-header">SEG</div>
                         <div class="day-header">TER</div>
@@ -59,10 +62,10 @@
                         <div class="day-header">SEX</div>
                         <div class="day-header">SÁB</div>
                     </div>
-                    <div class="calendar-body" id="calendar-body">
-                        </div>
+                    <div class="calendar-body" id="calendar-body"></div>
                 </div>
-            </main>
+            </div>
+
             <aside class="events-sidebar">
                 <div class="events-header">
                     <h3>Eventos do Mês</h3>
@@ -71,10 +74,14 @@
                     </button>
                 </div>
                 <div class="events-list" id="events-list-container">
+                    <div class="no-events-placeholder">
+                        <i class='bx bx-calendar-x'></i>
+                        <span>Nenhum evento neste mês.</span>
                     </div>
+                </div>
             </aside>
         </div>
-    </div>
+    </main>
 
     <div class="modal-overlay hidden" id="event-modal">
         <div class="modal-content">
@@ -84,8 +91,23 @@
             </header>
             <form id="event-form">
                 <input type="hidden" id="event-id">
-                <div class="form-group"><label for="event-title">Título do Evento</label><input type="text" id="event-title" placeholder="Ex: Reunião Pedagógica" required></div>
-                <div class="form-group"><label for="event-date">Data</label><input type="date" id="event-date" required></div>
+                <div class="form-group">
+                    <label for="event-title">Título do Evento</label>
+                    <input type="text" id="event-title" placeholder="Um título curto..." required maxlength="20">
+                    <div class="char-counter" id="title-char-counter">0/20</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="event-date">Data</label>
+                        <input type="date" id="event-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-time">Horário</label>
+                        <input type="time" id="event-time">
+                    </div>
+                </div>
+                
                 <div class="form-group">
                     <label for="event-type">Tipo de Evento</label>
                     <select id="event-type">
@@ -95,6 +117,33 @@
                         <option value="pessoal">Pessoal</option>
                     </select>
                 </div>
+
+                <div class="form-group">
+                    <label for="event-observation">Observação</label>
+                    <textarea id="event-observation" rows="3" placeholder="Máximo de 30 caracteres..." maxlength="30"></textarea>
+                    <div class="char-counter" id="observation-char-counter">0/30</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Cor do Evento</label>
+                    <div class="color-picker">
+                        <input type="radio" id="color-blue" name="event_color" value="#0d6efd" checked>
+                        <label for="color-blue" style="--event-color: #0d6efd;"></label>
+
+                        <input type="radio" id="color-green" name="event_color" value="#198754">
+                        <label for="color-green" style="--event-color: #198754;"></label>
+                        
+                        <input type="radio" id="color-yellow" name="event_color" value="#ffc107">
+                        <label for="color-yellow" style="--event-color: #ffc107;"></label>
+                        
+                        <input type="radio" id="color-red" name="event_color" value="#dc3545">
+                        <label for="color-red" style="--event-color: #dc3545;"></label>
+                        
+                        <input type="radio" id="color-purple" name="event_color" value="#6f42c1">
+                        <label for="color-purple" style="--event-color: #6f42c1;"></label>
+                    </div>
+                </div>
+
                 <footer class="modal-footer">
                     <button type="button" class="btn btn-danger" id="delete-event-btn" style="display: none; margin-right: auto;">Apagar</button>
                     <button type="submit" class="btn btn-primary">Salvar</button>
@@ -115,7 +164,8 @@
     </div>
 
     <script src="/js/toast.js"></script>
-    <script src="/js/tooltip.js"></script> <script src="/js/auth.js"></script>
+    <script src="/js/tooltip.js"></script>
+    <script src="/js/auth.js"></script>
     <script src="/js/agenda.js"></script>
 </body>
 </html>

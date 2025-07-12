@@ -12,8 +12,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalTitle = document.getElementById('modal-title');
     const deleteEventBtn = document.getElementById('delete-event-btn');
 
+    const eventTitleInput = document.getElementById('event-title');
+    const eventObservationInput = document.getElementById('event-observation');
+    const titleCharCounter = document.getElementById('title-char-counter');
+    const observationCharCounter = document.getElementById('observation-char-counter');
+    const eventDateInput = document.getElementById('event-date');
+    const eventTimeInput = document.getElementById('event-time');
+    const TITLE_MAX_LENGTH = 20;
+    const OBSERVATION_MAX_LENGTH = 30;
+
     let currentDate = new Date();
     let events = [];
+
+    function showLimitTooltip(element, message) {
+        if (document.querySelector(`.limit-tooltip[data-for="${element.id}"]`)) return;
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip tooltip-bottom show limit-tooltip';
+        tooltip.textContent = message;
+        tooltip.dataset.for = element.id;
+        document.body.appendChild(tooltip);
+
+        const elRect = element.getBoundingClientRect();
+        tooltip.style.left = `${elRect.left + window.scrollX}px`;
+        tooltip.style.top = `${elRect.bottom + window.scrollY + 5}px`;
+
+        setTimeout(() => {
+            tooltip.classList.remove('show');
+            tooltip.addEventListener('transitionend', () => {
+                if(tooltip.parentElement) tooltip.remove()
+            });
+        }, 2500);
+    }
 
     async function fetchEvents() {
         try {
@@ -28,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ATUALIZADO: Adiciona data-tooltip e chama initTooltips()
     function renderCalendar(date) {
         if (!calendarBody || !monthYearDisplay) return;
 
@@ -54,9 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let tooltipText = '';
 
             if (eventsOfTheDay.length > 0) {
-                pinsHTML = `<i class='bx bxs-pin pin-icon ${eventsOfTheDay[0].type}'></i>`;
-                tooltipText = eventsOfTheDay.map(e => e.title).join(', '); // Junta títulos se houver mais de um
-                classes += ' has-event'; // Adiciona classe para estilização se necessário
+                pinsHTML = `<i class='bx bxs-pin pin-icon' style="color: ${eventsOfTheDay[0].cor};"></i>`;
+                tooltipText = eventsOfTheDay.map(e => e.title).join(', ');
+                classes += ' has-event';
             }
             
             calendarBody.insertAdjacentHTML('beforeend', 
@@ -66,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         }
         
-        // Inicializa os tooltips após o calendário ser renderizado
         initTooltips();
     }
 
@@ -75,8 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const year = date.getFullYear();
         const eventsThisMonth = events.filter(e => {
             if (!e.date) return false;
-            const eventDate = new Date(e.date);
-            return eventDate.getUTCMonth() === month && eventDate.getUTCFullYear() === year;
+            const eventDate = new Date(e.date + 'T12:00:00');
+            return eventDate.getMonth() === month && eventDate.getFullYear() === year;
         });
 
         eventsListContainer.innerHTML = '';
@@ -87,40 +115,81 @@ document.addEventListener('DOMContentLoaded', () => {
 
         eventsThisMonth.sort((a, b) => new Date(a.date) - new Date(b.date));
         eventsThisMonth.forEach(event => {
-            const eventDate = new Date(event.date);
-            const day = eventDate.getUTCDate();
-            const monthShort = eventDate.toLocaleString('pt-BR', { month: 'short' }).replace('.', '');
-            const eventHTML = `<div class="event-item" data-id="${event.id}" data-title="${event.title}"><div class="event-date"><div class="day">${day}</div><div class="month">${monthShort}</div></div><div class="event-details"><h4>${event.title}</h4><p>Tipo: ${event.type}</p></div></div>`;
+            const eventDate = new Date(event.date + 'T12:00:00');
+            const day = eventDate.getDate();
+            const monthShort = eventDate.toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', '');
+            
+            const formattedDate = eventDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            
+            let tooltipLines = [event.title];
+            tooltipLines.push(`Data: ${formattedDate}`);
+            if (event.time) {
+                tooltipLines.push(`Horário: ${event.time}`);
+            }
+            if (event.observacao) {
+                tooltipLines.push(`Obs: ${event.observacao}`);
+            }
+            const tooltipContent = tooltipLines.join('\n');
+            
+            const eventHTML = `
+                <div class="event-item" 
+                     data-id="${event.id}" 
+                     data-title="${event.title}" 
+                     style="--event-color: ${event.cor};"
+                     data-custom-tooltip 
+                     data-tooltip-color="${event.cor}"
+                     data-tooltip-content="${tooltipContent}">
+                    <div class="event-date">
+                        <div class="day">${day}</div>
+                        <div class="month">${monthShort}</div>
+                    </div>
+                    <div class="event-details">
+                        <h4>${event.title}</h4>
+                        <p>Tipo: ${event.type}</p>
+                    </div>
+                </div>`;
             eventsListContainer.insertAdjacentHTML('beforeend', eventHTML);
         });
+        initCustomTooltips();
     }
     
     function openModal(dateStr = null, eventData = null) {
         eventForm.reset();
         deleteEventBtn.style.display = 'none';
         
-        const eventDateInput = document.getElementById('event-date');
         const today = new Date().toISOString().split('T')[0];
         eventDateInput.min = today;
 
         if (eventData) {
             modalTitle.textContent = "Editar Evento";
             document.getElementById('event-id').value = eventData.id;
-            document.getElementById('event-title').value = eventData.title;
+            eventTitleInput.value = eventData.title;
             const eventDate = eventData.date.split('T')[0];
             eventDateInput.value = eventDate;
+            eventTimeInput.value = eventData.time || '';
             document.getElementById('event-type').value = eventData.type;
             deleteEventBtn.style.display = 'block';
             
-            if (eventDate < today) {
-                eventDateInput.min = eventDate;
-            }
+            eventObservationInput.value = eventData.observacao || '';
+            const colorRadio = document.querySelector(`input[name="event_color"][value="${eventData.cor}"]`);
+            if(colorRadio) colorRadio.checked = true;
+            else document.querySelector('input[name="event_color"][value="#0d6efd"]').checked = true;
+
+            if (eventDate < today) eventDateInput.min = eventDate;
+
         } else {
             modalTitle.textContent = "Adicionar Evento";
             document.getElementById('event-id').value = '';
+            eventObservationInput.value = '';
+            eventTimeInput.value = '';
+            document.querySelector('input[name="event_color"][value="#0d6efd"]').checked = true;
             const defaultDate = (dateStr && dateStr < today) ? today : (dateStr || today);
             eventDateInput.value = defaultDate;
         }
+
+        titleCharCounter.textContent = `${eventTitleInput.value.length}/${TITLE_MAX_LENGTH}`;
+        observationCharCounter.textContent = `${eventObservationInput.value.length}/${OBSERVATION_MAX_LENGTH}`;
+
         modal.classList.remove('hidden');
     }
     
@@ -136,14 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
             modalText.textContent = text;
             confirmModal.classList.remove('hidden');
 
-            const handleConfirm = () => {
-                confirmModal.classList.add('hidden');
-                resolve(true);
-            };
-            const handleCancel = () => {
-                confirmModal.classList.add('hidden');
-                resolve(false);
-            };
+            const handleConfirm = () => { confirmModal.classList.add('hidden'); resolve(true); };
+            const handleCancel = () => { confirmModal.classList.add('hidden'); resolve(false); };
 
             confirmBtn.onclick = handleConfirm;
             cancelBtn.onclick = handleCancel;
@@ -155,11 +218,14 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleFormSubmit(e) {
         e.preventDefault();
         const id = document.getElementById('event-id').value;
+        
         const eventData = { 
-            id: id || undefined,
-            title: document.getElementById('event-title').value, 
-            date: document.getElementById('event-date').value, 
-            type: document.getElementById('event-type').value 
+            title: eventTitleInput.value, 
+            date: eventDateInput.value, 
+            time: eventTimeInput.value,
+            type: document.getElementById('event-type').value,
+            observacao: eventObservationInput.value.trim(),
+            cor: document.querySelector('input[name="event_color"]:checked').value
         };
         const method = id ? 'PUT' : 'POST';
         const url = id ? `${API_URL}/${id}` : API_URL;
@@ -187,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const id = document.getElementById('event-id').value;
         if (!id) return;
         
-        const eventTitle = document.getElementById('event-title').value;
+        const eventTitle = eventTitleInput.value;
         const confirmed = await showConfirmationModal('Apagar Evento', `Tem certeza que deseja apagar o evento "${eventTitle}"?`);
 
         if (confirmed) {
@@ -216,6 +282,40 @@ document.addEventListener('DOMContentLoaded', () => {
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
     eventForm.addEventListener('submit', handleFormSubmit);
     deleteEventBtn.addEventListener('click', handleDeleteEvent);
+
+    eventTitleInput.addEventListener('input', () => {
+        const len = eventTitleInput.value.length;
+        titleCharCounter.textContent = `${len}/${TITLE_MAX_LENGTH}`;
+        if (len >= TITLE_MAX_LENGTH) {
+            showLimitTooltip(eventTitleInput, `Limite de ${TITLE_MAX_LENGTH} caracteres atingido.`);
+        }
+    });
+
+    eventObservationInput.addEventListener('input', () => {
+        const len = eventObservationInput.value.length;
+        observationCharCounter.textContent = `${len}/${OBSERVATION_MAX_LENGTH}`;
+        if (len >= OBSERVATION_MAX_LENGTH) {
+            showLimitTooltip(eventObservationInput, `Limite de ${OBSERVATION_MAX_LENGTH} caracteres atingido.`);
+        }
+    });
+
+    // --- NOVO: Adiciona evento de clique para abrir os seletores de data/hora ---
+    eventDateInput.addEventListener('click', () => {
+        try {
+            eventDateInput.showPicker();
+        } catch (e) {
+            console.error("Navegador não suporta showPicker() para data.", e);
+        }
+    });
+
+    eventTimeInput.addEventListener('click', () => {
+        try {
+            eventTimeInput.showPicker();
+        } catch (e) {
+            console.error("Navegador não suporta showPicker() para hora.", e);
+        }
+    });
+    // --- FIM DO NOVO CÓDIGO ---
 
     fetchEvents();
 });

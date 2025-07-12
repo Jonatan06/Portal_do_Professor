@@ -5,7 +5,7 @@ async function setupDatabase() {
   console.log('Iniciando a configuração completa do banco de dados...');
 
   try {
-    // --- Tabela de Alunos ---
+    // ... (outras tabelas permanecem iguais) ...
     await db.schema.dropTableIfExists('alunos');
     await db.schema.createTable('alunos', table => {
       table.increments('id').primary();
@@ -16,7 +16,6 @@ async function setupDatabase() {
     });
     console.log('✅ Tabela "alunos" criada com sucesso.');
     
-    // --- Tabelas de Posts e Comentários (Blog) ---
     await db.schema.dropTableIfExists('comentarios');
     await db.schema.dropTableIfExists('posts');
     await db.schema.createTable('posts', table => {
@@ -45,7 +44,6 @@ async function setupDatabase() {
     ]);
     console.log('✅ Tabela "comentarios" criada e populada com sucesso.');
     
-    // --- Tabela de Materiais ---
     await db.schema.dropTableIfExists('materiais');
     await db.schema.createTable('materiais', table => {
         table.increments('id').primary();
@@ -61,7 +59,6 @@ async function setupDatabase() {
     });
     console.log('✅ Tabela "materiais" criada com sucesso.');
 
-    // --- Tabela de Mensagens ---
     await db.schema.dropTableIfExists('mensagens');
     await db.schema.createTable('mensagens', table => {
         table.increments('id').primary();
@@ -75,7 +72,6 @@ async function setupDatabase() {
     });
     console.log('✅ Tabela "mensagens" criada com sucesso.');
 
-    // --- Tabela de Perfil ---
     await db.schema.dropTableIfExists('perfil');
     await db.schema.createTable('perfil', table => { 
         table.increments('id').primary(); 
@@ -96,14 +92,15 @@ async function setupDatabase() {
     await db('perfil').insert({ id: 1, nome: 'Ridis Pereira Ribeiro', cargo: 'Professor', email: 'professor@email.com', senha: senhaHashProfessor, imagem_url: '/uploads/images/default-avatar.png' });
     console.log('✅ Tabela "perfil" criada e populada com sucesso.');
 
-    // --- Tabelas de Projetos e Mídias (Portfólio) ---
-    await db.schema.dropTableIfExists('portfolio_media'); // Apaga a de mídias primeiro
+    await db.schema.dropTableIfExists('portfolio_media');
     await db.schema.dropTableIfExists('projetos');
     
+    // --- ATUALIZAÇÃO NA TABELA 'projetos' ---
     await db.schema.createTable('projetos', table => {
         table.increments('id').primary();
         table.string('titulo').notNullable();
         table.text('descricao').notNullable();
+        table.string('imagem_capa_url'); // <-- NOVA COLUNA ADICIONADA AQUI
         table.string('categoria').notNullable();
         table.string('status').notNullable();
         table.string('periodo').notNullable();
@@ -114,25 +111,45 @@ async function setupDatabase() {
     await db('projetos').insert([ { titulo: 'Metodologias Ativas', descricao: 'Investigação sobre a eficácia das metodologias.', categoria: 'pesquisa', status: 'concluido', periodo: '2022-2024' }]);
     console.log('✅ Tabela "projetos" criada e populada com sucesso.');
 
-    // --- TABELA "portfolio_media" ADICIONADA AQUI ---
     await db.schema.createTable('portfolio_media', table => {
         table.increments('id').primary();
         table.string('caminho_arquivo').notNullable();
-        table.string('tipo_midia').notNullable(); // 'imagem' ou 'video'
+        table.string('tipo_midia').notNullable(); 
         table.integer('projeto_id').unsigned().notNullable().references('id').inTable('projetos').onDelete('CASCADE');
     });
     console.log('✅ Tabela "portfolio_media" criada com sucesso.');
     
-    // --- Tabela de Eventos ---
     await db.schema.dropTableIfExists('eventos');
     await db.schema.createTable('eventos', table => { 
         table.increments('id').primary(); 
         table.string('title').notNullable(); 
-        table.string('date').notNullable(); 
-        table.string('type').notNullable(); 
+        table.string('date').notNullable();
+        table.string('time');
+        table.string('type').notNullable();
+        table.string('cor').defaultTo('#0d6efd');
+        table.text('observacao');
     });
-    await db('eventos').insert([ { title: 'Reunião Pedagógica', date: new Date().toISOString().split('T')[0], type: 'reuniao' } ]);
+    await db('eventos').insert([ { 
+        title: 'Reunião Pedagógica', 
+        date: new Date().toISOString().split('T')[0], 
+        time: '14:30',
+        type: 'reuniao',
+        cor: '#dc3545',
+        observacao: 'Discussão das metas do semestre.'
+    } ]);
     console.log('✅ Tabela "eventos" criada e populada com sucesso.');
+
+    await db.schema.dropTableIfExists('sobre_conteudo');
+    await db.schema.createTable('sobre_conteudo', table => {
+        table.string('secao').primary();
+        table.text('conteudo').defaultTo('');
+    });
+    await db('sobre_conteudo').insert([
+        { secao: 'formacao', conteudo: '<h3>Doutorado em Educação</h3>\n<h4>Universidade Federal de Exemplo (UFE), 2018 - 2022</h4>\n<div class="info-block">\n<h3>Mestrado em Tecnologias da Informação</h3>\n<h4>Instituto de Tecnologia Avançada (ITA), 2016 - 2018</h4>\n</div>' },
+        { secao: 'interesses', conteudo: '<ul class="interest-list">\n<li>Metodologias Ativas de Aprendizagem</li>\n<li>Tecnologias Educacionais Emergentes</li>\n<li>Design Instrucional para EAD</li>\n<li>Gamificação na Educação</li>\n<li>Avaliação Formativa</li>\n<li>Inclusão Digital</li>\n</ul>' }
+    ]);
+    console.log('✅ Tabela "sobre_conteudo" criada e populada com sucesso.');
+
 
     console.log('\n🎉 Configuração do banco de dados concluída com sucesso!');
   } catch (err) {

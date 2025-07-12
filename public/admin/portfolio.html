@@ -16,7 +16,8 @@
     <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/portfolio.css"> 
     <link rel="stylesheet" href="/css/toast.css">
-    <link rel="stylesheet" href="/css/tooltip.css"> </head>
+    <link rel="stylesheet" href="/css/tooltip.css">
+</head>
 <body>
     <div id="toast-container"></div>
 
@@ -68,12 +69,19 @@
                         <label for="project-title">Título do Projeto</label>
                         <input type="text" id="project-title" name="titulo" required>
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="project-cover-image">Foto de Capa do Projeto</label>
+                        <input type="file" class="form-control-file" id="project-cover-image" name="imagem_capa" accept="image/*">
+                        <img id="cover-image-preview" src="#" alt="Pré-visualização da capa" class="img-preview" style="display:none;"/>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="project-description">Descrição Detalhada do Projeto</label>
                         <textarea id="project-description" name="descricao" rows="4"></textarea>
                     </div>
                      <div class="form-group">
-                        <label for="project-photos">Fotos do Projeto (Arraste ou Clique para Adicionar)</label>
+                        <label for="project-photos">Fotos da Galeria (Arraste ou Clique)</label>
                         <input type="file" id="project-photos" name="fotos" multiple>
                     </div>
                     <div class="form-row">
@@ -132,6 +140,7 @@
     <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
     <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
     <script src="/js/toast.js"></script>
-    <script src="/js/tooltip.js"></script> <script src="/js/portfolio.js"></script>
+    <script src="/js/tooltip.js"></script>
+    <script src="/js/portfolio.js"></script>
 </body>
 </html>

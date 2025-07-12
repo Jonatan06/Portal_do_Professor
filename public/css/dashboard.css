@@ -1,4 +1,4 @@
-/* public/css/dashboard.css - Estilos completos e revisados */
+/* public/css/dashboard.css */
 
 .main-wrapper {
     flex-grow: 1;
@@ -7,7 +7,7 @@
     background-color: #f4f7fc;
 }
 
-/* --- Cabeçalho Principal --- */
+/* Cabeçalho Principal */
 .main-header {
     display: flex;
     justify-content: space-between;
@@ -26,7 +26,7 @@
 .btn-secondary { background-color: #ecf0f1; color: #34495e; }
 .btn-moodle { background-color: #0d6efd; color: #ffffff; }
 
-/* --- Conteúdo Principal --- */
+/* Conteúdo Principal */
 .main-content {
     flex-grow: 1;
     padding: 30px;
@@ -48,7 +48,7 @@
     font-weight: 700;
     line-height: 1;
     color: #2c3e50;
-    margin-right: 10px; /* <<<---- CORREÇÃO ADICIONADA AQUI */
+    margin-right: 10px;
 }
 .card-info .card-label { font-size: 14px; color: #7f8c8d; }
 
@@ -64,18 +64,38 @@
 .activity-item:hover { background-color: #ecf0f1; }
 .activity-icon-wrapper { width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; }
 .activity-icon-wrapper i { font-size: 16px; }
-.activity-item p { margin: 0; color: #34495e; font-size: 14px; }
 .icon-green { background: linear-gradient(45deg, #27ae60, #2ecc71); }
 .icon-blue { background: linear-gradient(45deg, #2980b9, #3498db);; }
 .icon-orange { background: linear-gradient(45deg, #d35400, #e67e22); }
 .icon-purple { background: linear-gradient(45deg, #8e44ad, #9b59b6);; }
+
+/* CORREÇÃO APLICADA AQUI */
+.activity-item p { 
+    margin: 0; 
+    color: #34495e; 
+    font-size: 14px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 /* Próximos Eventos */
 #events-list { display: flex; flex-direction: column; gap: 15px; }
 .event-item { display: flex; align-items: center; gap: 15px; }
 .event-date { background-color: #ecf0f1; color: #34495e; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 8px; text-align: center; line-height: 1.2; width: 50px; flex-shrink: 0; }
 .event-date span { display: block; font-size: 18px; font-weight: 700; }
-.event-item p { margin: 0; font-weight: 500; color: #34495e; }
+
+/* CORREÇÃO APLICADA AQUI */
+.event-item p { 
+    margin: 0; 
+    font-weight: 500; 
+    color: #34495e;
+    min-width: 0; /* Essencial para o truncamento funcionar em um flex container */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 /* Responsividade */
 @media (max-width: 1200px) { .dashboard-grid { grid-template-columns: 1fr; } .info-box.col-span-2 { grid-column: span 1; } }
