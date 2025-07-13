@@ -17,6 +17,9 @@ body {
     background-color: var(--cor-fundo);
     color: var(--cor-texto-principal);
 }
+.nav-welcome {
+  margin-left: 20px; /* ou mais, se necessário */
+}
 
 .container {
     max-width: 1200px;
@@ -37,6 +40,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    /* margin-right: 50px; */
 }
 .logo a {
     font-size: 1.6rem;
