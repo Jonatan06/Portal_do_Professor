@@ -17,6 +17,14 @@ body {
     background-color: var(--cor-fundo);
     color: var(--cor-texto-principal);
 }
+
+/* --- NOVA REGRA ADICIONADA --- */
+/* Oculta o botão da área do professor se o aluno estiver logado */
+body.aluno-logado #btn-area-professor {
+    display: none;
+}
+/* --- FIM DA NOVA REGRA --- */
+
 .nav-welcome {
   margin-left: 20px; /* ou mais, se necessário */
 }
