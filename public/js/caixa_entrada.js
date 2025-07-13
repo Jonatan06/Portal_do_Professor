@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
     
+    // ATUALIZADO: para armazenar dados para a resposta
     const displayMessage = async (id) => {
         const message = messages.find(msg => msg.id === id);
         if (message) {
@@ -73,7 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
             senderDetailsEl.innerHTML = `De: <strong>${message.remetente_nome}</strong> &lt;${message.remetente_email}&gt;`;
             bodyContentEl.innerHTML = message.corpo.replace(/\n/g, '<br>');
             
-            // Atualiza a lista visualmente
+            // Armazena dados para a resposta de email
+            replyBtn.dataset.email = message.remetente_email;
+            subjectEl.dataset.subject = message.assunto;
+            bodyContentEl.dataset.originalMessage = message.corpo;
+            replyTextarea.value = '';
+
             document.querySelectorAll('.message-item').forEach(el => {
                 el.classList.remove('active');
                 if (el.dataset.id == id) {
@@ -142,10 +148,38 @@ document.addEventListener('DOMContentLoaded', () => {
         replyTextarea.focus();
     });
 
+    // ATUALIZADO: Implementa a funcionalidade de resposta com mailto:
     sendReplyBtn.addEventListener('click', () => {
-        if (replyTextarea.value.trim() !== '') {
-            showToast('Funcionalidade de resposta ainda não implementada.', 'info');
+        const recipientEmail = replyBtn.dataset.email;
+        const originalSubject = subjectEl.dataset.subject;
+        const replyBody = replyTextarea.value.trim();
+        const originalMessage = bodyContentEl.dataset.originalMessage;
+
+        if (!recipientEmail) {
+            showToast('Não foi possível encontrar o e-mail do destinatário.', 'error');
+            return;
         }
+        if (!replyBody) {
+            showToast('Por favor, escreva uma resposta.', 'info');
+            return;
+        }
+
+        const subject = `Re: ${originalSubject}`;
+        const body = `
+${replyBody}
+
+------------------------------------------------------
+Em resposta à sua mensagem:
+
+"${originalMessage}"
+        `;
+
+        // Cria e abre o link mailto
+        const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.location.href = mailtoLink;
+
+        replyTextarea.value = '';
+        showToast('Abrindo seu cliente de e-mail...', 'success');
     });
 
     deleteBtn.addEventListener('click', async () => {
@@ -181,6 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
             messages = await response.json();
             renderMessageList();
             
+            // Seleciona a primeira mensagem da lista (se houver)
             const firstMessageId = messages.length > 0 ? messages[0].id : null;
             displayMessage(firstMessageId);
 
@@ -191,7 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // ATUALIZADO: Chama a inicialização dos tooltips
     loadMessages();
     initTooltips();
 });

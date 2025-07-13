@@ -1,8 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     const portfolioContainer = document.getElementById('portfolio-container');
+    const filterTabs = document.querySelector('.filter-tabs');
+    const searchInput = document.getElementById('search-input');
+    const sortSelect = document.getElementById('sort-select');
     const API_URL = '/api/projetos';
+    let allProjects = [];
 
-    if (!portfolioContainer) return;
+    if (!portfolioContainer || !filterTabs || !searchInput || !sortSelect) return;
+
+    const categories = {
+        pesquisa: { title: 'Projetos de Pesquisa', icon: 'fa-flask' },
+        ensino: { title: 'Projetos de Ensino', icon: 'fa-chalkboard-teacher' },
+        extensao: { title: 'Projetos de Extensão', icon: 'fa-hands-helping' }
+    };
 
     const createSummary = (htmlContent, maxLength = 150) => {
         if (!htmlContent) return 'Clique para ver os detalhes do projeto.';
@@ -14,14 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return cleanText;
     };
 
-    // ATUALIZADO para incluir a imagem de capa
     const createProjectHTML = (data) => {
         const summary = createSummary(data.descricao);
         const statusClass = data.status === 'concluido' ? 'status-concluido' : 'status-andamento';
         const statusText = data.status === 'concluido' ? 'Concluído' : 'Em Andamento';
-        
-        // NOVO: Define a URL da imagem de capa ou uma imagem padrão
-        const imageUrl = data.imagem_capa_url || '/uploads/images/default-image.png';
+        const imageUrl = data.imagem_capa_url || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800';
 
         return `
             <a href="/portfolio-detalhe?id=${data.id}" class="project-card">
@@ -40,58 +47,104 @@ document.addEventListener('DOMContentLoaded', () => {
             </a>
         `;
     };
+    
+    // Função principal que aplica todos os filtros e renderiza
+    const renderFilteredProjects = () => {
+        const categoryFilter = filterTabs.querySelector('.active').dataset.filter;
+        const searchTerm = searchInput.value.toLowerCase();
+        const sortOrder = sortSelect.value;
 
-    const fetchAndRenderProjects = async () => {
+        // 1. Filtra por busca
+        let filtered = allProjects.filter(project => 
+            project.titulo.toLowerCase().includes(searchTerm)
+        );
+
+        // 2. Filtra por categoria
+        if (categoryFilter !== 'todos') {
+            filtered = filtered.filter(project => project.categoria === categoryFilter);
+        }
+
+        // 3. Ordena
+        filtered.sort((a, b) => {
+            switch (sortOrder) {
+                case 'antigos':
+                    return new Date(a.data_criacao) - new Date(b.data_criacao);
+                case 'az':
+                    return a.titulo.localeCompare(b.titulo);
+                case 'za':
+                    return b.titulo.localeCompare(a.titulo);
+                case 'recentes':
+                default:
+                    return new Date(b.data_criacao) - new Date(a.data_criacao);
+            }
+        });
+
+        // 4. Agrupa por categoria para renderização
+        const groupedByCategory = filtered.reduce((acc, project) => {
+            const category = project.categoria;
+            if (!acc[category]) {
+                acc[category] = [];
+            }
+            acc[category].push(project);
+            return acc;
+        }, {});
+        
+        // 5. Renderiza na tela
+        portfolioContainer.innerHTML = '';
+        if (filtered.length === 0) {
+            portfolioContainer.innerHTML = '<p>Nenhum projeto encontrado com os filtros selecionados.</p>';
+            return;
+        }
+
+        Object.keys(groupedByCategory).forEach(catKey => {
+            const categoryInfo = categories[catKey];
+            const projectsForCategory = groupedByCategory[catKey];
+            if (categoryInfo && projectsForCategory.length > 0) {
+                const projectsHTML = projectsForCategory.map(createProjectHTML).join('');
+                const sectionHTML = `
+                    <section class="project-section">
+                        <h2 class="project-section-title">
+                            <i class="fas ${categoryInfo.icon}"></i>
+                            ${categoryInfo.title}
+                        </h2>
+                        <div class="project-grid">${projectsHTML}</div>
+                    </section>`;
+                portfolioContainer.insertAdjacentHTML('beforeend', sectionHTML);
+            }
+        });
+    };
+
+    // Carga inicial dos dados
+    const initialLoad = async () => {
         portfolioContainer.innerHTML = '<p>Carregando projetos...</p>';
         try {
             const response = await fetch(API_URL);
             if (!response.ok) throw new Error('Falha ao carregar projetos.');
-            const projetos = await response.json();
-
-            if (projetos.length === 0) {
-                portfolioContainer.innerHTML = `
-                    <div class="empty-list-placeholder" style="border-style: solid; padding: 40px;">
-                        <i class="fas fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <p>Nenhum projeto foi publicado no momento. Crie um no painel de administrador!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const categories = {
-                pesquisa: { title: 'Projetos de Pesquisa', icon: 'fa-flask', projects: [] },
-                ensino: { title: 'Projetos de Ensino', icon: 'fa-chalkboard-teacher', projects: [] },
-                extensao: { title: 'Projetos de Extensão', icon: 'fa-hands-helping', projects: [] }
-            };
-
-            projetos.forEach(p => {
-                if (categories[p.categoria]) {
-                    categories[p.categoria].projects.push(p);
-                }
-            });
+            allProjects = await response.json();
             
-            portfolioContainer.innerHTML = '';
-
-            for (const catKey in categories) {
-                const category = categories[catKey];
-                if (category.projects.length > 0) {
-                    const projectsHTML = category.projects.map(createProjectHTML).join('');
-                    const sectionHTML = `
-                        <section class="project-section">
-                            <h2 class="project-section-title">
-                                <i class="fas ${category.icon}"></i>
-                                ${category.title}
-                            </h2>
-                            <div class="project-grid">${projectsHTML}</div>
-                        </section>`;
-                    portfolioContainer.insertAdjacentHTML('beforeend', sectionHTML);
-                }
+            if (allProjects.length === 0) {
+                portfolioContainer.innerHTML = '<p>Nenhum projeto publicado no momento.</p>';
+            } else {
+                renderFilteredProjects();
             }
         } catch (error) {
             console.error("Erro ao renderizar projetos:", error);
             portfolioContainer.innerHTML = `<p style="color: red;">Ocorreu um erro ao carregar os projetos.</p>`;
         }
     };
+    
+    // Adiciona os event listeners
+    filterTabs.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A') {
+            e.preventDefault();
+            filterTabs.querySelector('.active').classList.remove('active');
+            e.target.classList.add('active');
+            renderFilteredProjects();
+        }
+    });
 
-    fetchAndRenderProjects();
+    searchInput.addEventListener('input', renderFilteredProjects);
+    sortSelect.addEventListener('change', renderFilteredProjects);
+
+    initialLoad();
 });

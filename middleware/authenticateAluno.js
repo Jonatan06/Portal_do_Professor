@@ -3,6 +3,10 @@ const JWT_SECRET_ALUNO = 'R!d1sRIbeir0!'; // Use uma chave diferente para alunos
 
 function authenticateAluno(req, res, next) {
     const token = req.header('x-auth-token');
+    
+    // ADICIONE ESTA LINHA DE VERIFICAÇÃO AQUI
+    console.log('VERIFICAÇÃO: Chave usada para verificar o token:', JWT_SECRET_ALUNO);
+
     if (!token) return res.status(401).json({ message: 'Acesso negado. Nenhum token fornecido.' });
 
     try {

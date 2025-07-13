@@ -30,6 +30,30 @@
             <h1>Portfólio de Projetos</h1>
             <p>Conheça os projetos de pesquisa, ensino e extensão desenvolvidos.</p>
         </div>
+
+        <div class="toolbar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="search" id="search-input" placeholder="Buscar por título...">
+            </div>
+            <div class="sort-wrapper">
+                <label for="sort-select">Ordenar por:</label>
+                <select id="sort-select">
+                    <option value="recentes">Mais Recentes</option>
+                    <option value="antigos">Mais Antigos</option>
+                    <option value="az">A-Z</option>
+                    <option value="za">Z-A</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="filter-tabs">
+            <a href="#" class="tab-link active" data-filter="todos">Todos</a>
+            <a href="#" class="tab-link" data-filter="pesquisa">Pesquisa</a>
+            <a href="#" class="tab-link" data-filter="ensino">Ensino</a>
+            <a href="#" class="tab-link" data-filter="extensao">Extensão</a>
+        </div>
+
         <div id="portfolio-container">
             </div>
     </main>

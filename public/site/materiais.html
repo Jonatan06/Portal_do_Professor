@@ -30,6 +30,32 @@
             <h1>Materiais de Aula</h1>
             <p>Acesse slides, apostilas, exercícios e outros recursos disponíveis.</p>
         </div>
+
+        <div class="toolbar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="search" id="search-input" placeholder="Buscar por título...">
+            </div>
+            <div class="sort-wrapper">
+                <label for="sort-select">Ordenar por:</label>
+                <select id="sort-select">
+                    <option value="recentes">Mais Recentes</option>
+                    <option value="antigos">Mais Antigos</option>
+                    <option value="az">A-Z</option>
+                    <option value="za">Z-A</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="filter-tabs">
+            <a href="#" class="tab-link active" data-filter="todos">Todos</a>
+            <a href="#" class="tab-link" data-filter="slides">Slides</a>
+            <a href="#" class="tab-link" data-filter="apostilas">Apostilas</a>
+            <a href="#" class="tab-link" data-filter="exercicios">Exercícios</a>
+            <a href="#" class="tab-link" data-filter="videos">Vídeos</a>
+            <a href="#" class="tab-link" data-filter="outros">Outros</a>
+        </div>
+        
         <div id="materials-container">
             </div>
     </main>

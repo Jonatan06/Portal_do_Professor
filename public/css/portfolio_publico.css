@@ -17,20 +17,107 @@
     margin-right: 10px;
 }
 
+/* --- NOVOS ESTILOS PARA A BARRA DE FERRAMENTAS E FILTROS --- */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.search-wrapper {
+    position: relative;
+    flex-grow: 1;
+}
+
+.search-wrapper i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--cor-texto-secundario);
+}
+
+#search-input {
+    width: 100%;
+    padding: 10px 15px 10px 40px;
+    border-radius: 20px;
+    border: 1px solid var(--cor-borda);
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+}
+#search-input:focus {
+    outline: none;
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+.sort-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sort-wrapper label {
+    font-weight: 500;
+    color: var(--cor-texto-secundario);
+}
+
+#sort-select {
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: 1px solid var(--cor-borda);
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--cor-branco);
+}
+
+.filter-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 50px;
+    flex-wrap: wrap;
+}
+.tab-link {
+    background-color: var(--cor-branco);
+    color: var(--cor-texto-secundario);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    border: 1px solid var(--cor-borda);
+    text-decoration: none;
+    cursor: pointer;
+}
+.tab-link:hover {
+    background-color: #f8f9fa;
+    color: var(--cor-primaria);
+}
+.tab-link.active {
+    background-color: var(--cor-primaria);
+    color: var(--cor-branco);
+    border-color: var(--cor-primaria);
+}
+/* --- FIM DOS NOVOS ESTILOS --- */
+
+
 .project-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 30px;
 }
 
-/* --- ESTILO DO CARD ATUALIZADO --- */
 .project-card {
     display: flex;
     flex-direction: column;
     background-color: var(--cor-branco);
     border: 1px solid var(--cor-borda);
     border-radius: 8px;
-    overflow: hidden; /* Garante que a imagem não vaze das bordas */
+    overflow: hidden;
     text-decoration: none;
     color: var(--cor-texto-principal);
     box-shadow: var(--sombra);
@@ -42,7 +129,6 @@
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
-/* NOVO: Estilo para a área da imagem */
 .project-card-image {
     height: 220px;
     background-size: cover;
@@ -50,12 +136,11 @@
     border-bottom: 1px solid var(--cor-borda);
 }
 
-/* NOVO: Container para o conteúdo de texto */
 .project-card-content {
     padding: 25px;
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* Faz esta área crescer para preencher o espaço */
+    flex-grow: 1;
 }
 
 .project-card-header {
@@ -88,7 +173,7 @@
 .project-card-summary {
     color: var(--cor-texto-secundario);
     line-height: 1.7;
-    flex-grow: 1; 
+    flex-grow: 1;
     margin-bottom: 20px;
     overflow-wrap: break-word;
 }
