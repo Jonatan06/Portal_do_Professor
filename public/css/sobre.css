@@ -1,0 +1,137 @@
+/* public/css/sobre.css */
+
+:root {
+    --cor-primaria: #0d6efd;
+    --cor-fundo-card: #ffffff;
+    --cor-texto-principal: #343a40;
+    --cor-texto-secundario: #6c757d;
+    --cor-borda: #dee2e6;
+}
+
+/* O layout geral vem do layout.css, aqui ficam os estilos específicos */
+.main-content-wrapper {
+    padding: 30px; /* Adiciona um respiro interno */
+}
+
+/* Cabeçalho da Página */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    text-align: left;
+    margin-bottom: 30px;
+    background-color: var(--cor-fundo-card);
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid var(--cor-borda);
+}
+.page-header h1 { font-size: 28px; font-weight: 600; margin-bottom: 5px; }
+.page-header h1 i { vertical-align: middle; margin-right: 10px; }
+.page-header p { font-size: 16px; color: var(--cor-texto-secundario); }
+
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--cor-borda);
+    color: var(--cor-texto-principal);
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.btn-outline:hover { background-color: #f8f9fa; }
+
+/* Layout de Duas Colunas */
+.portfolio-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
+}
+
+/* Coluna da Esquerda (Navegação Interna) */
+.profile-nav-summary {
+    flex: 0 0 250px; /* Largura fixa */
+    position: sticky; /* Fica fixo ao rolar */
+    top: 30px;
+}
+.profile-nav-summary ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.profile-nav-summary li a {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s, color 0.2s, transform 0.2s;
+    font-weight: 500;
+    color: var(--cor-texto-secundario);
+    text-decoration: none;
+}
+.profile-nav-summary li a:hover {
+    background-color: #e9ecef;
+    color: var(--cor-texto-principal);
+    transform: translateX(5px);
+}
+.profile-nav-summary i {
+    width: 30px;
+    text-align: center;
+    color: var(--cor-primaria);
+    font-size: 16px;
+}
+
+/* Coluna da Direita (Conteúdo) */
+.portfolio-content {
+    flex: 1;
+    min-width: 0; /* Impede que o conteúdo vaze */
+}
+
+/* Cabeçalho do Perfil */
+.profile-header {
+    text-align: center;
+    margin-bottom: 50px;
+    padding: 25px;
+    background-color: var(--cor-fundo-card);
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+}
+.profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 4px solid #ffffff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.profile-header h1 { font-size: 32px; font-weight: 700; }
+.profile-header h2 { font-size: 18px; font-weight: 400; color: var(--cor-texto-secundario); margin-bottom: 15px; }
+.profile-bio { font-size: 16px; max-width: 700px; margin: 0 auto; line-height: 1.7; }
+
+/* Seções de Conteúdo */
+.content-section {
+    margin-bottom: 50px;
+    padding: 25px;
+    background-color: var(--cor-fundo-card);
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+}
+.section-title {
+    font-size: 22px;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--cor-borda);
+}
+.section-title i { margin-right: 12px; color: var(--cor-primaria); }
+
+.info-block { margin-bottom: 20px; }
+.info-block h3 { font-size: 18px; }
+.info-block h4 { font-size: 15px; color: var(--cor-texto-secundario); font-weight: 400; }
+
+.interest-list { list-style: none;}

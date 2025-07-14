@@ -137,3 +137,5 @@ $ npm run dev
 Projeto desenvolvido como parte de um trabalho acadêmico de um curso técnico.
 
 ---
+
+
