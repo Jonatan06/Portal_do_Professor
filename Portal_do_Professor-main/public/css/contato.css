@@ -1,0 +1,108 @@
+/* public/css/contato.css */
+
+:root {
+    --cor-primaria: #0d6efd;
+    --cor-fundo-card: #ffffff;
+    --cor-texto-principal: #343a40;
+    --cor-texto-secundario: #6c757d;
+    --cor-borda: #dee2e6;
+    --cor-sucesso: #198754;
+    --cor-fundo-sucesso: #e6f9f1;
+}
+
+/* Cabeçalho da Página */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    text-align: left;
+    margin-bottom: 40px;
+    background-color: var(--cor-fundo-card);
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid var(--cor-borda);
+}
+.page-header h1 { font-size: 28px; font-weight: 600; margin-bottom: 5px; }
+.page-header h1 i { vertical-align: middle; margin-right: 10px; }
+.page-header p { font-size: 16px; color: var(--cor-texto-secundario); }
+
+/* Botões */
+.btn { text-decoration: none; transition: all 0.2s; }
+.btn-primary { background-color: var(--cor-primaria); color: white; border: none; border-radius: 6px; padding: 12px 25px; cursor: pointer; font-size: 16px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; }
+
+/* Estilo do botão "Voltar" corrigido para ser idêntico ao resto do sistema */
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid #ced4da;
+    color: #495057;
+    padding: 10px 20px;
+    border-radius: 6px; /* Raio de borda corrigido */
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.btn-outline:hover { 
+    background-color: #f8f9fa; 
+}
+
+
+/* LAYOUT RESTAURADO: Uma única coluna */
+.contact-section {
+    padding: 0 20px; /* Adiciona um pouco de respiro nas laterais */
+}
+
+.card {
+    background-color: var(--cor-fundo-card);
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 30px; /* Espaço entre o formulário e os canais de contato */
+}
+
+/* Formulário de Contato */
+.contact-form-container h4 { font-size: 20px; margin-bottom: 5px; }
+.contact-form-container > p { color: var(--cor-texto-secundario); margin-bottom: 25px; }
+.form-group { margin-bottom: 1.25rem; }
+
+.form-group label { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.5rem; 
+    font-weight: 600; /* Intensidade da fonte ajustada */
+    margin-bottom: 8px; 
+}
+
+.form-group label .bx { font-size: 1.1rem; }
+.form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 6px; font-family: 'Poppins', sans-serif; }
+.form-group textarea { resize: vertical; }
+.form-buttons { display: flex; }
+
+/* Informações de Contato (Canais) */
+.contact-info-container {
+    padding: 25px; /* Adicionado padding para consistência */
+}
+.contact-info-container h5 { font-size: 20px; margin-bottom: 25px; }
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; } /* Grid para os cards de info */
+.info-card { display: flex; align-items: center; gap: 1rem; background-color: #f8f9fa; padding: 1rem; border: 1px solid var(--cor-borda); border-radius: 8px; }
+.info-card .bx { font-size: 1.8rem; color: var(--cor-primaria); }
+.info-card h6 { font-size: 1rem; margin-bottom: 3px; }
+.info-card p { font-size: 0.85rem; color: var(--cor-texto-secundario); line-height: 1.4; }
+
+/* Mensagem de Sucesso */
+.success-message {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: var(--cor-fundo-sucesso);
+    color: var(--cor-sucesso);
+    border: 1px solid var(--cor-sucesso);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.success-message i { font-size: 1.2rem; }

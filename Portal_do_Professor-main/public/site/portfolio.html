@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfólio - Portal do Professor</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/layout_publico.css">
+    <link rel="stylesheet" href="/css/portfolio_publico.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-container">
+            <div class="logo"><a href="/">Portal do Professor</a></div>
+            <nav class="main-nav">
+                <a href="/sobre">Sobre</a>
+                <a href="/blog">Blog</a>
+                <a href="/portfolio" class="active">Portfólio</a>
+                <a href="/materiais-de-aula">Materiais</a>
+                <a href="/contato">Contato</a>
+                <a href="/admin" class="btn-login">Área do Professor</a>
+                <a href="/login" class="btn-login">Login do Aluno</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-wrapper container">
+        <div class="page-title">
+            <h1>Portfólio de Projetos</h1>
+            <p>Conheça os projetos de pesquisa, ensino e extensão desenvolvidos.</p>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="search" id="search-input" placeholder="Buscar por título...">
+            </div>
+            <div class="sort-wrapper">
+                <label for="sort-select">Ordenar por:</label>
+                <select id="sort-select">
+                    <option value="recentes">Mais Recentes</option>
+                    <option value="antigos">Mais Antigos</option>
+                    <option value="az">A-Z</option>
+                    <option value="za">Z-A</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="filter-tabs">
+            <a href="#" class="tab-link active" data-filter="todos">Todos</a>
+            <a href="#" class="tab-link" data-filter="pesquisa">Pesquisa</a>
+            <a href="#" class="tab-link" data-filter="ensino">Ensino</a>
+            <a href="#" class="tab-link" data-filter="extensao">Extensão</a>
+        </div>
+
+        <div id="portfolio-container">
+            </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 Portal do Professor. Todos os direitos reservados.</p>
+    </footer>
+    
+    <script src="/js/auth_aluno.js"></script>
+    <script src="/js/portfolio_publico.js"></script>
+</body>
+</html>

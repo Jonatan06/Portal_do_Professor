@@ -1,0 +1,32 @@
+/* /public/css/agenda_custom.css */
+
+/* Adiciona um posicionamento relativo ao contêiner do campo do formulário */
+#event-form .form-group {
+    position: relative;
+}
+
+/* Estilo para o contador de caracteres */
+.char-counter {
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    background-color: #f0f2f5;
+    padding: 1px 6px;
+    border-radius: 4px;
+    pointer-events: none; /* Impede que o contador interfira com o clique no campo */
+}
+
+/* Ajusta a posição do contador para o textarea */
+#event-form textarea + .char-counter {
+    bottom: 12px;
+    right: 15px;
+}
+
+/* Estilo para o tooltip que aparece abaixo do elemento */
+.tooltip.tooltip-bottom::after {
+    bottom: auto;
+    top: -10px; /* Posiciona a seta na parte de cima do tooltip */
+    transform: translateX(-50%) rotate(180deg); /* Vira a seta para cima */
+}
