@@ -60,7 +60,7 @@ const singleImageUpload = portfolioMediaUpload.single('file');
 
 // --- 4. INICIALIZAÇÃO DO EXPRESS ---
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3005;
 
 // --- 5. MIDDLEWARES GLOBAIS ---
 app.use(cors());
