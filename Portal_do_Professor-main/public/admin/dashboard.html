@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Professor - Dashboard</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/dashboard.css?v=1.1">
+    <link rel="stylesheet" href="/css/toast.css">
+    <link rel="stylesheet" href="/css/tooltip.css">
+</head>
+<body>
+    <div id="toast-container"></div>
+    
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-user-tie"></i>
+            <h1>Painel do Professor</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                    <li><a href="dashboard.html" class="active"><i class="fas fa-home nav-icon"></i> <span>Dashboard</span></a></li>
+                    <li><a href="perfil.html"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
+                    <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
+                    <li><a href="materiais.html"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
+                    <li><a href="agenda.html"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
+                    <li><a href="portfolio.html"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
+                    <li><a href="caixa_entrada.html"><i class="fas fa-envelope nav-icon"></i> <span>Contatos</span></a></li>
+                    <li><a href="sobre.html"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
+            </ul>
+        </nav>
+        <a href="/" target="_blank" class="sidebar-view-public-btn">Ver Site Público</a>
+    </aside>
+
+    <main class="main-content-wrapper">
+        <header class="main-header">
+            <div class="header-greeting">
+                <h1>Bem-vindo, Professor!</h1>
+                <p>Aqui está um resumo da sua atividade no portal.</p>
+            </div>
+            <div class="header-actions">
+                <a href="#" id="logout-button" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                <a href="https://ribeiro.pro.br/moodle/" target="_blank" class="btn btn-moodle"><i class="fa-solid fa-graduation-cap"></i> Moodle</a>
+            </div>
+        </header>
+        <div class="main-content">
+            <div class="stats-cards">
+                 <div class="card"><div class="card-icon bg-purple"><i class="fas fa-blog"></i></div><div class="card-info"><span class="card-number" id="posts-count">0</span><span class="card-label">Posts do Blog</span></div></div>
+                <div class="card"><div class="card-icon bg-pink"><i class="fas fa-folder"></i></div><div class="card-info"><span class="card-number" id="materiais-count">0</span><span class="card-label">Materiais</span></div></div>
+                <div class="card"><div class="card-icon bg-blue"><i class="fas fa-calendar-alt"></i></div><div class="card-info"><span class="card-number" id="eventos-count">0</span><span class="card-label">Eventos</span></div></div>
+                <div class="card"><div class="card-icon bg-green"><i class="fas fa-briefcase"></i></div><div class="card-info"><span class="card-number" id="projetos-count">0</span><span class="card-label">Projetos</span></div></div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="info-box col-span-2">
+                    <h2>Atividade Recente</h2>
+                    <div id="activity-list"></div>
+                </div>
+                <div class="info-box">
+                    <h2>Próximos Eventos</h2>
+                    <div id="events-list"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="/js/toast.js"></script>
+    <script src="/js/tooltip.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
