@@ -210,3 +210,104 @@ textarea.profile-input {
 .form-row .form-group {
     flex: 1;
 }
+
+/* Adicione estas novas regras ao final do arquivo /public/css/perfil.css */
+
+.bio-group {
+    position: relative;
+}
+
+.char-counter {
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
+    font-size: 0.75rem;
+    color: #999;
+    background-color: #f0f2f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none; /* Impede que o contador interfira com o clique no campo */
+}
+
+/* O contador só aparece no modo de edição */
+.edit-mode .char-counter {
+    opacity: 1;
+}
+
+/* Adicione estas novas regras ao final do arquivo /public/css/perfil.css */
+
+/* Estilos para a nova seção de links personalizados */
+.custom-links-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+.custom-link-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.custom-link-row .form-group {
+    margin-bottom: 0;
+    flex-grow: 1;
+}
+
+/* Deixa o campo de nome do link menor que o de URL */
+.custom-link-row .form-group:first-child {
+    flex-grow: 0.5;
+}
+
+.btn-remove-link {
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    color: #dc3545;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px; /* Alinha com os inputs */
+    transition: all 0.2s;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.edit-mode .btn-remove-link {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.btn-remove-link:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-add-link {
+    background-color: #e9ecef;
+    color: #34495e;
+    border: 1px dashed #ced4da;
+    width: 100%;
+    padding: 10px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-add-link:hover {
+    background-color: #d1d5db;
+    border-color: #adb5bd;
+}
+
+/* Adicionado para o ícone do Instagram */
+.input-with-icon .fa-instagram {
+    color: #C13584;
+}

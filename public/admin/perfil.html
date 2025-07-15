@@ -74,8 +74,9 @@
                             </div>
                             <section class="contact-info">
                                 <h3>Mini-Biografia</h3>
-                                <div class="form-group">
-                                    <textarea id="bio" name="bio" class="profile-input" placeholder="Escreva uma breve biografia..." disabled></textarea>
+                                <div class="form-group bio-group">
+                                    <textarea id="bio" name="bio" class="profile-input" placeholder="Escreva uma breve biografia..." disabled maxlength="50"></textarea>
+                                    <div class="char-counter" id="bio-char-counter">0/50</div>
                                 </div>
                             </section>
                         </div>
@@ -103,36 +104,45 @@
                                 <h3>Redes Sociais e Links</h3>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="linkedin1">LinkedIn</label>
-                                        <div class="input-with-icon" id="linkedin-container" data-url="">
+                                        <label for="linkedin_url">LinkedIn</label>
+                                        <div class="input-with-icon">
                                             <i class="fab fa-linkedin"></i>
-                                            <input type="url" id="linkedin1" name="linkedin_url" class="profile-input" placeholder="https://linkedin.com/in/..." disabled>
+                                            <input type="url" id="linkedin_url" name="linkedin_url" class="profile-input" placeholder="https://linkedin.com/in/..." disabled>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="github">Github</label>
-                                        <div class="input-with-icon" id="github-container" data-url="">
+                                        <label for="github_url">Github</label>
+                                        <div class="input-with-icon">
                                             <i class="fab fa-github"></i>
-                                            <input type="url" id="github" name="github_url" class="profile-input" placeholder="https://github.com/..." disabled>
+                                            <input type="url" id="github_url" name="github_url" class="profile-input" placeholder="https://github.com/..." disabled>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="lattes">Lattes</label>
-                                        <div class="input-with-icon" id="lattes-container" data-url="">
-                                            <i class="fas fa-graduation-cap"></i>
-                                            <input type="url" id="lattes" name="lattes_url" class="profile-input" placeholder="http://lattes.cnpq.br/..." disabled>
+                                     <div class="form-group">
+                                        <label for="instagram_url">Instagram</label>
+                                        <div class="input-with-icon">
+                                            <i class="fab fa-instagram"></i>
+                                            <input type="url" id="instagram_url" name="instagram_url" class="profile-input" placeholder="https://instagram.com/..." disabled>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="website">Website</label>
-                                        <div class="input-with-icon" id="website-container" data-url="">
+                                        <label for="website_url">Website</label>
+                                        <div class="input-with-icon">
                                             <i class="fas fa-globe"></i>
-                                            <input type="url" id="website" name="website_url" class="profile-input" placeholder="https://seu-site.com" disabled>
+                                            <input type="url" id="website_url" name="website_url" class="profile-input" placeholder="https://seu-site.com" disabled>
                                         </div>
                                     </div>
                                 </div>
+                            </section>
+
+                            <section class="custom-links-section">
+                                <h3>Links Personalizados</h3>
+                                <div id="custom-links-container">
+                                    </div>
+                                <button type="button" class="btn btn-add-link" id="add-link-btn" style="display: none;">
+                                    <i class="fas fa-plus"></i> Adicionar Outro Link
+                                </button>
                             </section>
                         </div>
                     </div>

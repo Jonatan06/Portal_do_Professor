@@ -18,15 +18,8 @@ body {
     color: var(--cor-texto-principal);
 }
 
-/* --- NOVA REGRA ADICIONADA --- */
-/* Oculta o botão da área do professor se o aluno estiver logado */
 body.aluno-logado #btn-area-professor {
     display: none;
-}
-/* --- FIM DA NOVA REGRA --- */
-
-.nav-welcome {
-  margin-left: 20px; /* ou mais, se necessário */
 }
 
 .container {
@@ -35,7 +28,7 @@ body.aluno-logado #btn-area-professor {
     padding: 0 20px;
 }
 
-/* Cabeçalho */
+/* --- CABEÇALHO CORRIGIDO --- */
 .site-header {
     background-color: var(--cor-branco);
     padding: 15px 0;
@@ -48,7 +41,9 @@ body.aluno-logado #btn-area-professor {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* margin-right: 50px; */
+}
+.logo {
+    flex-shrink: 0; /* Impede que o logo encolha */
 }
 .logo a {
     font-size: 1.6rem;
@@ -56,8 +51,12 @@ body.aluno-logado #btn-area-professor {
     color: var(--cor-texto-principal);
     text-decoration: none;
 }
+
+.main-nav {
+    display: flex;
+    gap: 30px; /* Espaço entre os links "Sobre", "Blog", etc. */
+}
 .main-nav a {
-    margin-left: 25px;
     text-decoration: none;
     font-weight: 500;
     color: var(--cor-texto-secundario);
@@ -66,168 +65,147 @@ body.aluno-logado #btn-area-professor {
 .main-nav a:hover, .main-nav a.active {
     color: var(--cor-primaria);
 }
+
+.nav-user-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Alinha o conteúdo à direita */
+    gap: 15px;
+}
+.nav-user-actions .nav-welcome {
+    font-weight: 500;
+    white-space: nowrap;
+}
 .btn-login {
     background-color: var(--cor-primaria);
     color: var(--cor-branco) !important;
     padding: 8px 18px;
     border-radius: 6px;
     font-size: 0.9rem;
+    white-space: nowrap;
 }
+/* --- FIM DA CORREÇÃO DO CABEÇALHO --- */
 
 /* Conteúdo Principal */
-.page-wrapper {
-    padding: 50px 0;
-}
-.page-title {
-    text-align: center;
-    margin-bottom: 40px;
-}
-.page-title h1 {
-    font-size: 2.5rem;
-    margin-bottom: 5px;
-}
-.page-title p {
-    font-size: 1.1rem;
-    color: var(--cor-texto-secundario);
-}
+.page-wrapper { padding: 50px 0; }
+.page-title { text-align: center; margin-bottom: 40px; }
+.page-title h1 { font-size: 2.5rem; margin-bottom: 5px; }
+.page-title p { font-size: 1.1rem; color: var(--cor-texto-secundario); }
 
-/* Rodapé */
-.site-footer {
-    text-align: center;
-    padding: 30px 0;
-    margin-top: 50px;
-    border-top: 1px solid var(--cor-borda);
-    color: var(--cor-texto-secundario);
-    font-size: 0.9rem;
-}
+/* Rodapé e Outros */
+.site-footer { text-align: center; padding: 30px 0; margin-top: 50px; border-top: 1px solid var(--cor-borda); color: var(--cor-texto-secundario); font-size: 0.9rem; }
+.hidden { display: none; }
+.login-prompt { background-color: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; border-radius: 5px; text-align: center; margin-bottom: 20px; }
 
-.hidden {
-    display: none;
-}
-.login-prompt {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    padding: 20px;
-    border-radius: 5px;
-    text-align: center;
-    margin-bottom: 20px;
-}
+/* Modal de Confirmação */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal-content { background-color: #fff; padding: 25px 30px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); width: 90%; max-width: 450px; text-align: center; position: relative; transform: scale(0.95); transition: transform 0.3s ease; }
+.modal-overlay.active .modal-content { transform: scale(1); }
+.modal-title { font-size: 1.5rem; font-weight: 600; color: #333; margin-top: 0; margin-bottom: 10px; }
+.modal-text { font-size: 1rem; color: #555; margin-bottom: 25px; }
+.modal-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 2rem; color: #888; cursor: pointer; line-height: 1; }
+.modal-close-btn:hover { color: #333; }
+.modal-actions { display: flex; justify-content: center; gap: 15px; }
+.modal-actions .btn { padding: 10px 25px; border: none; border-radius: 5px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background-color 0.2s ease, transform 0.2s ease; }
+.modal-actions .btn:active { transform: scale(0.98); }
+.modal-actions .btn-secondary { background-color: #f0f0f0; color: #555; border: 1px solid #ccc; }
+.modal-actions .btn-secondary:hover { background-color: #e0e0e0; }
+.modal-actions .btn-danger { background-color: #e74c3c; color: white; }
+.modal-actions .btn-danger:hover { background-color: #c0392b; }
 
-/* Estilos para o Modal de Confirmação (com botões centralizados) */
+/* Adicione ao final de /css/layout_publico.css */
 
-/* O Fundo do Modal (Overlay) */
-.modal-overlay {
-    position: fixed; /* Fica fixo na tela */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Fundo escuro semitransparente */
+.nav-user-actions {
     display: flex;
-    justify-content: center;
     align-items: center;
-    z-index: 1000; /* Garante que o modal fique na frente de outros elementos */
-    opacity: 0; /* Começa invisível */
-    visibility: hidden; /* Começa escondido */
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    gap: 15px;
 }
 
-/* Animação para mostrar o modal */
-.modal-overlay.active {
+.aluno-profile-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 20px;
+    transition: background-color 0.2s;
+}
+
+.aluno-profile-area:hover {
+    background-color: #f0f0f0;
+}
+
+.aluno-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--cor-borda);
+}
+
+/* Adicionado para animação da foto de perfil do aluno */
+
+.aluno-profile-area {
+    position: relative; /* Para posicionar as opções absolutamente */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 20px;
+    transition: background-color 0.2s;
+}
+
+.aluno-profile-area:hover {
+    background-color: #f0f0f0;
+}
+
+.aluno-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--cor-borda);
+}
+
+.profile-options {
+    position: absolute;
+    top: 100%; /* Posiciona abaixo da área do perfil */
+    left: 0;
+    background-color: #fff;
+    border: 1px solid var(--cor-borda);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 10px 15px;
+    font-size: 0.9em;
+    z-index: 10;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out, visibility 0s 0.2s;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.profile-options.active {
     opacity: 1;
     visibility: visible;
+    transform: translateY(0);
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out, visibility 0s 0s;
 }
 
-/* O Conteúdo do Modal */
-.modal-content {
-    background-color: #fff;
-    padding: 25px 30px;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    width: 90%;
-    max-width: 450px;
-    text-align: center;
-    position: relative;
-    transform: scale(0.95); /* Efeito de zoom na entrada */
-    transition: transform 0.3s ease;
+.profile-options i {
+    margin-right: 8px;
 }
 
-.modal-overlay.active .modal-content {
-    transform: scale(1);
-}
-
-/* Título do Modal */
-.modal-title {
-    font-size: 1.5rem; /* 24px */
-    font-weight: 600;
-    color: #333;
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-/* Texto do Modal */
-.modal-text {
-    font-size: 1rem; /* 16px */
-    color: #555;
-    margin-bottom: 25px;
-}
-
-/* Botão de Fechar (X) no canto */
-.modal-close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 2rem; /* 32px */
-    color: #888;
-    cursor: pointer;
-    line-height: 1;
-}
-
-.modal-close-btn:hover {
-    color: #333;
-}
-
-/* Container para os botões de ação */
-.modal-actions {
+.nav-user-actions {
     display: flex;
-    justify-content: center; /* <<< MUDANÇA APLICADA AQUI */
-    gap: 15px; /* Espaço entre os botões */
+    align-items: center;
+    gap: 15px;
 }
 
-/* Estilo geral para os botões do modal */
-.modal-actions .btn {
-    padding: 10px 25px;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.modal-actions .btn:active {
-    transform: scale(0.98);
-}
-
-/* Botão Secundário (Cancelar) */
-.modal-actions .btn-secondary {
-    background-color: #f0f0f0;
-    color: #555;
-    border: 1px solid #ccc;
-}
-
-.modal-actions .btn-secondary:hover {
-    background-color: #e0e0e0;
-}
-
-/* Botão de Perigo (Sim, Sair) */
-.modal-actions .btn-danger {
-    background-color: #e74c3c;
-    color: white;
-}
-
-.modal-actions .btn-danger:hover {
-    background-color: #c0392b;
+.nav-welcome {
+    cursor: pointer; /* Indica que o nome é clicável */
 }

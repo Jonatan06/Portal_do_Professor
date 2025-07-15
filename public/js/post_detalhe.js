@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const commentsList = document.getElementById('comments-list');
     const commentsTitle = document.getElementById('comments-title');
     
-    // --- ELEMENTOS DO FORMULÁRIO DE COMENTÁRIO ---
     const commentForm = document.getElementById('comment-form');
     const loginPrompt = document.getElementById('comment-login-prompt');
     const commentAuthorInput = document.getElementById('comment-author');
@@ -17,16 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // --- LÓGICA DE AUTENTICAÇÃO ---
     const aluno = getAlunoLogado();
 
     if (aluno) {
-        // Aluno está logado
         loginPrompt.classList.add('hidden');
         commentForm.classList.remove('hidden');
         commentAuthorInput.value = aluno.nome;
     } else {
-        // Aluno NÃO está logado
         loginPrompt.classList.remove('hidden');
         commentForm.classList.add('hidden');
     }
@@ -44,17 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let externalLinkButton = '';
             if (post.external_url) {
-                externalLinkButton = `
-                    <div class="external-link-wrapper">
-                        <a href="${post.external_url}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
-                            <i class="fas fa-external-link-alt"></i> Acessar Conteúdo Original
-                        </a>
-                    </div>
-                `;
+                externalLinkButton = `<div class="external-link-wrapper"><a href="${post.external_url}" class="btn btn-primary" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i> Acessar Conteúdo Original</a></div>`;
             }
 
-            postContainer.innerHTML = `
-                <article>
+            postContainer.innerHTML = `<article>
                     <header class="post-header">
                         <div class="post-category">${post.categoria}</div>
                         <h1>${post.titulo}</h1>
@@ -64,12 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </header>
                     <figure class="post-featured-image"><img src="${imageUrl}" alt="Imagem do post"></figure>
-                    
                     ${externalLinkButton}
-
                     <div class="post-body">${formattedContent}</div>
-                </article>
-            `;
+                </article>`;
         } catch (error) {
             console.error('Erro ao buscar o post:', error);
             postContainer.innerHTML = `<h1>Erro 404: Post não encontrado</h1><p>O post que você está procurando não existe ou foi removido.</p>`;
@@ -91,9 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const dataFormatada = dataObj.toLocaleDateString('pt-BR');
                     const horaFormatada = dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
                     const commentDate = `${dataFormatada} às ${horaFormatada}`;
-                    commentsList.innerHTML += `
-                        <div class="comment">
-                            <img src="https://i.pravatar.cc/50?u=${encodeURIComponent(comment.autor)}" alt="Avatar" class="comment-avatar">
+                    
+                    // Lógica da imagem corrigida
+                    const avatarSrc = comment.autor_imagem_url || '/uploads/images/default-student-avatar.png';
+
+                    commentsList.innerHTML += `<div class="comment">
+                            <img src="${avatarSrc}" alt="Avatar de ${comment.autor}" class="comment-avatar">
                             <div class="comment-content">
                                 <div class="comment-author"><strong>${comment.autor}</strong> <span>- ${commentDate}</span></div>
                                 <p class="comment-text">${comment.conteudo}</p>
@@ -113,39 +102,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if (commentForm) {
         commentForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
             if (!aluno) {
                 showToast("Você precisa estar logado para comentar.", "error");
                 return;
             }
-            
             const contentInput = document.getElementById('comment-text');
-            const newComment = {
-                autor: aluno.nome, 
-                conteudo: contentInput.value.trim()
-            };
+            // O autor é pego pelo token no servidor, então não precisamos mais enviar
+            const newComment = { conteudo: contentInput.value.trim() };
 
             if (!newComment.conteudo) {
                 showToast('Por favor, escreva um comentário.', 'info');
                 return;
             }
-
+            const token = localStorage.getItem('alunoAuthToken');
             try {
                 const response = await fetch(`/api/posts/${postId}/comments`, { 
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
                     body: JSON.stringify(newComment)
                 });
-
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.message || 'Falha ao publicar o comentário.');
                 }
-                
                 contentInput.value = '';
                 showToast('Comentário publicado com sucesso!', 'success');
                 await fetchAndRenderComments();
-
             } catch (error) {
                 console.error('Erro ao enviar comentário:', error);
                 showToast(error.message, 'error');

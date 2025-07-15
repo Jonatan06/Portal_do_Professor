@@ -54,7 +54,6 @@ const materialFormHandler = materialUpload.fields([
     { name: 'materialFile', maxCount: 1 }
 ]);
 
-// Manipulador específico para a imagem do editor TinyMCE
 const singleImageUpload = portfolioMediaUpload.single('file');
 
 
@@ -94,7 +93,9 @@ app.post('/api/alunos/cadastro', async (req, res) => {
     }
 });
 
-// ROTA DE LOGIN DE ALUNO
+// ... (Todo o código inicial do server.js permanece o mesmo)
+
+// === ROTA DE LOGIN DE ALUNO (ATUALIZADA) ===
 app.post('/api/alunos/login', async (req, res) => {
     const { email, senha } = req.body;
     if (!email || !senha) {
@@ -109,8 +110,9 @@ app.post('/api/alunos/login', async (req, res) => {
         if (!senhaCorreta) {
             return res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
         }
+        // Inclui a imagem_url no token e no objeto de retorno
         const token = jwt.sign(
-            { id: aluno.id, nome: aluno.nome, email: aluno.email, role: 'aluno' },
+            { id: aluno.id, nome: aluno.nome, email: aluno.email, imagem_url: aluno.imagem_url, role: 'aluno' },
             JWT_SECRET_ALUNO,
             { expiresIn: '8h' }
         );
@@ -118,7 +120,7 @@ app.post('/api/alunos/login', async (req, res) => {
             success: true,
             message: 'Login bem-sucedido!',
             token: token,
-            aluno: { id: aluno.id, nome: aluno.nome, email: aluno.email }
+            aluno: { id: aluno.id, nome: aluno.nome, email: aluno.email, imagem_url: aluno.imagem_url }
         });
     } catch (err) {
         console.error("Erro no login do aluno:", err);
@@ -126,6 +128,26 @@ app.post('/api/alunos/login', async (req, res) => {
     }
 });
 
+// === NOVA ROTA PARA UPLOAD DE FOTO DO ALUNO ===
+app.post('/api/alunos/profile/picture', authenticateAluno, imageUpload.single('alunoProfilePicture'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: 'Nenhum arquivo de imagem enviado.' });
+    }
+    try {
+        const imagem_url = `/uploads/images/${req.file.filename}`;
+        // Atualiza a imagem do aluno logado (ID vem do token)
+        await db('alunos').where('id', req.aluno.id).update({ imagem_url });
+        
+        // Retorna a URL da nova imagem
+        res.json({ success: true, imagem_url });
+    } catch (err) {
+        console.error("Erro ao fazer upload da foto de perfil do aluno:", err);
+        res.status(500).json({ message: `Erro interno ao processar a imagem: ${err.message}` });
+    }
+});
+
+
+// ... (O restante do arquivo server.js continua o mesmo)
 // API: LOGIN PROFESSOR
 app.post('/api/auth/login', async (req, res) => {
     const { email, senha } = req.body;
@@ -153,22 +175,52 @@ app.post('/api/auth/login', async (req, res) => {
 app.get('/api/profile', authenticateProfessor, async (req, res) => {
     try {
         const profile = await db('perfil').where({ id: req.professor.id }).first();
-        if (profile) res.json(profile);
-        else res.status(404).json({ message: "Perfil não encontrado." });
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar perfil." }); }
-});
-
-app.put('/api/profile', authenticateProfessor, async (req, res) => {
-    try {
-        delete req.body.imagem_url;
-        const count = await db('perfil').where('id', req.professor.id).update(req.body);
-        if (count > 0) {
-            const updatedProfile = await db('perfil').where('id', req.professor.id).first();
-            res.json(updatedProfile);
+        if (profile) {
+            const customLinks = await db('perfil_links').where({ perfil_id: req.professor.id });
+            profile.custom_links = customLinks;
+            res.json(profile);
         } else {
             res.status(404).json({ message: "Perfil não encontrado." });
         }
-    } catch (err) { res.status(500).json({ message: "Erro ao salvar perfil." }); }
+    } catch (err) {
+        console.error("Erro ao buscar perfil:", err);
+        res.status(500).json({ message: "Erro ao buscar perfil." });
+    }
+});
+
+app.put('/api/profile', authenticateProfessor, async (req, res) => {
+    const { custom_links, ...profileData } = req.body;
+    const trx = await db.transaction();
+    try {
+        const count = await trx('perfil').where('id', req.professor.id).update(profileData);
+
+        if (count > 0) {
+            await trx('perfil_links').where('perfil_id', req.professor.id).del();
+            if (custom_links && custom_links.length > 0) {
+                const linksToInsert = custom_links
+                    .filter(link => link.label && link.url)
+                    .map(link => ({
+                        ...link,
+                        perfil_id: req.professor.id
+                    }));
+                if (linksToInsert.length > 0) {
+                  await trx('perfil_links').insert(linksToInsert);
+                }
+            }
+            await trx.commit();
+            const updatedProfile = await db('perfil').where('id', req.professor.id).first();
+            const updatedLinks = await db('perfil_links').where({ perfil_id: req.professor.id });
+            updatedProfile.custom_links = updatedLinks;
+            res.json(updatedProfile);
+        } else {
+            await trx.rollback();
+            res.status(404).json({ message: "Perfil não encontrado." });
+        }
+    } catch (err) {
+        await trx.rollback();
+        console.error("Erro ao salvar perfil:", err);
+        res.status(500).json({ message: "Erro ao salvar perfil." });
+    }
 });
 
 app.post('/api/profile/picture', authenticateProfessor, imageUpload.single('profilePicture'), async (req, res) => {
@@ -184,11 +236,17 @@ app.post('/api/profile/picture', authenticateProfessor, imageUpload.single('prof
     }
 });
 
+
+// === ROTA DE PERFIL PÚBLICO ATUALIZADA ===
 app.get('/api/public-profile', async (req, res) => {
     try {
-        const profile = await db('perfil').where({ id: 1 }).first();
+        // Assume que o perfil público é sempre o do professor com id = 1
+        const profile = await db('perfil').where({ id: 1 }).first(); 
         if (profile) {
             delete profile.senha;
+            // Busca os links personalizados associados a este perfil
+            const customLinks = await db('perfil_links').where({ perfil_id: 1 });
+            profile.custom_links = customLinks; // Adiciona os links ao objeto
             res.json(profile);
         } else {
             res.status(404).json({ message: "Perfil principal não encontrado." });
@@ -198,6 +256,8 @@ app.get('/api/public-profile', async (req, res) => {
         res.status(500).json({ message: "Erro ao buscar perfil." });
     }
 });
+// === FIM DA ATUALIZAÇÃO ===
+
 
 // API: SOBRE
 app.get('/api/sobre', async (req, res) => {
@@ -306,7 +366,6 @@ app.post('/api/materiais', authenticateProfessor, materialFormHandler, async (re
     }
 });
 
-// ROTA PUT PARA EDITAR MATERIAIS
 app.put('/api/materiais/:id', authenticateProfessor, materialFormHandler, async (req, res) => {
     const { id } = req.params;
     try {
@@ -360,8 +419,6 @@ app.delete('/api/materiais/:id', authenticateProfessor, async (req, res) => {
     }
 });
 
-// *** ROTA CORRIGIDA DE LUGAR ***
-// ROTA PARA UPLOAD DE IMAGEM DO TINYMCE
 app.post('/api/projetos/upload-image', authenticateProfessor, singleImageUpload, (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
@@ -502,6 +559,13 @@ app.get('/api/eventos', authenticateProfessor, async (req, res) => {
 app.post('/api/eventos', authenticateProfessor, async (req, res) => {
     try {
         const { title, date, type, cor, observacao, time } = req.body;
+        
+        const eventoExistente = await db('eventos').where({ date, time }).first();
+        
+        if (eventoExistente) {
+            return res.status(409).json({ message: "Já existe um evento agendado para esta data e horário." });
+        }
+
         const [id] = await db('eventos').insert({ title, date, type, cor, observacao, time }).returning('id');
         const newId = typeof id === 'object' ? id.id : id;
         res.status(201).json(await db('eventos').where({ id: newId }).first());
@@ -515,6 +579,16 @@ app.put('/api/eventos/:id', authenticateProfessor, async (req, res) => {
     try {
         const { id } = req.params;
         const { title, date, type, cor, observacao, time } = req.body;
+        
+        const eventoExistente = await db('eventos')
+            .where({ date, time })
+            .whereNot({ id })
+            .first();
+
+        if (eventoExistente) {
+            return res.status(409).json({ message: "Já existe um evento agendado para esta data e horário." });
+        }
+        
         const count = await db('eventos').where({ id }).update({ title, date, type, cor, observacao, time });
         
         if (count > 0) {
@@ -554,6 +628,32 @@ app.post('/api/posts', authenticateProfessor, imageUpload.single('imagem'), asyn
     } catch (err) { res.status(500).json({ message: "Erro ao salvar post." }); }
 });
 
+// === NOVA ROTA DE ATUALIZAÇÃO ADICIONADA AQUI ===
+app.put('/api/posts/:id', authenticateProfessor, imageUpload.single('imagem'), async (req, res) => {
+    const { id } = req.params;
+    try {
+        const { titulo, conteudo, categoria, external_url } = req.body;
+        const updateData = { titulo, conteudo, categoria, external_url };
+
+        // Se um novo arquivo de imagem foi enviado, atualiza a URL da imagem
+        if (req.file) {
+            updateData.imagem_url = `/${path.relative('public', req.file.path).replace(/\\/g, "/")}`;
+        }
+
+        const count = await db('posts').where({ id }).update(updateData);
+        if (count > 0) {
+            const updatedPost = await db('posts').where({ id }).first();
+            res.status(200).json(updatedPost);
+        } else {
+            res.status(404).json({ message: "Post não encontrado." });
+        }
+    } catch (err) {
+        console.error("Erro ao atualizar post:", err);
+        res.status(500).json({ message: "Erro ao atualizar post." });
+    }
+});
+// === FIM DA NOVA ROTA ===
+
 app.delete('/api/posts/:id', authenticateProfessor, async (req, res) => {
     try {
         const post = await db('posts').where({ id: req.params.id }).first();
@@ -574,27 +674,95 @@ app.get('/api/posts/:id', async (req, res) => {
     }
 });
 
-// API: COMENTÁRIOS
-app.get('/api/posts/:id/comments', async (req, res) => {
-    try {
-        const comments = await db('comentarios').where({ post_id: req.params.id }).orderBy('data_publicacao', 'asc');
-        res.json(comments);
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar comentários." }); }
+// ROTA PARA VERIFICAR STATUS DE LOGIN (aluno ou professor)
+app.get('/api/auth/status', authenticateProfessor, authenticateAluno, (req, res) => {
+    if (req.professor) {
+        res.json({ loggedIn: true, role: 'professor', user: req.professor });
+    } else if (req.aluno) {
+        res.json({ loggedIn: true, role: 'aluno', user: req.aluno });
+    } else {
+        res.json({ loggedIn: false });
+    }
 });
 
-app.post('/api/posts/:id/comments', authenticateAluno, async (req, res) => {
+// === API: COMENTÁRIOS (REFEITA) ===
+
+// GET para buscar todos os comentários de um post
+app.get('/api/posts/:id/comments', async (req, res) => {
     try {
-        const { autor, conteudo } = req.body;
-        if (!conteudo) return res.status(400).json({ message: "O conteúdo do comentário é obrigatório." });
-        const newComment = { post_id: req.params.id, conteudo: conteudo, autor: autor || 'Anônimo' };
-        const [commentId] = await db('comentarios').insert(newComment).returning('id');
-        const newId = typeof commentId === 'object' ? commentId.id : commentId;
-        const result = await db('comentarios').where({ id: newId }).first();
-        res.status(201).json(result);
+        const comments = await db('comentarios')
+            .leftJoin('alunos', 'comentarios.aluno_id', 'alunos.id')
+            .where({ 'comentarios.post_id': req.params.id })
+            .select('comentarios.*', 'alunos.imagem_url as autor_imagem_url')
+            .orderBy('comentarios.data_publicacao', 'asc');
+        res.json(comments);
     } catch (err) {
-        console.error("Erro ao adicionar comentário:", err);
-        res.status(500).json({ message: "Erro ao salvar comentário." });
+        res.status(500).json({ message: "Erro ao buscar comentários." });
     }
+});
+
+// POST para criar um novo comentário ou resposta
+app.post('/api/comments', authenticateAluno, async (req, res) => {
+    try {
+        const { post_id, conteudo, parent_id } = req.body;
+        const { id: aluno_id, nome: autor } = req.aluno;
+
+        const [commentId] = await db('comentarios').insert({
+            post_id,
+            conteudo,
+            parent_id: parent_id || null,
+            aluno_id,
+            autor
+        }).returning('id');
+        
+        const newComment = await db('comentarios')
+            .leftJoin('alunos', 'comentarios.aluno_id', 'alunos.id')
+            .where('comentarios.id', commentId.id || commentId)
+            .select('comentarios.*', 'alunos.imagem_url as autor_imagem_url')
+            .first();
+
+        res.status(201).json(newComment);
+    } catch (err) {
+        res.status(500).json({ message: "Erro ao criar comentário." });
+    }
+});
+
+// PUT para editar um comentário
+app.put('/api/comments/:id', authenticateAluno, async (req, res) => {
+    const { id } = req.params;
+    const { conteudo } = req.body;
+    const comment = await db('comentarios').where({ id }).first();
+
+    if (!comment) return res.status(404).json({ message: "Comentário não encontrado." });
+
+    // Apenas o autor original pode editar
+    if (comment.aluno_id !== req.aluno.id) {
+        return res.status(403).json({ message: "Acesso negado." });
+    }
+
+    const [updatedId] = await db('comentarios').where({ id }).update({
+        conteudo,
+        data_edicao: db.fn.now()
+    }).returning('id');
+    
+    const updatedComment = await db('comentarios').where({ id: updatedId.id || updatedId }).first();
+    res.json(updatedComment);
+});
+
+// DELETE para apagar um comentário 2558
+app.delete('/api/comments/:id', authenticateProfessor, async (req, res) => {
+    const { id } = req.params;
+    const comment = await db('comentarios').where({ id }).first();
+
+    if (!comment) return res.status(404).json({ message: "Comentário não encontrado." });
+
+    // Professor pode apagar qualquer comentário, ou o autor pode apagar =o seu
+    if (req.professor || (req.aluno && comment.aluno_id === req.aluno.id)) {
+        await db('comentarios').where({ id }).del();
+        return res.status(204).send();
+    }
+
+    res.status(403).json({ message: "Acesso negado." }); //teste
 });
 
 // API: DASHBOARD
@@ -638,35 +806,26 @@ app.get('/api/dashboard/upcoming-events', authenticateProfessor, async (req, res
 // ||         ROTAS DE PÁGINAS DO SITE          ||
 // ===============================================
 
-// ROTA PRINCIPAL - Site Público para Alunos/Visitantes
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'site', 'index.html'));
 });
 
-// Outras páginas públicas
+// ... (O restante do arquivo continua o mesmo)
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'login.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'cadastro.html')));
 app.get('/blog', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'blog.html')));
 app.get('/portfolio', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'portfolio.html')));
 app.get('/materiais-de-aula', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'materiais.html')));
 app.get('/contato', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'contato.html')));
-
-// ROTA PARA DETALHES
 app.get('/post', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'post.html')));
 app.get('/portfolio-detalhe', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'site', 'portfolio-detalhe.html'));
 });
-
-// ROTA PARA O PAINEL DE ADMIN
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin', 'index.html'));
 });
 app.use('/admin', express.static(path.join(__dirname, 'public/admin')));
-
-// ROTA CATCH-ALL (deve ser a última)
 app.get('*', (req, res) => {
     res.redirect('/');
 });
-
-// INICIALIZAÇÃO DO SERVIDOR
 app.listen(PORT, () => { console.log(`🚀 Servidor rodando em: http://localhost:${PORT}`); });

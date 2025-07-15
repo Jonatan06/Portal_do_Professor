@@ -1,5 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- LÓGICA PARA ATUALIZAR DATA E HORA ---
+    const dateElement = document.getElementById('current-date');
+    const timeElement = document.getElementById('current-time');
+
+    function updateDateTime() {
+        const now = new Date();
+
+        // Formata a data (ex: terça-feira, 15 de julho de 2025)
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateElement.textContent = now.toLocaleDateString('pt-BR', dateOptions);
+
+        // Formata a hora (ex: 14:52)
+        const timeOptions = { hour: '2-digit', minute: '2-digit' };
+        timeElement.textContent = now.toLocaleTimeString('pt-BR', timeOptions);
+    }
+
+    // Atualiza a cada segundo
+    setInterval(updateDateTime, 1000);
+    // Chama a função uma vez para não esperar 1 segundo para exibir
+    updateDateTime();
+    // --- FIM DA LÓGICA DE DATA E HORA ---
+
+
     async function loadStats() {
         try {
             const response = await fetch('/api/dashboard/stats');
@@ -84,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const eventColor = event.cor || '#0d6efd';
 
-                // --- LÓGICA ATUALIZADA PARA O TOOLTIP DETALHADO ---
                 const formattedDate = eventDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 let tooltipLines = [event.title];
                 tooltipLines.push(`Data: ${formattedDate}`);
@@ -95,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     tooltipLines.push(`Obs: ${event.observacao}`);
                 }
                 const tooltipContent = tooltipLines.join('\n');
-                // --- FIM DA LÓGICA ATUALIZADA ---
 
                 const itemHTML = `
                     <div class="event-item" 

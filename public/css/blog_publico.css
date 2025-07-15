@@ -1,79 +1,129 @@
+/* --- ESTILOS PARA A BARRA DE FERRAMENTAS --- */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.search-wrapper {
+    /* Esta é a regra CHAVE. Ela cria o contexto para o posicionamento do ícone. */
+    position: relative; 
+    flex-grow: 1;
+}
+
+.search-wrapper i {
+    /* Esta regra posiciona o ícone DENTRO do seu container pai (.search-wrapper) */
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--cor-texto-secundario);
+    z-index: 1;
+}
+
+#search-input {
+    width: 100%;
+    /* Este padding cria o espaço à esquerda para o ícone não ficar em cima do texto */
+    padding: 12px 20px 12px 45px; 
+    border-radius: 25px;
+    border: 1px solid var(--cor-borda);
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+}
+#search-input:focus {
+    outline: none;
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+.sort-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sort-wrapper label {
+    font-weight: 500;
+    color: var(--cor-texto-secundario);
+}
+
+#sort-select {
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: 1px solid var(--cor-borda);
+    font-size: 1rem;
+    background-color: var(--cor-branco);
+    font-family: 'Poppins', sans-serif;
+}
+
+/* --- ESTILOS DOS CARDS DE POST --- */
 .posts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
 }
 
 .post-card {
     display: flex;
     flex-direction: column;
+    background-color: var(--cor-branco);
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
+    box-shadow: var(--sombra);
     text-decoration: none;
     color: inherit;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .post-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
 }
 
 .post-card-image {
-    height: 200px;
+    height: 220px;
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
+    border-bottom: 1px solid var(--cor-borda);
 }
 
 .post-card-content {
-    padding: 15px;
-    background-color: #fff;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     flex-grow: 1;
 }
 
 .post-card-category {
-    font-size: 0.8em;
-    color: #555;
-    margin-bottom: 5px;
-    display: block;
+    font-size: 0.8rem;
+    color: var(--cor-primaria);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 8px;
 }
 
 .post-card-title {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 10px;
-    line-height: 1.3;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
 }
 
 .post-card-description {
-    font-size: 0.95em;
-    color: #333;
-    line-height: 1.5;
-    margin-bottom: 10px;
-    flex-grow: 1; /* Para empurrar o footer para baixo */
+    font-size: 0.95rem;
+    color: var(--cor-texto-secundario);
+    line-height: 1.6;
+    flex-grow: 1;
+    margin-bottom: 15px;
 }
 
 .post-card-footer {
-    font-size: 0.8em;
-    color: #777;
-}
-
-.external-link-wrapper {
-    margin: 25px 0;
-    text-align: center; /* ou 'left' se preferir */
-}
-
-.external-link-wrapper .btn {
-    font-size: 1.1rem;
-    padding: 12px 25px;
-}
-
-.external-link-wrapper .btn i {
-    margin-right: 8px;
+    font-size: 0.85rem;
+    color: var(--cor-texto-secundario);
+    border-top: 1px solid var(--cor-borda);
+    padding-top: 15px;
+    margin-top: auto;
 }

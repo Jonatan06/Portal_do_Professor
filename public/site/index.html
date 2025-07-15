@@ -8,21 +8,27 @@
     <link rel="stylesheet" href="/css/layout_publico.css">
     <link rel="stylesheet" href="/css/sobre_publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/css/tooltip.css">
+
 </head>
 <body>
     <header class="site-header">
         <div class="container header-container">
-            <div class="logo"><a href="/">Portal do Professor</a></div>
+            <div class="logo">
+                <a href="/">Portal do Professor</a>
+            </div>
             <nav class="main-nav">
                 <a href="/sobre" class="active">Sobre</a>
                 <a href="/blog">Blog</a>
                 <a href="/portfolio">Portfólio</a>
                 <a href="/materiais-de-aula">Materiais</a>
                 <a href="/contato">Contato</a>
-                <!-- O 'id' foi adicionado a este link -->
+            </nav>
+            <div class="nav-user-actions">
                 <a href="/admin" class="btn-login" id="btn-area-professor">Área do Professor</a>
                 <a href="/login" class="btn-login">Login do Aluno</a>
-            </nav>
+            </div>
         </div>
     </header>
 
@@ -34,7 +40,6 @@
             <p id="profile-bio" class="profile-bio"></p>
             <div id="profile-social-links" class="social-links"></div>
         </section>
-
         <section class="quick-nav">
             <a href="/blog" class="nav-card">
                 <i class="fas fa-blog"></i>
@@ -57,20 +62,23 @@
     <footer class="site-footer">
         <p>© 2025 Portal do Professor. Todos os direitos reservados.</p>
     </footer>
-            <!-- Modal de Confirmação de Saída -->
-            <div id="confirm-logout-modal" class="modal-overlay" style="display: none;">
-                <div class="modal-content">
-                    <button class="modal-close-btn" aria-label="Fechar">×</button>
-                    <h2 class="modal-title">Confirmar Saída</h2>
-                    <p class="modal-text">Tem certeza que deseja sair da sua conta e retornar à tela inicial?</p>
-                    <div class="modal-actions">
-                        <button id="cancel-logout-btn" class="btn btn-secondary">Cancelar</button>
-                        <button id="confirm-logout-btn" class="btn btn-danger">Sim, Sair</button>
-                    </div>
-                </div>
+    
+    <div id="confirm-logout-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close-btn" aria-label="Fechar">×</button>
+            <h2 class="modal-title">Confirmar Saída</h2>
+            <p class="modal-text">Tem certeza que deseja sair da sua conta e retornar à tela inicial?</p>
+            <div class="modal-actions">
+                <button id="cancel-logout-btn" class="btn btn-secondary">Cancelar</button>
+                <button id="confirm-logout-btn" class="btn btn-danger">Sim, Sair</button>
             </div>
+        </div>
+    </div>
 
     <script src="/js/auth_aluno.js"></script>
     <script src="/js/sobre_publico.js"></script>
+    
+    <script src="/js/tooltip.js"></script>
+
 </body>
 </html>

@@ -2,15 +2,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- ELEMENTOS DO DOM ---
     const toggleEditButton = document.getElementById('toggleEditButton');
     const profileForm = document.getElementById('profile-form');
-    const formInputs = profileForm.querySelectorAll('.profile-input');
     const profileImagePreview = document.getElementById('profile-image-preview');
     const changePictureButton = document.getElementById('change-picture-button');
     const profilePictureInput = document.getElementById('profile-picture-input');
-    const socialMediaSection = document.querySelector('.social-media');
     
+    const bioTextarea = document.getElementById('bio');
+    const bioCharCounter = document.getElementById('bio-char-counter');
+
+    const customLinksContainer = document.getElementById('custom-links-container');
+    const addLinkBtn = document.getElementById('add-link-btn');
+    const MAX_LINKS = 3;
+
     // --- VARIÁVEIS DE ESTADO ---
     const API_URL = '/api/profile';
-    let originalProfileData = {};
 
     // --- FUNÇÕES ---
     async function loadProfile() {
@@ -18,9 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(API_URL);
             if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
             const user = await response.json();
-            originalProfileData = user;
             updateProfileFields(user);
-            // Garante que o estado inicial seja de visualização
             setViewState();
         } catch (error) {
             console.error('Erro detalhado ao carregar perfil:', error);
@@ -32,95 +34,174 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('nome').value = user.nome || '';
         document.getElementById('cargo').value = user.cargo || '';
         document.getElementById('email').value = user.email || '';
-        document.getElementById('bio').value = user.biografia || '';
         
-        document.getElementById('linkedin1').value = user.linkedin_url || '';
-        document.getElementById('linkedin-container').dataset.url = user.linkedin_url || '';
+        const bioContent = user.biografia || '';
+        bioTextarea.value = bioContent;
+        bioCharCounter.textContent = `${bioContent.length}/50`;
         
-        document.getElementById('github').value = user.github_url || '';
-        document.getElementById('github-container').dataset.url = user.github_url || '';
-        
-        document.getElementById('lattes').value = user.lattes_url || '';
-        document.getElementById('lattes-container').dataset.url = user.lattes_url || '';
-
-        document.getElementById('website').value = user.website_url || '';
-        document.getElementById('website-container').dataset.url = user.website_url || '';
+        document.getElementById('linkedin_url').value = user.linkedin_url || '';
+        document.getElementById('github_url').value = user.github_url || '';
+        document.getElementById('instagram_url').value = user.instagram_url || '';
+        document.getElementById('website_url').value = user.website_url || '';
         
         if (profileImagePreview && user.imagem_url) {
             profileImagePreview.src = user.imagem_url;
         }
+
+        renderCustomLinks(user.custom_links || []);
     }
 
-    // --- LÓGICA DE EDIÇÃO CORRIGIDA ---
-    
-    // Função para definir o MODO DE VISUALIZAÇÃO
     function setViewState() {
         profileForm.classList.remove('edit-mode');
         profileForm.classList.add('view-mode');
-        formInputs.forEach(input => {
-            // CORREÇÃO: Usar 'disabled' em vez de 'readOnly'
-            input.disabled = true;
+        
+        profileForm.querySelectorAll('.profile-input, .btn-remove-link').forEach(el => {
+            el.disabled = true;
         });
+        
         toggleEditButton.innerHTML = '<i class="fa-solid fa-pencil"></i> Editar Perfil';
         toggleEditButton.classList.remove('btn-success');
-        toggleEditButton.classList.add('btn-primary');
+        addLinkBtn.style.display = 'none';
     }
 
-    // Função para definir o MODO DE EDIÇÃO
     function setEditState() {
         profileForm.classList.remove('view-mode');
         profileForm.classList.add('edit-mode');
-        formInputs.forEach(input => {
-            // CORREÇÃO: Usar 'disabled' em vez de 'readOnly'
-            input.disabled = false;
+        
+        profileForm.querySelectorAll('.profile-input, .btn-remove-link').forEach(el => {
+            el.disabled = false;
         });
-        toggleEditButton.innerHTML = '<i class="fa-solid fa-save"></i> Salvar Alterações';
-        toggleEditButton.classList.remove('btn-primary');
-        toggleEditButton.classList.add('btn-success');
-    }
 
+        toggleEditButton.innerHTML = '<i class="fa-solid fa-save"></i> Salvar Alterações';
+        toggleEditButton.classList.add('btn-success');
+        updateAddLinkButtonVisibility();
+    }
+    
     async function saveProfile() {
         const profileData = {
             nome: document.getElementById('nome').value,
             cargo: document.getElementById('cargo').value,
             email: document.getElementById('email').value,
             biografia: document.getElementById('bio').value,
-            linkedin_url: document.getElementById('linkedin1').value,
-            github_url: document.getElementById('github').value,
-            lattes_url: document.getElementById('lattes').value,
-            website_url: document.getElementById('website').value,
+            linkedin_url: document.getElementById('linkedin_url').value,
+            github_url: document.getElementById('github_url').value,
+            instagram_url: document.getElementById('instagram_url').value,
+            website_url: document.getElementById('website_url').value,
         };
+
+        const customLinks = [];
+        const linkRows = customLinksContainer.querySelectorAll('.custom-link-row');
+        linkRows.forEach(row => {
+            const label = row.querySelector('input[name="custom_label"]').value.trim();
+            const url = row.querySelector('input[name="custom_url"]').value.trim();
+            if (label && url) {
+                customLinks.push({ label, url });
+            }
+        });
+
+        const fullProfileData = { ...profileData, custom_links: customLinks };
 
         try {
             const response = await fetch(API_URL, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(profileData)
+                body: JSON.stringify(fullProfileData)
             });
-            if (!response.ok) throw new Error('Falha ao salvar os dados.');
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ 
+                    message: `O servidor respondeu com um erro ${response.status}, mas sem detalhes.` 
+                }));
+                throw new Error(errorData.message);
+            }
             
-            originalProfileData = await response.json(); 
+            const updatedProfile = await response.json(); 
             showToast('Perfil atualizado com sucesso!', 'success');
-            setViewState(); // Volta para o modo de visualização após salvar
-            updateProfileFields(originalProfileData);
+            updateProfileFields(updatedProfile);
+            setViewState();
         } catch (error) {
-            console.error('Erro ao salvar perfil:', error);
-            showToast('Ocorreu um erro ao salvar as alterações.', 'error');
+            console.error('Erro detalhado ao salvar perfil:', error);
+            showToast(`Ocorreu um erro ao salvar: ${error.message}`, 'error');
         }
     }
+
+    function createCustomLinkRow(link = { label: '', url: '' }, isEditable = false) {
+        const row = document.createElement('div');
+        row.className = 'custom-link-row';
+        const disabledAttr = isEditable ? '' : 'disabled';
+        
+        row.innerHTML = `
+            <div class="form-group">
+                <label>Nome do Link</label>
+                <input type="text" name="custom_label" class="profile-input" placeholder="Ex: Portfólio" value="${link.label}" ${disabledAttr}>
+            </div>
+            <div class="form-group">
+                <label>URL</label>
+                <input type="url" name="custom_url" class="profile-input" placeholder="https://" value="${link.url}" ${disabledAttr}>
+            </div>
+            <button type="button" class="btn-remove-link" data-tooltip="Remover Link" ${disabledAttr}><i class="fas fa-trash"></i></button>
+        `;
+        customLinksContainer.appendChild(row);
+
+        // --- LÓGICA ATUALIZADA AQUI ---
+        row.querySelector('.btn-remove-link').addEventListener('click', () => {
+            row.remove();
+            // Ao remover uma linha, o botão "Adicionar" deve reaparecer se estivermos em modo de edição
+            updateAddLinkButtonVisibility();
+        });
+        
+        initTooltips();
+        return row;
+    }
+    
+    function renderCustomLinks(links) {
+        customLinksContainer.innerHTML = '';
+        if (links) {
+            const isEditable = profileForm.classList.contains('edit-mode');
+            links.forEach(link => createCustomLinkRow(link, isEditable));
+        }
+    }
+
+    // --- FUNÇÃO DE VISIBILIDADE ATUALIZADA ---
+    function updateAddLinkButtonVisibility() {
+        const currentLinks = customLinksContainer.querySelectorAll('.custom-link-row').length;
+        // O botão só aparece se estiver em modo de edição E houver espaço para mais links
+        if (currentLinks < MAX_LINKS && profileForm.classList.contains('edit-mode')) {
+            addLinkBtn.style.display = 'block';
+        } else {
+            addLinkBtn.style.display = 'none';
+        }
+    }
+
+    // --- EVENT LISTENERS ---
+    toggleEditButton.addEventListener('click', function() {
+        if (profileForm.classList.contains('edit-mode')) {
+            saveProfile();
+        } else {
+            setEditState();
+        }
+    });
+
+    addLinkBtn.addEventListener('click', () => {
+        if (customLinksContainer.querySelectorAll('.custom-link-row').length < MAX_LINKS) {
+            const newRow = createCustomLinkRow({ label: '', url: '' }, true);
+            newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            newRow.querySelector('input[name="custom_label"]').focus();
+        }
+        // Após adicionar, o botão é escondido até que o formulário seja salvo
+        updateAddLinkButtonVisibility();
+    });
+    
+    changePictureButton.addEventListener('click', () => profilePictureInput.click());
+    profilePictureInput.addEventListener('change', saveProfilePicture);
 
     async function saveProfilePicture() {
         const file = profilePictureInput.files[0];
         if (!file) return;
-
         const formData = new FormData();
         formData.append('profilePicture', file);
-
         try {
-            const response = await fetch('/api/profile/picture', {
-                method: 'POST',
-                body: formData,
-            });
+            const response = await fetch('/api/profile/picture', { method: 'POST', body: formData });
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Falha no upload da imagem.');
@@ -129,54 +210,18 @@ document.addEventListener('DOMContentLoaded', function() {
             profileImagePreview.src = updatedProfile.imagem_url;
             showToast('Foto de perfil atualizada com sucesso!', 'success');
         } catch (error) {
-            console.error('Erro ao salvar foto de perfil:', error);
             showToast(`Ocorreu um erro: ${error.message}`, 'error');
         } finally {
             profilePictureInput.value = '';
         }
     }
 
-    // --- EVENT LISTENERS ---
-    if (toggleEditButton) {
-        toggleEditButton.addEventListener('click', function() {
-            // Se o formulário está em modo de edição, o clique salva. Senão, entra no modo de edição.
-            if (profileForm.classList.contains('edit-mode')) {
-                saveProfile();
-            } else {
-                setEditState();
-            }
-        });
-    }
-
-    if (changePictureButton) {
-        changePictureButton.addEventListener('click', () => profilePictureInput.click());
-    }
-
-    if (profilePictureInput) {
-        profilePictureInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => profileImagePreview.src = e.target.result;
-                reader.readAsDataURL(file);
-                saveProfilePicture();
-            }
-        });
-    }
-
-    if (socialMediaSection) {
-        socialMediaSection.addEventListener('click', (e) => {
-            // Só redireciona se estiver no modo de visualização
-            if (profileForm.classList.contains('view-mode')) {
-                const container = e.target.closest('.input-with-icon');
-                if (container && container.dataset.url) {
-                    window.open(container.dataset.url, '_blank', 'noopener,noreferrer');
-                }
-            }
+    if (bioTextarea) {
+        bioTextarea.addEventListener('input', () => {
+            bioCharCounter.textContent = `${bioTextarea.value.length}/50`;
         });
     }
 
     // --- INICIALIZAÇÃO ---
     loadProfile();
-    initTooltips(); 
 });

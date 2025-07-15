@@ -82,11 +82,19 @@ document.addEventListener('DOMContentLoaded', () => {
             let pinsHTML = '';
             let tooltipText = '';
 
+            // --- LÓGICA ATUALIZADA PARA MÚLTIPLOS PINS ---
             if (eventsOfTheDay.length > 0) {
-                pinsHTML = `<i class='bx bxs-pin pin-icon' style="color: ${eventsOfTheDay[0].cor};"></i>`;
-                tooltipText = eventsOfTheDay.map(e => e.title).join(', ');
+                // Pega no máximo os 3 primeiros eventos para exibir os pins
+                const pinsToDisplay = eventsOfTheDay.slice(0, 3).map(event => 
+                    `<i class='bx bxs-pin pin-icon' style="color: ${event.cor};"></i>`
+                ).join('');
+
+                pinsHTML = `<div class="pin-container">${pinsToDisplay}</div>`;
+                
+                tooltipText = eventsOfTheDay.map(e => e.title).join(' | ');
                 classes += ' has-event';
             }
+            // --- FIM DA LÓGICA ATUALIZADA ---
             
             calendarBody.insertAdjacentHTML('beforeend', 
                 `<div class="${classes}" data-date="${dateStr}" ${tooltipText ? `data-tooltip="${tooltipText}"` : ''}>

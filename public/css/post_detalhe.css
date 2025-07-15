@@ -38,3 +38,58 @@
     text-align: center;
     margin-bottom: 20px;
 }
+
+/* Adicione ao final de /css/post_detalhe.css */
+
+/* Estilos para comentários aninhados (respostas) */
+.comment-reply {
+    margin-left: 65px; /* Indentação da resposta */
+    padding-left: 20px;
+    border-left: 2px solid #eee;
+    margin-top: 15px;
+}
+
+/* Ações do comentário (Editar, Apagar, Responder) */
+.comment-actions {
+    display: flex;
+    gap: 15px;
+    font-size: 0.8em;
+    margin-top: 8px;
+}
+.comment-actions button {
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    font-weight: 600;
+}
+.comment-actions button:hover {
+    color: var(--cor-primaria);
+}
+
+/* Timestamp de edição */
+.edited-timestamp {
+    font-size: 0.8em;
+    color: #6c757d;
+    font-style: italic;
+    margin-left: 10px;
+}
+
+/* Formulário de edição inline */
+.edit-comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+.edit-comment-form textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+.edit-comment-form div {
+    display: flex;
+    gap: 10px;
+}
