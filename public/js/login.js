@@ -1,9 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     
-    document.getElementById('btn-voltar').addEventListener('click', () => {
-        history.back();
-    });
+    const btnVoltar = document.getElementById('btn-voltar');
+    if (btnVoltar) {
+        btnVoltar.addEventListener('click', () => {
+            history.back();
+        });
+    }
 
     if (!loginForm) {
         return;
@@ -28,11 +31,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.message || 'Ocorreu um erro desconhecido.');
             }
 
+            // ==========================================================
+            // ||           **INÍCIO DA CORREÇÃO PRINCIPAL** ||
+            // ==========================================================
+
+            // Salva o token E os dados do professor que vêm da API
             localStorage.setItem('authToken', data.token);
+            localStorage.setItem('professorLogado', JSON.stringify(data.professor));
+
+            // ==========================================================
+            // ||             **FIM DA CORREÇÃO PRINCIPAL** ||
+            // ==========================================================
+
             window.location.href = '/admin/dashboard.html';
 
         } catch (error) {
-            // SUBSTITUÍDO: alert(error.message) por showToast
             showToast(error.message, 'error');
         }
     });

@@ -11,13 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const renderPostCard = (post) => {
-        // CORREÇÃO APLICADA AQUI: O ano não era dinâmico
         const postDate = new Date(post.data_publicacao).toLocaleDateString('pt-BR', {
             day: '2-digit', month: 'long', year: 'numeric'
         });
         
+        // --- CORREÇÃO APLICADA AQUI ---
+        // A variável 'postLink' agora aponta SEMPRE para a página interna do post.
         const postLink = `/post?id=${post.id}`;
-        const target = post.external_url ? 'target="_blank" rel="noopener noreferrer"' : '';
+        
+        // O atributo 'target' não é mais necessário aqui, pois o link é sempre interno.
+        const target = '';
+
         const excerptText = post.conteudo ? post.conteudo.replace(/<[^>]*>?/gm, ' ').trim() : 'Clique para ver mais.';
         const excerpt = excerptText.length > 120 ? excerptText.substring(0, 120) + '...' : excerptText;
         const imageUrl = post.imagem_url || 'https://images.unsplash.com/photo-1516321497487-e288fb19713f';

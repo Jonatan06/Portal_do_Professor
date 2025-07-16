@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     protectPage();
 
     const API_URL = '/api/materiais';
-    let allMaterials = []; // Armazena todos os materiais carregados
+    let allMaterials = [];
 
     // --- SELEÇÃO DE ELEMENTOS ---
     const addMaterialBtn = document.querySelector('.btn-add-material');
@@ -38,28 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.remove('hidden');
     };
     
-    // NOVA FUNÇÃO para abrir o modal para edição
+    // A função de editar foi simplificada, pois a edição de múltiplos arquivos
+    // adicionaria muita complexidade. A recomendação é apagar e criar um novo material.
     const openModalForEdit = (material) => {
-        materialForm.reset();
-        document.getElementById('material-id').value = material.id;
-        modalTitle.textContent = 'Editar Material';
-
-        document.getElementById('material-title').value = material.titulo;
-        document.getElementById('material-description').value = material.descricao;
-        document.getElementById('material-category').value = material.categoria;
-        document.getElementById('material-link').value = material.link_externo || '';
-
-        fileLabelText.textContent = material.nome_arquivo || 'Clique para escolher um novo arquivo...';
-        
-        if (material.imagem_capa_url) {
-            coverImagePreview.src = material.imagem_capa_url;
-            coverImagePreview.style.display = 'block';
-        } else {
-            coverImagePreview.style.display = 'none';
-            coverImagePreview.src = '#';
-        }
-
-        modal.classList.remove('hidden');
+        showToast('Para editar, por favor, apague e crie o material novamente.', 'info');
     };
 
     const closeModal = () => modal.classList.add('hidden');
@@ -95,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(API_URL);
             if (!response.ok) throw new Error("Não foi possível carregar os materiais.");
-            allMaterials = await response.json(); // Salva os materiais na variável global
+            allMaterials = await response.json(); 
 
             materialsContainer.innerHTML = ''; 
 
@@ -126,42 +108,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    function getFileIcon(mimeType) {
-        if (!mimeType) return 'fa-link';
-        if (mimeType.includes('pdf')) return 'fa-file-pdf';
-        if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return 'fa-file-powerpoint';
-        if (mimeType.includes('word')) return 'fa-file-word';
-        if (mimeType.includes('image')) return 'fa-file-image';
-        if (mimeType.includes('video')) return 'fa-file-video';
-        if (mimeType.includes('zip') || mimeType.includes('archive')) return 'fa-file-archive';
-        return 'fa-file-alt';
-    }
-
-    // ATUALIZADO: Adiciona o botão de editar
+    // --- INÍCIO DA MODIFICAÇÃO ---
     function createMaterialListItem(data) {
-        const isExternalLink = data.link_externo && !data.caminho_arquivo;
-        const accessLink = isExternalLink ? data.link_externo : data.caminho_arquivo;
-        const downloadAttribute = !isExternalLink ? 'download' : '';
-        const targetAttribute = isExternalLink ? 'target="_blank" rel="noopener noreferrer"' : '';
-        const iconClass = getFileIcon(data.tipo_arquivo);
+        // 'data' agora contém um array 'arquivos'
+        const hasFiles = data.arquivos && data.arquivos.length > 0;
+        const hasLink = !!data.link_externo;
+        
+        let iconClass = 'fa-file-alt'; // Ícone padrão
+        if (hasLink && !hasFiles) iconClass = 'fa-link';
+        if (hasFiles) iconClass = 'fa-folder';
+
         const formattedDate = new Date(data.data_upload).toLocaleDateString('pt-BR');
+        const summary = (data.descricao || '').length > 100 ? (data.descricao || '').substring(0, 100) + '...' : (data.descricao || '');
+
+        const fileCountText = hasFiles ? `${data.arquivos.length} arquivo(s)` : (hasLink ? 'Link Externo' : '---');
 
         return `
             <div class="material-list-item" data-id="${data.id}" data-title="${data.titulo}">
                 <div class="item-icon"><i class="fas ${iconClass}"></i></div>
                 <div class="item-details">
                     <strong>${data.titulo}</strong>
-                    <p>${data.descricao}</p>
+                    <p>${summary}</p>
                 </div>
-                <div class="item-meta item-size">${data.tamanho_arquivo || '---'}</div>
+                <div class="item-meta item-size">${fileCountText}</div>
                 <div class="item-meta item-date">Adicionado em ${formattedDate}</div>
                 <div class="item-actions">
-                    <a href="${accessLink}" ${targetAttribute} ${downloadAttribute} class="btn-icon" data-tooltip="Acessar/Baixar"><i class="fa-solid fa-download"></i></a>
                     <button class="btn-icon btn-edit" data-tooltip="Editar"><i class="fa-solid fa-pencil-alt"></i></button>
                     <button class="btn-icon btn-delete" data-tooltip="Apagar"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>`;
     }
+    // --- FIM DA MODIFICAÇÃO ---
 
     // --- EVENT LISTENERS ---
     addMaterialBtn.addEventListener('click', openModalForAdd);
@@ -169,9 +146,16 @@ document.addEventListener('DOMContentLoaded', () => {
     cancelBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
+    // --- INÍCIO DA MODIFICAÇÃO ---
     fileInput.addEventListener('change', () => {
-        fileLabelText.textContent = fileInput.files[0] ? fileInput.files[0].name : 'Clique para escolher um arquivo...';
+        const numFiles = fileInput.files.length;
+        if (numFiles > 0) {
+            fileLabelText.textContent = `${numFiles} arquivo(s) selecionado(s)`;
+        } else {
+            fileLabelText.textContent = 'Clique para escolher um arquivo...';
+        }
     });
+    // --- FIM DA MODIFICAÇÃO ---
 
     coverImageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -185,19 +169,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ATUALIZADO: para lidar com POST (criar) e PUT (editar)
     materialForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(materialForm);
-        const id = document.getElementById('material-id').value;
-        const isEditing = !!id;
         
-        const url = isEditing ? `${API_URL}/${id}` : API_URL;
-        const method = isEditing ? 'PUT' : 'POST';
-
         try {
-            const response = await fetch(url, {
-                method: method,
+            const response = await fetch(API_URL, {
+                method: 'POST',
                 body: formData
             });
 
@@ -208,13 +186,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             closeModal();
             fetchAndRenderMaterials(filterTabs.querySelector('.active').dataset.filter);
-            showToast(`Material ${isEditing ? 'atualizado' : 'salvo'} com sucesso!`, 'success');
+            showToast(`Material salvo com sucesso!`, 'success');
         } catch(error) {
             showToast(`Erro: ${error.message}`, 'error');
         }
     });
 
-    // ATUALIZADO: para lidar com cliques de editar e apagar
     materialsContainer.addEventListener('click', async (e) => {
         const editBtn = e.target.closest('.btn-edit');
         const deleteBtn = e.target.closest('.btn-delete');
@@ -233,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = item.dataset.id;
             const title = item.dataset.title;
             
-            const confirmed = await showConfirmationModal('Apagar Material', `Tem certeza que deseja apagar o material "${title}"?`);
+            const confirmed = await showConfirmationModal('Apagar Material', `Tem certeza que deseja apagar o material "${title}"? Esta ação não pode ser desfeita.`);
 
             if (confirmed) {
                 try {
@@ -241,7 +218,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!response.ok) {
                         throw new Error("Falha ao apagar o material no servidor.");
                     }
-                    item.remove();
+                    // Recarrega a lista para refletir a exclusão
+                    await fetchAndRenderMaterials(filterTabs.querySelector('.active').dataset.filter);
                     showToast('Material apagado com sucesso.', 'success');
                 } catch (error) {
                     showToast(`Erro: ${error.message}`, 'error');
@@ -255,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         filterTabs.querySelector('.active').classList.remove('active');
         e.target.classList.add('active');
-        fetchAndRenderMaterials(e.target.dataset.filter); // Corrigido para chamar fetchAndRenderMaterials
+        fetchAndRenderMaterials(e.target.dataset.filter);
     });
 
     // --- INICIALIZAÇÃO ---

@@ -1,30 +1,41 @@
 // public/js/auth.js (PARA O PAINEL DO PROFESSOR)
 
-// Pega o token do localStorage
+/**
+ * Pega o token de autenticação do professor do localStorage.
+ */
 function getToken() {
     return localStorage.getItem('authToken');
 }
 
-// Remove o token para fazer logout e redireciona para o login do admin
+/**
+ * Remove os dados de login do professor e redireciona para a página de login.
+ */
 function logout() {
     localStorage.removeItem('authToken');
-    // IMPORTANTE: Mude 'index.html' para a sua página de login do PROFESSOR se for diferente
-    window.location.href = '/admin/login.html'; 
+    localStorage.removeItem('professorLogado'); // Limpa também os dados do professor
+    window.location.href = '/admin/index.html'; // Redireciona para a página de login correta
 }
 
-// Função para proteger uma página. Deve ser chamada no início de cada script de página protegida.
+/**
+ * Protege uma página. Se não houver token, redireciona para o login.
+ * Deve ser chamada no início de cada script de página protegida.
+ */
 function protectPage() {
     const token = getToken();
     if (!token) {
-        // Se não houver token, redireciona para a página de login do professor
-        alert("Acesso negado. Por favor, faça o login.");
-        window.location.href = '/admin/login.html'; // Mude se o nome da sua página for outro
+        // Usa o showToast em vez do alert nativo
+        showToast("Acesso negado. Por favor, faça o login.", 'error');
+        setTimeout(() => {
+            window.location.href = '/admin/index.html';
+        }, 1500);
     }
 }
 
-// Esta parte intercepta TODAS as chamadas `fetch` do seu painel de admin
-// e adiciona automaticamente o token de autenticação no cabeçalho.
-// Isso é essencial para que suas requisições à API sejam autorizadas.
+/**
+ * Intercepta TODAS as chamadas `fetch` do painel de admin
+ * e adiciona automaticamente o token de autenticação no cabeçalho.
+ * Isso é essencial para que suas requisições à API sejam autorizadas.
+ */
 const originalFetch = window.fetch;
 window.fetch = function (url, options) {
     const token = getToken();
@@ -32,10 +43,14 @@ window.fetch = function (url, options) {
     const newOptions = options ? { ...options } : {};
     newOptions.headers = newOptions.headers || {};
     
-    // Adiciona o token ao cabeçalho para todas as requisições da API
+    // Adiciona o token ao cabeçalho para todas as requisições da API do painel
     if (token && url.startsWith('/api/')) {
-        newOptions.headers['x-auth-token'] = token; // Ou 'Authorization': `Bearer ${token}`
+        newOptions.headers['x-auth-token'] = token;
     }
 
-    return originalFetch(url, newOptions);
+    return originalFetch(url, newOptions).catch(error => {
+        console.error('Fetch Error:', error);
+        showToast('Erro de conexão com o servidor.', 'error');
+        return Promise.reject(error);
+    });
 };

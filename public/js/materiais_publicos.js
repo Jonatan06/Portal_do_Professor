@@ -27,12 +27,17 @@ document.addEventListener('DOMContentLoaded', () => {
             day: '2-digit', month: 'long', year: 'numeric'
         });
 
+        // --- CORREÇÃO APLICADA AQUI ---
+        const description = data.descricao || '';
+        const summary = description.length > 120 ? description.substring(0, 120) + '...' : description;
+        // --- FIM DA CORREÇÃO ---
+
         return `
             <div class="material-card" data-id="${data.id}">
                 <div class="material-card-image" style="background-image: url('${imageUrl}')"></div>
                 <div class="material-card-content">
                     <h3>${data.titulo}</h3>
-                    <p>${data.descricao}</p>
+                    <p>${summary}</p>
                     <div class="file-info">
                         <span>${fileType}</span>
                         ${data.tamanho_arquivo ? `<span>${data.tamanho_arquivo}</span>` : ''}
@@ -47,18 +52,19 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
     };
 
-    // FUNÇÃO DE RENDERIZAÇÃO ATUALIZADA PARA REAGRUPAR POR CATEGORIA
     const renderFilteredMaterials = () => {
         const categoryFilter = filterTabs.querySelector('.active').dataset.filter;
         const searchTerm = searchInput.value.toLowerCase();
         const sortOrder = sortSelect.value;
 
-        // 1. Aplica o filtro de busca de texto primeiro
         let filtered = allMaterials.filter(material => 
             material.titulo.toLowerCase().includes(searchTerm)
         );
 
-        // 2. Aplica a ordenação
+        if (categoryFilter !== 'todos') {
+            filtered = filtered.filter(material => material.categoria === categoryFilter);
+        }
+        
         filtered.sort((a, b) => {
             switch (sortOrder) {
                 case 'antigos':
@@ -73,29 +79,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // 3. Agrupa os resultados filtrados e ordenados por categoria
         const groupedByCategory = filtered.reduce((acc, material) => {
             const category = material.categoria;
-            if (categoryFilter === 'todos' || category === categoryFilter) {
-                if (!acc[category]) {
-                    acc[category] = [];
-                }
-                acc[category].push(material);
+            if (!acc[category]) {
+                acc[category] = [];
             }
+            acc[category].push(material);
             return acc;
         }, {});
         
-        // 4. Renderiza as seções
         materialsContainer.innerHTML = '';
-        let contentRendered = false;
+        if (filtered.length === 0) {
+            materialsContainer.innerHTML = '<p>Nenhum material encontrado com os filtros selecionados.</p>';
+            return;
+        }
 
-        Object.keys(groupedByCategory).forEach(catKey => {
-            const categoryInfo = categories[catKey];
-            const materialsForCategory = groupedByCategory[catKey];
-
-            if (materialsForCategory.length > 0) {
-                contentRendered = true;
-                const gridContent = materialsForCategory.map(createMaterialCard).join('');
+        Object.keys(categories).forEach(catKey => {
+            if (groupedByCategory[catKey] && groupedByCategory[catKey].length > 0) {
+                const categoryInfo = categories[catKey];
+                const gridContent = groupedByCategory[catKey].map(createMaterialCard).join('');
                 const sectionHTML = `
                     <section class="material-section">
                         <h2 class="material-section-title">
@@ -106,10 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 materialsContainer.insertAdjacentHTML('beforeend', sectionHTML);
             }
         });
-
-        if (!contentRendered) {
-            materialsContainer.innerHTML = '<p>Nenhum material encontrado com os filtros selecionados.</p>';
-        }
     };
 
     const initialLoad = async () => {

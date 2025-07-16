@@ -22,14 +22,14 @@
         </div>
         <nav class="sidebar-nav">
             <ul>
-                    <li><a href="dashboard.html"><i class="fas fa-home nav-icon"></i> <span>Dashboard</span></a></li>
-                    <li><a href="perfil.html"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
-                    <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
-                    <li><a href="materiais.html" class="active"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
-                    <li><a href="agenda.html"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
-                    <li><a href="portfolio.html"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
-                    <li><a href="caixa_entrada.html"><i class="fas fa-envelope nav-icon"></i> <span>Contatos</span></a></li>
-                    <li><a href="sobre.html"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
+                <li><a href="dashboard.html"><i class="fas fa-home nav-icon"></i> <span>Dashboard</span></a></li>
+                <li><a href="perfil.html"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
+                <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
+                <li><a href="materiais.html" class="active"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
+                <li><a href="agenda.html"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
+                <li><a href="portfolio.html"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
+                <li><a href="caixa_entrada.html"><i class="fas fa-envelope nav-icon"></i> <span>Contatos</span></a></li>
+                <li><a href="sobre.html"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
             </ul>
         </nav>
         <a href="/" target="_blank" class="sidebar-view-public-btn">Ver Site Público</a>
@@ -74,9 +74,16 @@
                     </div>
                     
                     <div class="form-group"><label for="material-category">Categoria</label><select id="material-category" name="categoria" required><option value="" disabled selected>Selecione...</option><option value="slides">Slides</option><option value="apostilas">Apostilas</option><option value="exercicios">Exercícios</option><option value="videos">Vídeos</option><option value="outros">Outros</option></select></div>
+                    
                     <div class="form-group">
-                        <label for="material-file">Arquivo do Material</label>
-                        <div class="file-upload-wrapper"><input type="file" id="material-file" name="materialFile" class="file-input"><label for="material-file" class="file-label"><i class="fa-solid fa-cloud-arrow-up"></i><span class="file-label-text">Clique para escolher...</span></label></div>
+                        <label for="material-file">Arquivo(s) do Material</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="material-file" name="materialFile" class="file-input" multiple>
+                            <label for="material-file" class="file-label">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <span class="file-label-text">Clique para escolher...</span>
+                            </label>
+                        </div>
                         <small>Deixe em branco se for apenas um link.</small>
                     </div>
                     <div class="form-group"><label for="material-link">Ou insira um Link Externo</label><input type="url" id="material-link" name="link_externo" placeholder="https://..."></div>

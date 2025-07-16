@@ -1,6 +1,6 @@
 // ===============================================
 // ||           PORTAL DO PROFESSOR             ||
-// ||         SERVER.JS (VERSÃO FINAL)          ||
+// ||         SERVER.JS (VERSÃO CORRIGIDA)      ||
 // ===============================================
 
 // --- 1. IMPORTAÇÃO DOS MÓDULOS ---
@@ -29,7 +29,7 @@ if (!fs.existsSync(dbPath)) {
 const createMulterStorage = (destination) => {
     return multer.diskStorage({
         destination: function (req, file, cb) {
-            const uploadPath = path.join('public', destination);
+            const uploadPath = path.join(__dirname, 'public', destination);
             fs.mkdirSync(uploadPath, { recursive: true });
             cb(null, uploadPath);
         },
@@ -49,17 +49,19 @@ const projectFormHandler = portfolioMediaUpload.fields([
     { name: 'fotos', maxCount: 10 }
 ]);
 
+// --- INÍCIO DA MODIFICAÇÃO ---
 const materialFormHandler = materialUpload.fields([
     { name: 'imagem_capa', maxCount: 1 },
-    { name: 'materialFile', maxCount: 1 }
+    { name: 'materialFile', maxCount: 10 } // Aceita até 10 arquivos
 ]);
+// --- FIM DA MODIFICAÇÃO ---
 
 const singleImageUpload = portfolioMediaUpload.single('file');
 
 
 // --- 4. INICIALIZAÇÃO DO EXPRESS ---
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3011;
 
 // --- 5. MIDDLEWARES GLOBAIS ---
 app.use(cors());
@@ -67,10 +69,48 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
+// --- MIDDLEWARE DE AUTENTICAÇÃO COMBINADO ---
+function checkCombinedAuthStatus(req, res, next) {
+    const token = req.header('x-auth-token');
+    if (!token) {
+        req.aluno = null;
+        req.professor = null;
+        return next();
+    }
+
+    try {
+        const decodedProfessor = jwt.verify(token, JWT_SECRET);
+        req.professor = decodedProfessor;
+        req.aluno = null;
+        return next();
+    } catch (ex) {
+        try {
+            const decodedAluno = jwt.verify(token, JWT_SECRET_ALUNO);
+            req.aluno = decodedAluno;
+            req.professor = null;
+            return next();
+        } catch (ex2) {
+            req.aluno = null;
+            req.professor = null;
+            return next();
+        }
+    }
+}
 
 // ===============================================
 // ||              ROTAS DA API                 ||
 // ===============================================
+
+// ROTA DE STATUS DE LOGIN (para saber quem está logado no frontend)
+app.get('/api/auth/status', checkCombinedAuthStatus, (req, res) => {
+    if (req.professor) {
+        res.json({ loggedIn: true, role: 'professor', user: req.professor });
+    } else if (req.aluno) {
+        res.json({ loggedIn: true, role: 'aluno', user: req.aluno });
+    } else {
+        res.json({ loggedIn: false });
+    }
+});
 
 // ROTA DE CADASTRO DE ALUNO
 app.post('/api/alunos/cadastro', async (req, res) => {
@@ -93,9 +133,6 @@ app.post('/api/alunos/cadastro', async (req, res) => {
     }
 });
 
-// ... (Todo o código inicial do server.js permanece o mesmo)
-
-// === ROTA DE LOGIN DE ALUNO (ATUALIZADA) ===
 app.post('/api/alunos/login', async (req, res) => {
     const { email, senha } = req.body;
     if (!email || !senha) {
@@ -110,7 +147,6 @@ app.post('/api/alunos/login', async (req, res) => {
         if (!senhaCorreta) {
             return res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
         }
-        // Inclui a imagem_url no token e no objeto de retorno
         const token = jwt.sign(
             { id: aluno.id, nome: aluno.nome, email: aluno.email, imagem_url: aluno.imagem_url, role: 'aluno' },
             JWT_SECRET_ALUNO,
@@ -128,17 +164,14 @@ app.post('/api/alunos/login', async (req, res) => {
     }
 });
 
-// === NOVA ROTA PARA UPLOAD DE FOTO DO ALUNO ===
+
 app.post('/api/alunos/profile/picture', authenticateAluno, imageUpload.single('alunoProfilePicture'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: 'Nenhum arquivo de imagem enviado.' });
     }
     try {
         const imagem_url = `/uploads/images/${req.file.filename}`;
-        // Atualiza a imagem do aluno logado (ID vem do token)
         await db('alunos').where('id', req.aluno.id).update({ imagem_url });
-        
-        // Retorna a URL da nova imagem
         res.json({ success: true, imagem_url });
     } catch (err) {
         console.error("Erro ao fazer upload da foto de perfil do aluno:", err);
@@ -146,8 +179,6 @@ app.post('/api/alunos/profile/picture', authenticateAluno, imageUpload.single('a
     }
 });
 
-
-// ... (O restante do arquivo server.js continua o mesmo)
 // API: LOGIN PROFESSOR
 app.post('/api/auth/login', async (req, res) => {
     const { email, senha } = req.body;
@@ -163,8 +194,20 @@ app.post('/api/auth/login', async (req, res) => {
         if (!senhaCorreta) {
             return res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
         }
-        const token = jwt.sign({ id: professor.id, role: 'professor' }, JWT_SECRET, { expiresIn: '8h' });
-        res.json({ success: true, token: token });
+        
+        const payload = { 
+            id: professor.id, 
+            nome: professor.nome, 
+            role: 'professor' 
+        };
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+
+        res.json({ 
+            success: true, 
+            token: token,
+            professor: payload 
+        });
+
     } catch (err) {
         console.error("Erro no login do professor:", err);
         res.status(500).json({ success: false, message: 'Erro interno no servidor.' });
@@ -192,30 +235,24 @@ app.put('/api/profile', authenticateProfessor, async (req, res) => {
     const { custom_links, ...profileData } = req.body;
     const trx = await db.transaction();
     try {
-        const count = await trx('perfil').where('id', req.professor.id).update(profileData);
-
-        if (count > 0) {
-            await trx('perfil_links').where('perfil_id', req.professor.id).del();
-            if (custom_links && custom_links.length > 0) {
-                const linksToInsert = custom_links
-                    .filter(link => link.label && link.url)
-                    .map(link => ({
-                        ...link,
-                        perfil_id: req.professor.id
-                    }));
-                if (linksToInsert.length > 0) {
-                  await trx('perfil_links').insert(linksToInsert);
-                }
+        await trx('perfil').where('id', req.professor.id).update(profileData);
+        await trx('perfil_links').where('perfil_id', req.professor.id).del();
+        if (custom_links && custom_links.length > 0) {
+            const linksToInsert = custom_links
+                .filter(link => link.label && link.url)
+                .map(link => ({
+                    ...link,
+                    perfil_id: req.professor.id
+                }));
+            if (linksToInsert.length > 0) {
+              await trx('perfil_links').insert(linksToInsert);
             }
-            await trx.commit();
-            const updatedProfile = await db('perfil').where('id', req.professor.id).first();
-            const updatedLinks = await db('perfil_links').where({ perfil_id: req.professor.id });
-            updatedProfile.custom_links = updatedLinks;
-            res.json(updatedProfile);
-        } else {
-            await trx.rollback();
-            res.status(404).json({ message: "Perfil não encontrado." });
         }
+        await trx.commit();
+        const updatedProfile = await db('perfil').where('id', req.professor.id).first();
+        const updatedLinks = await db('perfil_links').where({ perfil_id: req.professor.id });
+        updatedProfile.custom_links = updatedLinks;
+        res.json(updatedProfile);
     } catch (err) {
         await trx.rollback();
         console.error("Erro ao salvar perfil:", err);
@@ -237,16 +274,14 @@ app.post('/api/profile/picture', authenticateProfessor, imageUpload.single('prof
 });
 
 
-// === ROTA DE PERFIL PÚBLICO ATUALIZADA ===
+// ROTA DE PERFIL PÚBLICO
 app.get('/api/public-profile', async (req, res) => {
     try {
-        // Assume que o perfil público é sempre o do professor com id = 1
         const profile = await db('perfil').where({ id: 1 }).first(); 
         if (profile) {
             delete profile.senha;
-            // Busca os links personalizados associados a este perfil
             const customLinks = await db('perfil_links').where({ perfil_id: 1 });
-            profile.custom_links = customLinks; // Adiciona os links ao objeto
+            profile.custom_links = customLinks;
             res.json(profile);
         } else {
             res.status(404).json({ message: "Perfil principal não encontrado." });
@@ -256,7 +291,6 @@ app.get('/api/public-profile', async (req, res) => {
         res.status(500).json({ message: "Erro ao buscar perfil." });
     }
 });
-// === FIM DA ATUALIZAÇÃO ===
 
 
 // API: SOBRE
@@ -328,104 +362,119 @@ app.delete('/api/mensagens/:id', authenticateProfessor, async (req, res) => {
     } catch (err) { res.status(500).json({ message: "Erro ao apagar mensagem." }); }
 });
 
+// --- INÍCIO DA MODIFICAÇÃO ---
+
 // API: MATERIAIS
 app.get('/api/materiais', async (req, res) => {
     try {
         const materiais = await db('materiais').select('*').orderBy('data_upload', 'desc');
-        res.json(materiais);
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar materiais." }); }
+        if (materiais.length === 0) {
+            return res.json([]);
+        }
+        const materialIds = materiais.map(m => m.id);
+        const arquivos = await db('material_arquivos').whereIn('material_id', materialIds);
+
+        const arquivosMap = arquivos.reduce((map, arquivo) => {
+            if (!map[arquivo.material_id]) {
+                map[arquivo.material_id] = [];
+            }
+            map[arquivo.material_id].push(arquivo);
+            return map;
+        }, {});
+
+        const result = materiais.map(material => ({
+            ...material,
+            arquivos: arquivosMap[material.id] || []
+        }));
+        
+        res.json(result);
+    } catch (err) {
+        console.error("Erro ao buscar materiais:", err);
+        res.status(500).json({ message: "Erro ao buscar materiais." });
+    }
 });
 
 app.post('/api/materiais', authenticateProfessor, materialFormHandler, async (req, res) => {
+    const trx = await db.transaction();
     try {
         const { titulo, descricao, categoria, link_externo } = req.body;
         const materialData = { titulo, descricao, categoria, link_externo };
 
         if (req.files.imagem_capa) {
-            materialData.imagem_capa_url = `/${path.relative('public', req.files.imagem_capa[0].path).replace(/\\/g, "/")}`;
-        }
-        if (req.files.materialFile) {
-            const materialFile = req.files.materialFile[0];
-            materialData.nome_arquivo = materialFile.originalname;
-            materialData.caminho_arquivo = `/${path.relative('public', materialFile.path).replace(/\\/g, "/")}`;
-            materialData.tipo_arquivo = materialFile.mimetype;
-            materialData.tamanho_arquivo = `${(materialFile.size / 1024 / 1024).toFixed(2)} MB`;
-        }
-        
-        if (!materialData.caminho_arquivo && !materialData.link_externo) {
-            return res.status(400).json({ message: "É necessário enviar um arquivo ou um link externo." });
+            materialData.imagem_capa_url = `/uploads/images/${req.files.imagem_capa[0].filename}`;
         }
 
-        const [id] = await db('materiais').insert(materialData).returning('id');
-        const newId = typeof id === 'object' ? id.id : id;
-        const newMaterial = await db('materiais').where({ id: newId }).first();
+        const [materialResult] = await trx('materiais').insert(materialData).returning('id');
+        const materialId = typeof materialResult === 'object' ? materialResult.id : materialResult;
+        
+        if (req.files.materialFile && req.files.materialFile.length > 0) {
+            const arquivosParaInserir = req.files.materialFile.map(file => ({
+                material_id: materialId,
+                nome_arquivo: file.originalname,
+                caminho_arquivo: `/uploads/materiais/${file.filename}`,
+                tipo_arquivo: file.mimetype,
+                tamanho_arquivo: `${(file.size / 1024 / 1024).toFixed(2)} MB`
+            }));
+            await trx('material_arquivos').insert(arquivosParaInserir);
+        } else if (!link_externo) {
+            await trx.rollback();
+            return res.status(400).json({ message: "É necessário enviar pelo menos um arquivo ou um link externo." });
+        }
+
+        await trx.commit();
+        const newMaterial = await db('materiais').where({ id: materialId }).first();
         res.status(201).json(newMaterial);
     } catch (err) {
+        await trx.rollback();
         console.error("Erro ao adicionar material:", err);
         res.status(500).json({ message: "Erro ao salvar material." });
     }
 });
 
-app.put('/api/materiais/:id', authenticateProfessor, materialFormHandler, async (req, res) => {
-    const { id } = req.params;
-    try {
-        const { titulo, descricao, categoria, link_externo } = req.body;
-        const updateData = { titulo, descricao, categoria, link_externo };
-
-        if (req.files.imagem_capa) {
-            updateData.imagem_capa_url = `/${path.relative('public', req.files.imagem_capa[0].path).replace(/\\/g, "/")}`;
-        }
-        if (req.files.materialFile) {
-            const materialFile = req.files.materialFile[0];
-            updateData.nome_arquivo = materialFile.originalname;
-            updateData.caminho_arquivo = `/${path.relative('public', materialFile.path).replace(/\\/g, "/")}`;
-            updateData.tipo_arquivo = materialFile.mimetype;
-            updateData.tamanho_arquivo = `${(materialFile.size / 1024 / 1024).toFixed(2)} MB`;
-        }
-        
-        const count = await db('materiais').where({ id }).update(updateData);
-        if (count > 0) {
-            const updatedMaterial = await db('materiais').where({ id }).first();
-            res.status(200).json(updatedMaterial);
-        } else {
-            res.status(404).json({ message: "Material não encontrado." });
-        }
-    } catch (err) {
-        console.error("Erro ao editar material:", err);
-        res.status(500).json({ message: "Erro ao editar material." });
-    }
-});
+// A rota PUT para editar foi removida por simplicidade. A edição de múltiplos arquivos
+// exigiria uma lógica complexa de apagar arquivos antigos e adicionar novos,
+// que pode ser implementada futuramente se necessário.
 
 app.delete('/api/materiais/:id', authenticateProfessor, async (req, res) => {
+    const trx = await db.transaction();
     try {
         const { id } = req.params;
-        const material = await db('materiais').where({ id }).first();
-        if (!material) return res.status(404).json({ message: "Material não encontrado." });
+        const material = await trx('materiais').where({ id }).first();
+        if (!material) {
+            await trx.rollback();
+            return res.status(404).json({ message: "Material não encontrado." });
+        }
         
         if (material.imagem_capa_url) {
             const capaPath = path.join(__dirname, 'public', material.imagem_capa_url);
             if (fs.existsSync(capaPath)) fs.unlinkSync(capaPath);
         }
-        if (material.caminho_arquivo) {
-            const filePath = path.join(__dirname, 'public', material.caminho_arquivo);
+
+        const arquivos = await trx('material_arquivos').where({ material_id: id });
+        for (const arquivo of arquivos) {
+            const filePath = path.join(__dirname, 'public', arquivo.caminho_arquivo);
             if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
         }
-
-        await db('materiais').where({ id }).del();
+        
+        await trx('material_arquivos').where({ material_id: id }).del();
+        await trx('materiais').where({ id }).del();
+        
+        await trx.commit();
         res.status(204).send();
     } catch (err) {
+        await trx.rollback();
         console.error("Erro ao apagar material:", err);
         res.status(500).json({ message: "Erro ao apagar material." });
     }
 });
+// --- FIM DA MODIFICAÇÃO ---
 
 app.post('/api/projetos/upload-image', authenticateProfessor, singleImageUpload, (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
     }
-    res.json({ location: `/${path.relative('public', req.file.path).replace(/\\/g, "/")}` });
+    res.json({ location: `/uploads/portfolio/${req.file.filename}` });
 });
-
 
 // API: PROJETOS (Portfólio)
 app.get('/api/projetos', async (req, res) => {
@@ -440,7 +489,7 @@ app.post('/api/projetos', authenticateProfessor, projectFormHandler, async (req,
     try {
         let capaUrl = null;
         if (req.files && req.files.imagem_capa) {
-            capaUrl = `/${path.relative('public', req.files.imagem_capa[0].path).replace(/\\/g, "/")}`;
+            capaUrl = `/uploads/portfolio/${req.files.imagem_capa[0].filename}`;
         }
 
         const [projetoResult] = await trx('projetos').insert({
@@ -452,7 +501,7 @@ app.post('/api/projetos', authenticateProfessor, projectFormHandler, async (req,
         
         if (req.files && req.files.fotos) {
             const medias = req.files.fotos.map(file => ({
-                caminho_arquivo: `/${path.relative('public', file.path).replace(/\\/g, "/")}`,
+                caminho_arquivo: `/uploads/portfolio/${file.filename}`,
                 tipo_midia: 'imagem',
                 projeto_id: projetoId
             }));
@@ -477,14 +526,14 @@ app.post('/api/projetos/:id', authenticateProfessor, projectFormHandler, async (
         const updateData = { titulo, descricao, categoria, status, periodo, tags, link_externo };
 
         if (req.files && req.files.imagem_capa) {
-            updateData.imagem_capa_url = `/${path.relative('public', req.files.imagem_capa[0].path).replace(/\\/g, "/")}`;
+            updateData.imagem_capa_url = `/uploads/portfolio/${req.files.imagem_capa[0].filename}`;
         }
 
         await trx('projetos').where({ id }).update(updateData);
         
         if (req.files && req.files.fotos) {
             const medias = req.files.fotos.map(file => ({
-                caminho_arquivo: `/${path.relative('public', file.path).replace(/\\/g, "/")}`,
+                caminho_arquivo: `/uploads/portfolio/${file.filename}`,
                 tipo_midia: 'imagem',
                 projeto_id: id
             }));
@@ -516,7 +565,7 @@ app.get('/api/projetos/:id/detalhes', async (req, res) => {
     }
 });
 
-app.delete('/api/projetos/:id', async (req, res) => {
+app.delete('/api/projetos/:id', authenticateProfessor, async (req, res) => {
     const { id } = req.params;
     const trx = await db.transaction();
     try {
@@ -560,10 +609,11 @@ app.post('/api/eventos', authenticateProfessor, async (req, res) => {
     try {
         const { title, date, type, cor, observacao, time } = req.body;
         
-        const eventoExistente = await db('eventos').where({ date, time }).first();
-        
-        if (eventoExistente) {
-            return res.status(409).json({ message: "Já existe um evento agendado para esta data e horário." });
+        if (time) {
+            const eventoExistente = await db('eventos').where({ date, time }).first();
+            if (eventoExistente) {
+                return res.status(409).json({ message: "Já existe um evento agendado para esta data e horário." });
+            }
         }
 
         const [id] = await db('eventos').insert({ title, date, type, cor, observacao, time }).returning('id');
@@ -580,13 +630,15 @@ app.put('/api/eventos/:id', authenticateProfessor, async (req, res) => {
         const { id } = req.params;
         const { title, date, type, cor, observacao, time } = req.body;
         
-        const eventoExistente = await db('eventos')
-            .where({ date, time })
-            .whereNot({ id })
-            .first();
+        if (time) {
+            const eventoExistente = await db('eventos')
+                .where({ date, time })
+                .whereNot({ id })
+                .first();
 
-        if (eventoExistente) {
-            return res.status(409).json({ message: "Já existe um evento agendado para esta data e horário." });
+            if (eventoExistente) {
+                return res.status(409).json({ message: "Já existe um evento agendado para esta data e horário." });
+            }
         }
         
         const count = await db('eventos').where({ id }).update({ title, date, type, cor, observacao, time });
@@ -620,7 +672,7 @@ app.get('/api/posts', async (req, res) => {
 app.post('/api/posts', authenticateProfessor, imageUpload.single('imagem'), async (req, res) => {
     try {
         const { titulo, conteudo, categoria, external_url } = req.body;
-        const imagem_url = req.file ? `/${path.relative('public', req.file.path).replace(/\\/g, "/")}` : null;
+        const imagem_url = req.file ? `/uploads/images/${req.file.filename}` : null;
         const postData = { titulo, conteudo, categoria, imagem_url, external_url };
         const [id] = await db('posts').insert(postData).returning('id');
         const newId = typeof id === 'object' ? id.id : id;
@@ -628,16 +680,14 @@ app.post('/api/posts', authenticateProfessor, imageUpload.single('imagem'), asyn
     } catch (err) { res.status(500).json({ message: "Erro ao salvar post." }); }
 });
 
-// === NOVA ROTA DE ATUALIZAÇÃO ADICIONADA AQUI ===
 app.put('/api/posts/:id', authenticateProfessor, imageUpload.single('imagem'), async (req, res) => {
     const { id } = req.params;
     try {
         const { titulo, conteudo, categoria, external_url } = req.body;
         const updateData = { titulo, conteudo, categoria, external_url };
 
-        // Se um novo arquivo de imagem foi enviado, atualiza a URL da imagem
         if (req.file) {
-            updateData.imagem_url = `/${path.relative('public', req.file.path).replace(/\\/g, "/")}`;
+            updateData.imagem_url = `/uploads/images/${req.file.filename}`;
         }
 
         const count = await db('posts').where({ id }).update(updateData);
@@ -652,7 +702,6 @@ app.put('/api/posts/:id', authenticateProfessor, imageUpload.single('imagem'), a
         res.status(500).json({ message: "Erro ao atualizar post." });
     }
 });
-// === FIM DA NOVA ROTA ===
 
 app.delete('/api/posts/:id', authenticateProfessor, async (req, res) => {
     try {
@@ -674,108 +723,150 @@ app.get('/api/posts/:id', async (req, res) => {
     }
 });
 
-// ROTA PARA VERIFICAR STATUS DE LOGIN (aluno ou professor)
-app.get('/api/auth/status', authenticateProfessor, authenticateAluno, (req, res) => {
-    if (req.professor) {
-        res.json({ loggedIn: true, role: 'professor', user: req.professor });
-    } else if (req.aluno) {
-        res.json({ loggedIn: true, role: 'aluno', user: req.aluno });
-    } else {
-        res.json({ loggedIn: false });
-    }
-});
-
-// === API: COMENTÁRIOS (REFEITA) ===
-
-// GET para buscar todos os comentários de um post
+// API: COMENTÁRIOS
 app.get('/api/posts/:id/comments', async (req, res) => {
     try {
         const comments = await db('comentarios')
-            .leftJoin('alunos', 'comentarios.aluno_id', 'alunos.id')
-            .where({ 'comentarios.post_id': req.params.id })
-            .select('comentarios.*', 'alunos.imagem_url as autor_imagem_url')
-            .orderBy('comentarios.data_publicacao', 'asc');
-        res.json(comments);
+            .where({ post_id: req.params.id })
+            .orderBy('data_publicacao', 'asc');
+
+        if (comments.length === 0) {
+            return res.json([]);
+        }
+
+        const professor = await db('perfil').select('imagem_url').where({ id: 1 }).first();
+        const professorImageUrl = professor ? professor.imagem_url : null;
+
+        const studentIds = comments
+            .map(c => c.aluno_id)
+            .filter(id => id !== null);
+            
+        let studentImagesMap = {};
+        if (studentIds.length > 0) {
+            const students = await db('alunos').select('id', 'imagem_url').whereIn('id', studentIds);
+            students.forEach(s => {
+                studentImagesMap[s.id] = s.imagem_url;
+            });
+        }
+        
+        const commentsWithImages = comments.map(comment => {
+            const imageUrl = comment.aluno_id 
+                ? studentImagesMap[comment.aluno_id] 
+                : professorImageUrl;
+            
+            return { ...comment, autor_imagem_url: imageUrl };
+        });
+
+        res.json(commentsWithImages);
     } catch (err) {
+        console.error("Erro ao buscar comentários:", err);
         res.status(500).json({ message: "Erro ao buscar comentários." });
     }
 });
 
-// POST para criar um novo comentário ou resposta
-app.post('/api/comments', authenticateAluno, async (req, res) => {
+app.post('/api/comments', checkCombinedAuthStatus, async (req, res) => {
+    if (!req.aluno && !req.professor) {
+        return res.status(401).json({ message: "Autenticação necessária." });
+    }
     try {
         const { post_id, conteudo, parent_id } = req.body;
-        const { id: aluno_id, nome: autor } = req.aluno;
+        let autor, aluno_id = null;
 
-        const [commentId] = await db('comentarios').insert({
-            post_id,
-            conteudo,
-            parent_id: parent_id || null,
-            aluno_id,
-            autor
+        if (req.aluno) {
+            autor = req.aluno.nome;
+            aluno_id = req.aluno.id;
+        } else {
+            const professor = await db('perfil').where({ id: req.professor.id }).first();
+            autor = `${professor.nome} (Professor)`;
+        }
+
+        const [commentIdResult] = await db('comentarios').insert({
+            post_id, conteudo, parent_id: parent_id || null, aluno_id, autor
         }).returning('id');
         
-        const newComment = await db('comentarios')
-            .leftJoin('alunos', 'comentarios.aluno_id', 'alunos.id')
-            .where('comentarios.id', commentId.id || commentId)
-            .select('comentarios.*', 'alunos.imagem_url as autor_imagem_url')
-            .first();
-
+        const newCommentId = (typeof commentIdResult === 'object') ? commentIdResult.id : commentIdResult;
+        const newComment = await db('comentarios').where('id', newCommentId).first();
         res.status(201).json(newComment);
     } catch (err) {
+        console.error("Erro ao criar comentário:", err);
         res.status(500).json({ message: "Erro ao criar comentário." });
     }
 });
 
-// PUT para editar um comentário
-app.put('/api/comments/:id', authenticateAluno, async (req, res) => {
+app.put('/api/comments/:id', checkCombinedAuthStatus, async (req, res) => {
+    if (!req.aluno && !req.professor) {
+        return res.status(401).json({ message: "Autenticação necessária para editar." });
+    }
+
     const { id } = req.params;
     const { conteudo } = req.body;
-    const comment = await db('comentarios').where({ id }).first();
-
-    if (!comment) return res.status(404).json({ message: "Comentário não encontrado." });
-
-    // Apenas o autor original pode editar
-    if (comment.aluno_id !== req.aluno.id) {
-        return res.status(403).json({ message: "Acesso negado." });
-    }
-
-    const [updatedId] = await db('comentarios').where({ id }).update({
-        conteudo,
-        data_edicao: db.fn.now()
-    }).returning('id');
     
-    const updatedComment = await db('comentarios').where({ id: updatedId.id || updatedId }).first();
-    res.json(updatedComment);
+    try {
+        const comment = await db('comentarios').where({ id }).first();
+        if (!comment) return res.status(404).json({ message: "Comentário não encontrado." });
+
+        let isOwner = false;
+        if (req.aluno) {
+            isOwner = (comment.aluno_id === req.aluno.id);
+        } else if (req.professor) {
+            const professorName = `${req.professor.nome} (Professor)`;
+            isOwner = (comment.autor === professorName);
+        }
+
+        if (!isOwner) {
+            return res.status(403).json({ message: "Acesso negado. Você não pode editar este comentário." });
+        }
+
+        await db('comentarios').where({ id }).update({ conteudo, data_edicao: db.fn.now() });
+        const updatedComment = await db('comentarios').where({ id }).first();
+        res.json(updatedComment);
+
+    } catch(err) {
+        console.error("Erro ao editar comentário:", err);
+        res.status(500).json({ message: "Erro ao editar comentário." });
+    }
 });
 
-// DELETE para apagar um comentário 2558
-app.delete('/api/comments/:id', authenticateProfessor, async (req, res) => {
+app.delete('/api/comments/:id', checkCombinedAuthStatus, async (req, res) => {
     const { id } = req.params;
-    const comment = await db('comentarios').where({ id }).first();
+    try {
+        const comment = await db('comentarios').where({ id }).first();
+        if (!comment) return res.status(404).json({ message: "Comentário não encontrado." });
 
-    if (!comment) return res.status(404).json({ message: "Comentário não encontrado." });
+        const isAuthor = req.aluno && comment.aluno_id === req.aluno.id;
+        const isProfessor = !!req.professor;
 
-    // Professor pode apagar qualquer comentário, ou o autor pode apagar =o seu
-    if (req.professor || (req.aluno && comment.aluno_id === req.aluno.id)) {
-        await db('comentarios').where({ id }).del();
-        return res.status(204).send();
+        if (isAuthor || isProfessor) {
+            await db('comentarios').where({ id }).del();
+            return res.status(204).send();
+        }
+        res.status(403).json({ message: "Acesso negado." });
+    } catch (err) {
+        res.status(500).json({ message: "Erro interno no servidor." });
     }
-
-    res.status(403).json({ message: "Acesso negado." }); //teste
 });
 
 // API: DASHBOARD
 app.get('/api/dashboard/recent-activity', authenticateProfessor, async (req, res) => {
     try {
         const limit = 5;
-        const posts = await db('posts').select('titulo as title', 'data_publicacao as date', db.raw("'post' as type")).orderBy('data_publicacao', 'desc').limit(limit);
-        const materiais = await db('materiais').select('titulo as title', 'data_upload as date', db.raw("'material' as type")).orderBy('data_upload', 'desc').limit(limit);
-        const projetos = await db('projetos').select('titulo as title', 'data_criacao as date', db.raw("'projeto' as type")).orderBy('data_criacao', 'desc').limit(limit);
-        const eventos = await db('eventos').select('title as title', 'date as date', db.raw("'evento' as type")).orderBy('date', 'desc').limit(limit);
+
+        const postsData = await db('posts').select('titulo as title', 'data_publicacao as date').orderBy('data_publicacao', 'desc').limit(limit);
+        const posts = postsData.map(p => ({ ...p, type: 'post' }));
+
+        const materiaisData = await db('materiais').select('titulo as title', 'data_upload as date').orderBy('data_upload', 'desc').limit(limit);
+        const materiais = materiaisData.map(m => ({ ...m, type: 'material' }));
+
+        const projetosData = await db('projetos').select('titulo as title', 'data_criacao as date').orderBy('data_criacao', 'desc').limit(limit);
+        const projetos = projetosData.map(p => ({ ...p, type: 'projeto' }));
+
+        const eventosData = await db('eventos').select('title', 'date').orderBy('date', 'desc').limit(limit);
+        const eventos = eventosData.map(e => ({ ...e, type: 'evento' }));
+        
         const allActivities = [...posts, ...materiais, ...projetos, ...eventos];
         allActivities.sort((a, b) => new Date(b.date) - new Date(a.date));
         const recentActivities = allActivities.slice(0, 4);
+        
         res.json(recentActivities);
     } catch (err) {
         console.error("Erro ao buscar atividade recente:", err);
@@ -789,18 +880,31 @@ app.get('/api/dashboard/stats', authenticateProfessor, async (req, res) => {
         const projetos = await db('projetos').count('id as count').first();
         const eventos = await db('eventos').count('id as count').first();
         const materiais = await db('materiais').count('id as count').first();
-        res.json({ posts: posts.count, projetos: projetos.count, eventos: eventos.count, materiais: materiais.count });
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar estatísticas." }); }
+        res.json({ 
+            posts: posts.count, 
+            projetos: projetos.count, 
+            eventos: eventos.count, 
+            materiais: materiais.count 
+        });
+    } catch (err) { 
+        console.error("Erro ao buscar estatísticas:", err);
+        res.status(500).json({ message: "Erro ao buscar estatísticas." }); 
+    }
 });
 
 app.get('/api/dashboard/upcoming-events', authenticateProfessor, async (req, res) => {
     try {
         const today = new Date().toISOString().split('T')[0];
-        const upcomingEvents = await db('eventos').where('date', '>=', today).orderBy('date', 'asc').limit(4);
+        const upcomingEvents = await db('eventos')
+            .where('date', '>=', today)
+            .orderBy('date', 'asc')
+            .limit(4);
         res.json(upcomingEvents);
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar próximos eventos." }); }
+    } catch (err) { 
+        console.error("Erro ao buscar próximos eventos:", err);
+        res.status(500).json({ message: "Erro ao buscar próximos eventos." }); 
+    }
 });
-
 
 // ===============================================
 // ||         ROTAS DE PÁGINAS DO SITE          ||
@@ -810,7 +914,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'site', 'index.html'));
 });
 
-// ... (O restante do arquivo continua o mesmo)
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'login.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'cadastro.html')));
 app.get('/blog', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'blog.html')));

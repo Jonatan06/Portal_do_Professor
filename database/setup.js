@@ -8,6 +8,7 @@ async function setupDatabase() {
   try {
     // Apaga as tabelas na ordem correta para evitar erros de chave estrangeira
     await db.schema.dropTableIfExists('comentarios');
+    await db.schema.dropTableIfExists('material_arquivos'); // Nova tabela
     await db.schema.dropTableIfExists('portfolio_media');
     await db.schema.dropTableIfExists('projetos');
     await db.schema.dropTableIfExists('eventos');
@@ -18,6 +19,7 @@ async function setupDatabase() {
     await db.schema.dropTableIfExists('alunos');
     await db.schema.dropTableIfExists('perfil');
     await db.schema.dropTableIfExists('sobre_conteudo');
+    console.log('Tabelas antigas removidas (se existiam).');
 
     // Criação da tabela de Alunos
     await db.schema.createTable('alunos', table => {
@@ -42,20 +44,18 @@ async function setupDatabase() {
     });
     console.log('✅ Tabela "posts" criada.');
 
-    // === TABELA DE COMENTÁRIOS ATUALIZADA ===
+    // Criação da tabela de Comentários
     await db.schema.createTable('comentarios', table => {
         table.increments('id').primary();
         table.integer('post_id').unsigned().notNullable().references('id').inTable('posts').onDelete('CASCADE');
         table.integer('aluno_id').unsigned().references('id').inTable('alunos').onDelete('SET NULL');
-        // Adiciona a referência para respostas (comentário pai)
         table.integer('parent_id').unsigned().references('id').inTable('comentarios').onDelete('CASCADE');
         table.string('autor').notNullable();
         table.text('conteudo').notNullable();
         table.timestamp('data_publicacao').defaultTo(db.fn.now());
-        // Adiciona campo para registrar edições
         table.timestamp('data_edicao');
     });
-    console.log('✅ Tabela "comentarios" atualizada com suporte a respostas e edições.');
+    console.log('✅ Tabela "comentarios" criada.');
 
     // Criação da tabela de Perfil do Professor
     await db.schema.createTable('perfil', table => { 
@@ -76,7 +76,7 @@ async function setupDatabase() {
     await db('perfil').insert({ id: 1, nome: 'Ridis Pereira Ribeiro', cargo: 'Professor', email: 'professor@email.com', senha: senhaHashProfessor, imagem_url: '/uploads/images/default-avatar.png' });
     console.log('✅ Tabela "perfil" criada e populada.');
     
-    // O restante das tabelas...
+    // Criação da tabela de Links do Perfil
     await db.schema.createTable('perfil_links', table => {
       table.increments('id').primary();
       table.integer('perfil_id').unsigned().notNullable().references('id').inTable('perfil').onDelete('CASCADE');
@@ -85,21 +85,34 @@ async function setupDatabase() {
     });
     console.log('✅ Tabela "perfil_links" criada.');
     
+    // --- INÍCIO DA MODIFICAÇÃO ---
+
+    // Tabela 'materiais' atualizada (sem colunas de arquivo)
     await db.schema.createTable('materiais', table => {
         table.increments('id').primary();
         table.string('titulo').notNullable();
         table.text('descricao');
         table.string('categoria').notNullable();
         table.string('imagem_capa_url');
+        table.string('link_externo');
+        table.timestamp('data_upload').defaultTo(db.fn.now());
+    });
+    console.log('✅ Tabela "materiais" recriada para múltiplos arquivos.');
+
+    // NOVA tabela para armazenar múltiplos arquivos por material
+    await db.schema.createTable('material_arquivos', table => {
+        table.increments('id').primary();
+        table.integer('material_id').unsigned().notNullable().references('id').inTable('materiais').onDelete('CASCADE');
         table.string('nome_arquivo');
         table.string('caminho_arquivo');
         table.string('tipo_arquivo');
         table.string('tamanho_arquivo');
-        table.string('link_externo');
-        table.timestamp('data_upload').defaultTo(db.fn.now());
     });
-    console.log('✅ Tabela "materiais" criada.');
+    console.log('✅ Tabela "material_arquivos" criada.');
 
+    // --- FIM DA MODIFICAÇÃO ---
+    
+    // Criação da tabela de Mensagens
     await db.schema.createTable('mensagens', table => {
         table.increments('id').primary();
         table.integer('aluno_id').unsigned().notNullable().references('id').inTable('alunos').onDelete('CASCADE');
@@ -112,6 +125,7 @@ async function setupDatabase() {
     });
     console.log('✅ Tabela "mensagens" criada.');
 
+    // Criação da tabela de Projetos
     await db.schema.createTable('projetos', table => {
         table.increments('id').primary();
         table.string('titulo').notNullable();
@@ -126,6 +140,7 @@ async function setupDatabase() {
     });
     console.log('✅ Tabela "projetos" criada.');
     
+    // Criação da tabela de Mídia do Portfólio
     await db.schema.createTable('portfolio_media', table => {
         table.increments('id').primary();
         table.string('caminho_arquivo').notNullable();
@@ -134,6 +149,7 @@ async function setupDatabase() {
     });
     console.log('✅ Tabela "portfolio_media" criada.');
     
+    // Criação da tabela de Eventos
     await db.schema.createTable('eventos', table => { 
         table.increments('id').primary(); 
         table.string('title').notNullable(); 
@@ -145,6 +161,7 @@ async function setupDatabase() {
     });
     console.log('✅ Tabela "eventos" criada.');
 
+    // Criação da tabela de Conteúdo "Sobre"
     await db.schema.createTable('sobre_conteudo', table => {
         table.string('secao').primary();
         table.text('conteudo').defaultTo('');
