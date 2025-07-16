@@ -322,14 +322,20 @@ app.put('/api/sobre', authenticateProfessor, async (req, res) => {
 });
 
 // API: MENSAGENS
-app.post('/api/mensagens', authenticateAluno, async (req, res) => {
-    const { assunto, corpo } = req.body;
-    const { id, nome, email } = req.aluno;
-    if (!assunto || !corpo) {
-        return res.status(400).json({ message: "Assunto e corpo da mensagem são obrigatórios." });
+app.post('/api/mensagens', async (req, res) => {
+    const { assunto, corpo, nome, email } = req.body;
+
+    if (!assunto || !corpo || !nome || !email) {
+        return res.status(400).json({ message: "Todos os campos (nome, email, assunto e mensagem) são obrigatórios." });
     }
     try {
-        const novaMensagem = { aluno_id: id, remetente_nome: nome, remetente_email: email, assunto, corpo };
+        const novaMensagem = {
+            aluno_id: null, // Nenhuma conta de aluno associada
+            remetente_nome: nome,
+            remetente_email: email,
+            assunto,
+            corpo
+        };
         await db('mensagens').insert(novaMensagem);
         res.status(201).json({ success: true, message: 'Mensagem enviada com sucesso!' });
     } catch (err) {

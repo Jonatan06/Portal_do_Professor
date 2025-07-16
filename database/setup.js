@@ -115,7 +115,7 @@ async function setupDatabase() {
     // Criação da tabela de Mensagens
     await db.schema.createTable('mensagens', table => {
         table.increments('id').primary();
-        table.integer('aluno_id').unsigned().notNullable().references('id').inTable('alunos').onDelete('CASCADE');
+        table.integer('aluno_id').unsigned().references('id').inTable('alunos').onDelete('CASCADE');
         table.string('remetente_nome').notNullable();
         table.string('remetente_email').notNullable();
         table.string('assunto').notNullable();
