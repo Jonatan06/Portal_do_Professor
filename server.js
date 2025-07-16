@@ -373,8 +373,33 @@ app.post('/api/mensagens', checkCombinedAuthStatus , async (req, res) => {
 app.get('/api/mensagens', authenticateProfessor, async (req, res) => {
     try {
         const mensagens = await db('mensagens').select('*').orderBy('data_envio', 'desc');
-        res.json(mensagens);
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar mensagens." }); }
+
+        // Se não houver mensagens, retorna um array vazio
+        if (mensagens.length === 0) {
+            return res.json([]);
+        }
+
+        const alunoIds = [...new Set(mensagens.map(m => m.aluno_id).filter(id => id !== null))];
+        let imagensDosAlunos = {};
+        if (alunoIds.length > 0) {
+            const alunos = await db('alunos').select('id', 'imagem_url').whereIn('id', alunoIds);
+            alunos.forEach(aluno => {
+                imagensDosAlunos[aluno.id] = aluno.imagem_url;
+            });
+        }
+        const mensagensComFotos = mensagens.map(msg => {
+            return {
+                ...msg,
+                remetente_imagem_url: msg.aluno_id ? imagensDosAlunos[msg.aluno_id] : null
+            };
+        });
+
+        res.json(mensagensComFotos);
+
+    } catch (err) {
+        console.error("Erro ao buscar mensagens:", err);
+        res.status(500).json({ message: "Erro ao buscar mensagens." });
+    }
 });
 
 app.put('/api/mensagens/:id/read', authenticateProfessor, async (req, res) => {

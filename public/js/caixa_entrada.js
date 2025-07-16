@@ -41,10 +41,19 @@ document.addEventListener('DOMContentLoaded', () => {
             item.className = `message-item ${msg.lida ? 'read' : ''} ${msg.id === activeMessageId ? 'active' : ''}`;
             item.dataset.id = msg.id;
             const timeAgo = formatTimeAgo(msg.data_envio);
+            let avatarHtml;
+                // Se a mensagem tem uma URL de imagem...
+                if (msg.remetente_imagem_url) {
+                    // ...cria uma tag <img>
+                    avatarHtml = `<img src="${msg.remetente_imagem_url}" alt="${msg.remetente_nome}" class="sender-avatar">`;
+                } else {
+                    // ...senão, cria a div com a inicial, como antes.
+                    avatarHtml = `<div class="sender-avatar" style="background-color: ${stringToColor(msg.remetente_nome)};">${msg.remetente_nome.charAt(0)}</div>`;
+                }
 
             item.innerHTML = `
                 <div class="message-sender">
-                    <div class="sender-avatar" style="background-color: ${stringToColor(msg.remetente_nome)};">${msg.remetente_nome.charAt(0)}</div>
+                    ${avatarHtml}
                     <div class="sender-info">
                         <strong>${msg.remetente_nome}</strong>
                         <p>${msg.assunto}</p>
