@@ -38,11 +38,41 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.remove('hidden');
     };
     
-    // A função de editar foi simplificada, pois a edição de múltiplos arquivos
-    // adicionaria muita complexidade. A recomendação é apagar e criar um novo material.
+    // >>> INÍCIO DA FUNÇÃO DE EDIÇÃO ATIVADA <<<
     const openModalForEdit = (material) => {
-        showToast('Para editar, por favor, apague e crie o material novamente.', 'info');
+        // Limpa o formulário e o ID
+        materialForm.reset();
+        const existingIdField = document.getElementById('material-id');
+        if (existingIdField) existingIdField.value = '';
+
+        // Preenche os campos com os dados do material
+        modalTitle.textContent = 'Editar Material';
+        document.getElementById('material-id').value = material.id;
+        document.getElementById('material-title').value = material.titulo;
+        document.getElementById('material-description').value = material.descricao || '';
+        document.getElementById('material-category').value = material.categoria;
+        document.getElementById('material-link').value = material.link_externo || '';
+
+        // Mostra a pré-visualização da imagem de capa, se existir
+        if (material.imagem_capa_url) {
+            coverImagePreview.src = material.imagem_capa_url;
+            coverImagePreview.style.display = 'block';
+        } else {
+            coverImagePreview.style.display = 'none';
+        }
+        
+        // Informa sobre os arquivos existentes (sem permitir edição direta deles)
+        const fileCount = material.arquivos ? material.arquivos.length : 0;
+        if (fileCount > 0) {
+            fileLabelText.textContent = `${fileCount} arquivo(s) existente(s). Envie novos para substituí-los.`;
+        } else {
+            fileLabelText.textContent = 'Clique para escolher novos arquivos...';
+        }
+
+        // Abre o modal
+        modal.classList.remove('hidden');
     };
+    // >>> FIM DA FUNÇÃO DE EDIÇÃO ATIVADA <<<
 
     const closeModal = () => modal.classList.add('hidden');
 
@@ -108,9 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // --- INÍCIO DA MODIFICAÇÃO ---
     function createMaterialListItem(data) {
-        // 'data' agora contém um array 'arquivos'
         const hasFiles = data.arquivos && data.arquivos.length > 0;
         const hasLink = !!data.link_externo;
         
@@ -138,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>`;
     }
-    // --- FIM DA MODIFICAÇÃO ---
 
     // --- EVENT LISTENERS ---
     addMaterialBtn.addEventListener('click', openModalForAdd);
@@ -146,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
     cancelBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
-    // --- INÍCIO DA MODIFICAÇÃO ---
     fileInput.addEventListener('change', () => {
         const numFiles = fileInput.files.length;
         if (numFiles > 0) {
@@ -155,7 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
             fileLabelText.textContent = 'Clique para escolher um arquivo...';
         }
     });
-    // --- FIM DA MODIFICAÇÃO ---
 
     coverImageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -169,16 +194,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // >>> INÍCIO DA LÓGICA DE SUBMISSÃO ATUALIZADA <<<
     materialForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(materialForm);
-        
+        const id = document.getElementById('material-id').value;
+        const isEditing = !!id;
+    
+        const url = isEditing ? `${API_URL}/${id}` : API_URL;
+        const method = isEditing ? 'PUT' : 'POST';
+    
         try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 body: formData
+                // O token de autenticação já é adicionado pelo script auth.js
             });
-
+    
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || "Erro ao salvar o material.");
@@ -186,11 +218,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             closeModal();
             fetchAndRenderMaterials(filterTabs.querySelector('.active').dataset.filter);
-            showToast(`Material salvo com sucesso!`, 'success');
+            showToast(`Material ${isEditing ? 'atualizado' : 'salvo'} com sucesso!`, 'success');
+    
         } catch(error) {
             showToast(`Erro: ${error.message}`, 'error');
         }
     });
+    // >>> FIM DA LÓGICA DE SUBMISSÃO ATUALIZADA <<<
 
     materialsContainer.addEventListener('click', async (e) => {
         const editBtn = e.target.closest('.btn-edit');
@@ -218,7 +252,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!response.ok) {
                         throw new Error("Falha ao apagar o material no servidor.");
                     }
-                    // Recarrega a lista para refletir a exclusão
                     await fetchAndRenderMaterials(filterTabs.querySelector('.active').dataset.filter);
                     showToast('Material apagado com sucesso.', 'success');
                 } catch (error) {

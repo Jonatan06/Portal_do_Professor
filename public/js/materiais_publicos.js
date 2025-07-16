@@ -16,21 +16,31 @@ document.addEventListener('DOMContentLoaded', () => {
         outros: { name: 'Outros', icon: 'fa-box-archive' },
     };
 
+    // >>> INÍCIO DA FUNÇÃO CORRIGIDA <<<
     const createMaterialCard = (data) => {
-        const isExternalLink = data.link_externo && !data.caminho_arquivo;
-        const accessLink = isExternalLink ? data.link_externo : data.caminho_arquivo;
-        const downloadAttribute = !isExternalLink ? 'download' : '';
-        const targetAttribute = isExternalLink ? 'target="_blank" rel="noopener noreferrer"' : '';
-        const fileType = data.tipo_arquivo ? data.tipo_arquivo.split('/').pop().toUpperCase() : 'LINK';
         const imageUrl = data.imagem_capa_url || 'https://images.unsplash.com/photo-1543286386-71314a49692f?w=800';
         const publicationDate = new Date(data.data_upload).toLocaleDateString('pt-BR', {
             day: '2-digit', month: 'long', year: 'numeric'
         });
-
-        // --- CORREÇÃO APLICADA AQUI ---
         const description = data.descricao || '';
         const summary = description.length > 120 ? description.substring(0, 120) + '...' : description;
-        // --- FIM DA CORREÇÃO ---
+
+        // Lógica para determinar o tipo, tamanho e link do arquivo
+        let fileType = 'LINK';
+        let fileSize = '';
+        let accessLink = data.link_externo;
+        let targetAttribute = 'target="_blank" rel="noopener noreferrer"';
+        let downloadAttribute = '';
+
+        // Se houver arquivos, eles têm prioridade sobre o link externo
+        if (data.arquivos && data.arquivos.length > 0) {
+            const firstFile = data.arquivos[0];
+            fileType = firstFile.tipo_arquivo ? firstFile.tipo_arquivo.split('/').pop().toUpperCase() : 'ARQUIVO';
+            fileSize = firstFile.tamanho_arquivo || '';
+            accessLink = firstFile.caminho_arquivo;
+            targetAttribute = ''; // Remove o target _blank para downloads
+            downloadAttribute = 'download';
+        }
 
         return `
             <div class="material-card" data-id="${data.id}">
@@ -40,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p>${summary}</p>
                     <div class="file-info">
                         <span>${fileType}</span>
-                        ${data.tamanho_arquivo ? `<span>${data.tamanho_arquivo}</span>` : ''}
+                        ${fileSize ? `<span>${fileSize}</span>` : ''}
                     </div>
                     <div class="card-footer">
                         <span><i class="fas fa-calendar-alt"></i> ${publicationDate}</span>
@@ -51,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>`;
     };
+    // >>> FIM DA FUNÇÃO CORRIGIDA <<<
 
     const renderFilteredMaterials = () => {
         const categoryFilter = filterTabs.querySelector('.active').dataset.filter;

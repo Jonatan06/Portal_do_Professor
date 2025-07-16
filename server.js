@@ -49,19 +49,17 @@ const projectFormHandler = portfolioMediaUpload.fields([
     { name: 'fotos', maxCount: 10 }
 ]);
 
-// --- INÍCIO DA MODIFICAÇÃO ---
 const materialFormHandler = materialUpload.fields([
     { name: 'imagem_capa', maxCount: 1 },
-    { name: 'materialFile', maxCount: 10 } // Aceita até 10 arquivos
+    { name: 'materialFile', maxCount: 10 }
 ]);
-// --- FIM DA MODIFICAÇÃO ---
 
 const singleImageUpload = portfolioMediaUpload.single('file');
 
 
 // --- 4. INICIALIZAÇÃO DO EXPRESS ---
 const app = express();
-const PORT = process.env.PORT || 3011;
+const PORT = process.env.PORT || 3001;
 
 // --- 5. MIDDLEWARES GLOBAIS ---
 app.use(cors());
@@ -362,8 +360,6 @@ app.delete('/api/mensagens/:id', authenticateProfessor, async (req, res) => {
     } catch (err) { res.status(500).json({ message: "Erro ao apagar mensagem." }); }
 });
 
-// --- INÍCIO DA MODIFICAÇÃO ---
-
 // API: MATERIAIS
 app.get('/api/materiais', async (req, res) => {
     try {
@@ -400,12 +396,16 @@ app.post('/api/materiais', authenticateProfessor, materialFormHandler, async (re
         const { titulo, descricao, categoria, link_externo } = req.body;
         const materialData = { titulo, descricao, categoria, link_externo };
 
+        // >>> INÍCIO DA CORREÇÃO 1 <<<
+        // A imagem de capa de um material deve ser salva na pasta de materiais.
         if (req.files.imagem_capa) {
-            materialData.imagem_capa_url = `/uploads/images/${req.files.imagem_capa[0].filename}`;
+            materialData.imagem_capa_url = `/uploads/materiais/${req.files.imagem_capa[0].filename}`;
         }
-
-        const [materialResult] = await trx('materiais').insert(materialData).returning('id');
-        const materialId = typeof materialResult === 'object' ? materialResult.id : materialResult;
+        // >>> FIM DA CORREÇÃO 1 <<<
+        
+        const [result] = await trx('materiais').insert(materialData).returning('id');
+        const materialId = result ? (typeof result === 'object' ? result.id : result) : null;
+        if (!materialId) throw new Error("Falha ao obter o ID do novo material após a inserção.");
         
         if (req.files.materialFile && req.files.materialFile.length > 0) {
             const arquivosParaInserir = req.files.materialFile.map(file => ({
@@ -431,9 +431,61 @@ app.post('/api/materiais', authenticateProfessor, materialFormHandler, async (re
     }
 });
 
-// A rota PUT para editar foi removida por simplicidade. A edição de múltiplos arquivos
-// exigiria uma lógica complexa de apagar arquivos antigos e adicionar novos,
-// que pode ser implementada futuramente se necessário.
+app.put('/api/materiais/:id', authenticateProfessor, materialFormHandler, async (req, res) => {
+    const { id } = req.params;
+    const trx = await db.transaction();
+
+    try {
+        const { titulo, descricao, categoria, link_externo } = req.body;
+        const updateData = { titulo, descricao, categoria, link_externo };
+
+        const materialAtual = await trx('materiais').where({ id }).first();
+        if (!materialAtual) {
+            await trx.rollback();
+            return res.status(404).json({ message: 'Material não encontrado.' });
+        }
+
+        // >>> INÍCIO DA CORREÇÃO 2 <<<
+        // Garante que a URL da imagem de capa editada aponte para a pasta correta.
+        if (req.files.imagem_capa) {
+            updateData.imagem_capa_url = `/uploads/materiais/${req.files.imagem_capa[0].filename}`;
+            if (materialAtual.imagem_capa_url) {
+                const oldCapaPath = path.join(__dirname, 'public', materialAtual.imagem_capa_url);
+                if (fs.existsSync(oldCapaPath)) fs.unlinkSync(oldCapaPath);
+            }
+        }
+        // >>> FIM DA CORREÇÃO 2 <<<
+
+        await trx('materiais').where({ id }).update(updateData);
+
+        if (req.files.materialFile && req.files.materialFile.length > 0) {
+            const arquivosAntigos = await trx('material_arquivos').where({ material_id: id });
+            for (const arquivo of arquivosAntigos) {
+                const filePath = path.join(__dirname, 'public', arquivo.caminho_arquivo);
+                if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            }
+            await trx('material_arquivos').where({ material_id: id }).del();
+
+            const arquivosParaInserir = req.files.materialFile.map(file => ({
+                material_id: id,
+                nome_arquivo: file.originalname,
+                caminho_arquivo: `/uploads/materiais/${file.filename}`,
+                tipo_arquivo: file.mimetype,
+                tamanho_arquivo: `${(file.size / 1024 / 1024).toFixed(2)} MB`
+            }));
+            await trx('material_arquivos').insert(arquivosParaInserir);
+        }
+
+        await trx.commit();
+        const materialAtualizado = await db('materiais').where({ id }).first();
+        res.status(200).json(materialAtualizado);
+
+    } catch (err) {
+        await trx.rollback();
+        console.error("Erro ao atualizar material:", err);
+        res.status(500).json({ message: "Erro ao atualizar material." });
+    }
+});
 
 app.delete('/api/materiais/:id', authenticateProfessor, async (req, res) => {
     const trx = await db.transaction();
@@ -467,7 +519,6 @@ app.delete('/api/materiais/:id', authenticateProfessor, async (req, res) => {
         res.status(500).json({ message: "Erro ao apagar material." });
     }
 });
-// --- FIM DA MODIFICAÇÃO ---
 
 app.post('/api/projetos/upload-image', authenticateProfessor, singleImageUpload, (req, res) => {
     if (!req.file) {

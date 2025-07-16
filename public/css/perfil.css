@@ -83,11 +83,10 @@
     object-fit: cover;
 }
 
-/* --- ESTILO CORRIGIDO AQUI --- */
 .btn-change-picture {
     position: absolute;
-    bottom: 15px; /* Aumentado para subir o botão */
-    right: 15px;  /* Aumentado para mover para a esquerda (relativo à borda) */
+    bottom: 15px; 
+    right: 15px; 
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -105,7 +104,6 @@
     background-color: rgba(13, 110, 253, 1);
     transform: scale(1.1);
 }
-/* --- FIM DA CORREÇÃO --- */
 
 .contact-info h3, .basic-info h3, .social-media h3 {
     font-size: 16px;
@@ -117,6 +115,7 @@
 
 .profile-right {
     flex-grow: 1;
+    min-width: 300px; /* Garante que não fique muito espremido */
 }
 
 .form-group { margin-bottom: 20px; }
@@ -136,14 +135,12 @@ textarea.profile-input {
     resize: none;
 }
 
-/* Estilo dos campos quando estão em modo de VISUALIZAÇÃO */
 .view-mode .profile-input {
     background-color: #f8f9fa;
     color: #343a40;
     border-color: #f8f9fa;
 }
 
-/* Estilo dos campos quando estão em modo de EDIÇÃO */
 .edit-mode .profile-input {
     background-color: #ffffff;
     border-color: #ced4da;
@@ -190,7 +187,6 @@ textarea.profile-input {
     color: #0d6efd;
 }
 
-/* Estilo do link em modo de VISUALIZAÇÃO */
 .view-mode .input-with-icon {
     cursor: pointer;
     background-color: #f8f9fa;
@@ -206,12 +202,12 @@ textarea.profile-input {
 .form-row {
     display: flex;
     gap: 20px;
+    flex-wrap: wrap; /* ADICIONADO: Permite a quebra de linha */
 }
 .form-row .form-group {
     flex: 1;
+    min-width: 250px; /* ADICIONADO: Largura mínima para os campos */
 }
-
-/* Adicione estas novas regras ao final do arquivo /public/css/perfil.css */
 
 .bio-group {
     position: relative;
@@ -228,17 +224,13 @@ textarea.profile-input {
     border-radius: 4px;
     opacity: 0;
     transition: opacity 0.3s;
-    pointer-events: none; /* Impede que o contador interfira com o clique no campo */
+    pointer-events: none;
 }
 
-/* O contador só aparece no modo de edição */
 .edit-mode .char-counter {
     opacity: 1;
 }
 
-/* Adicione estas novas regras ao final do arquivo /public/css/perfil.css */
-
-/* Estilos para a nova seção de links personalizados */
 .custom-links-section {
     margin-top: 30px;
     padding-top: 20px;
@@ -250,6 +242,7 @@ textarea.profile-input {
     align-items: center;
     gap: 15px;
     margin-bottom: 15px;
+    flex-wrap: wrap; /* ADICIONADO: para quebra em telas pequenas */
 }
 
 .custom-link-row .form-group {
@@ -257,9 +250,9 @@ textarea.profile-input {
     flex-grow: 1;
 }
 
-/* Deixa o campo de nome do link menor que o de URL */
 .custom-link-row .form-group:first-child {
     flex-grow: 0.5;
+    min-width: 150px;
 }
 
 .btn-remove-link {
@@ -274,7 +267,7 @@ textarea.profile-input {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 20px; /* Alinha com os inputs */
+    margin-top: 20px;
     transition: all 0.2s;
     opacity: 0;
     pointer-events: none;
@@ -307,7 +300,17 @@ textarea.profile-input {
     border-color: #adb5bd;
 }
 
-/* Adicionado para o ícone do Instagram */
 .input-with-icon .fa-instagram {
     color: #C13584;
+}
+
+/* ADICIONADO: Media query para responsividade */
+@media (max-width: 768px) {
+    .profile-left {
+        flex: 1 1 100%; /* Ocupa a largura total */
+    }
+
+    .card-body {
+        gap: 20px;
+    }
 }

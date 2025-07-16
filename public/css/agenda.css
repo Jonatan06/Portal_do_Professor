@@ -136,7 +136,18 @@
 .no-events-placeholder .bx { font-size: 4rem; margin-bottom: 10px; }
 
 /* Modal */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-overlay { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0,0,0,0.6); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 2000; /* <<< MUDANÇA APLICADA AQUI: de 1000 para 2000 */
+}
 .modal-content { background: var(--white); padding: 25px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 .modal-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
 .modal-header h2 { font-weight: 600; font-size: 1.2rem; }
@@ -160,7 +171,6 @@
     font-size: 1rem; 
     font-family: 'Poppins', sans-serif; 
 }
-/* ALTERAÇÃO AQUI */
 #event-form input[type="date"], #event-form input[type="time"] {
     cursor: pointer;
 }
@@ -204,12 +214,6 @@
 .btn-primary { background-color: var(--primary-blue); color: var(--white); }
 .btn-danger { background-color: var(--red-accent); color: var(--white); }
 
-/* public/css/agenda.css */
-
-/* Remova os estilos .one-event, .multiple-events e .pin-icon que existiam antes */
-/* E adicione/substitua pelo bloco abaixo */
-
-/* Container para os pins dentro da célula do dia */
 .pin-container {
     position: absolute;
     bottom: 4px;
@@ -218,7 +222,6 @@
     flex-direction: row-reverse; /* Faz os pins empilharem da direita para a esquerda */
 }
 
-/* Estilo individual de cada pin */
 .pin-icon {
     font-size: 1rem;
     position: relative;
@@ -226,12 +229,10 @@
     text-shadow: 0 1px 2px rgba(0,0,0,0.2); /* Sombra para dar profundidade */
 }
 
-/* Efeito de sobreposição */
 .pin-container .pin-icon:not(:last-child) {
     margin-right: -8px; /* Valor negativo para sobrepor os ícones */
 }
 
-/* Efeito de hover para destacar os pins */
 .day-cell:hover .pin-icon {
     transform: translateY(-2px);
 }

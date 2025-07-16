@@ -31,12 +31,16 @@ body {
     flex-shrink: 0; /* Impede que a sidebar encolha */
     background-color: var(--cor-fundo-sidebar);
     height: 100vh;
-    position: sticky;
+    position: fixed; /* MUDANÇA: Para controle de exibição */
     top: 0;
+    left: 0;
     padding: 20px;
     border-right: 1px solid var(--cor-borda);
     display: flex;
     flex-direction: column;
+    z-index: 1100; /* Para ficar sobre o conteúdo */
+    transform: translateX(0);
+    transition: transform 0.3s ease-in-out;
 }
 
 .sidebar-header {
@@ -115,8 +119,67 @@ body {
     flex-grow: 1; /* Ocupa todo o espaço restante */
     height: 100vh;
     overflow-y: auto; /* Adiciona scroll apenas nesta área */
-    padding: 30px; 
+    padding: 30px;
+    margin-left: 260px; /* MUDANÇA: Espaço para a sidebar */
+    transition: margin-left 0.3s ease-in-out;
 }
+
+/* --- ESTILOS RESPONSIVOS ADICIONADOS --- */
+
+/* Esconde o menu hamburguer em telas grandes */
+.mobile-menu-toggle {
+    display: none;
+}
+
+@media (max-width: 992px) {
+    .sidebar {
+        transform: translateX(-100%); /* Esconde a sidebar fora da tela */
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+        box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+    }
+
+    .main-content-wrapper {
+        margin-left: 0; /* Remove a margem quando a sidebar está escondida */
+    }
+
+    /* Estilo do botão do menu hamburguer */
+    .mobile-menu-toggle {
+        display: block;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1200; /* Acima da sidebar */
+        background-color: var(--cor-branco);
+        border: 1px solid var(--cor-borda);
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        font-size: 24px;
+        color: var(--cor-texto-principal);
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    /* Fundo escuro quando a sidebar está ativa no mobile */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.4);
+        z-index: 1099;
+    }
+
+    .sidebar.active + .sidebar-overlay {
+        display: block;
+    }
+}
+
 
 /* --- ESTILOS PADRONIZADOS PARA MODAL DE CONFIRMAÇÃO --- */
 .modal-overlay {

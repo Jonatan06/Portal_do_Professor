@@ -28,7 +28,7 @@ body.aluno-logado #btn-area-professor {
     padding: 0 20px;
 }
 
-/* --- CABEÇALHO CORRIGIDO --- */
+/* --- CABEÇALHO --- */
 .site-header {
     background-color: var(--cor-branco);
     padding: 15px 0;
@@ -43,7 +43,7 @@ body.aluno-logado #btn-area-professor {
     align-items: center;
 }
 .logo {
-    flex-shrink: 0; /* Impede que o logo encolha */
+    flex-shrink: 0;
 }
 .logo a {
     font-size: 1.6rem;
@@ -54,7 +54,7 @@ body.aluno-logado #btn-area-professor {
 
 .main-nav {
     display: flex;
-    gap: 30px; /* Espaço entre os links "Sobre", "Blog", etc. */
+    gap: 30px;
 }
 .main-nav a {
     text-decoration: none;
@@ -69,7 +69,7 @@ body.aluno-logado #btn-area-professor {
 .nav-user-actions {
     display: flex;
     align-items: center;
-    justify-content: flex-end; /* Alinha o conteúdo à direita */
+    justify-content: flex-end;
     gap: 15px;
 }
 .nav-user-actions .nav-welcome {
@@ -84,7 +84,55 @@ body.aluno-logado #btn-area-professor {
     font-size: 0.9rem;
     white-space: nowrap;
 }
-/* --- FIM DA CORREÇÃO DO CABEÇALHO --- */
+
+/* --- MODIFICAÇÕES PARA RESPONSIVIDADE DO CABEÇALHO --- */
+.mobile-nav-toggle {
+    display: none; /* Escondido por padrão em telas grandes */
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+@media (max-width: 992px) {
+    .main-nav {
+        display: none; /* Esconde a navegação principal */
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: var(--cor-branco);
+        flex-direction: column;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        gap: 0;
+    }
+    .main-nav.active {
+        display: flex; /* Mostra o menu quando ativo */
+    }
+    .main-nav a {
+        padding: 10px;
+        border-radius: 4px;
+    }
+    .main-nav a:hover {
+        background-color: #f8f9fa;
+    }
+
+    .mobile-nav-toggle {
+        display: block; /* Mostra o botão hamburguer */
+    }
+
+    .header-container {
+        justify-content: space-between;
+    }
+
+    .nav-user-actions {
+        margin-left: auto;
+        padding-left: 15px;
+    }
+}
+/* --- FIM DAS MODIFICAÇÕES --- */
 
 /* Conteúdo Principal */
 .page-wrapper { padding: 50px 0; }
@@ -113,15 +161,11 @@ body.aluno-logado #btn-area-professor {
 .modal-actions .btn-secondary:hover { background-color: #e0e0e0; }
 .modal-actions .btn-danger { background-color: #e74c3c; color: white; }
 .modal-actions .btn-danger:hover { background-color: #c0392b; }
-
-/* Adicione ao final de /css/layout_publico.css */
-
 .nav-user-actions {
     display: flex;
     align-items: center;
     gap: 15px;
 }
-
 .aluno-profile-area {
     display: flex;
     align-items: center;
@@ -131,11 +175,9 @@ body.aluno-logado #btn-area-professor {
     border-radius: 20px;
     transition: background-color 0.2s;
 }
-
 .aluno-profile-area:hover {
     background-color: #f0f0f0;
 }
-
 .aluno-avatar {
     width: 32px;
     height: 32px;
@@ -143,9 +185,6 @@ body.aluno-logado #btn-area-professor {
     object-fit: cover;
     border: 2px solid var(--cor-borda);
 }
-
-/* Adicionado para animação da foto de perfil do aluno */
-
 .aluno-profile-area {
     position: relative; /* Para posicionar as opções absolutamente */
     display: flex;
@@ -156,11 +195,9 @@ body.aluno-logado #btn-area-professor {
     border-radius: 20px;
     transition: background-color 0.2s;
 }
-
 .aluno-profile-area:hover {
     background-color: #f0f0f0;
 }
-
 .aluno-avatar {
     width: 32px;
     height: 32px;
@@ -168,7 +205,6 @@ body.aluno-logado #btn-area-professor {
     object-fit: cover;
     border: 2px solid var(--cor-borda);
 }
-
 .profile-options {
     position: absolute;
     top: 100%; /* Posiciona abaixo da área do perfil */
@@ -188,24 +224,20 @@ body.aluno-logado #btn-area-professor {
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-
 .profile-options.active {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
     transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out, visibility 0s 0s;
 }
-
 .profile-options i {
     margin-right: 8px;
 }
-
 .nav-user-actions {
     display: flex;
     align-items: center;
     gap: 15px;
 }
-
 .nav-welcome {
     cursor: pointer; /* Indica que o nome é clicável */
 }

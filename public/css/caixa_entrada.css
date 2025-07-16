@@ -8,13 +8,16 @@
     --border-color: #dee2e6;
 }
 
-.main-wrapper { 
-    flex-grow: 1; 
-    display: flex; 
-    flex-direction: column; 
-    padding: 0; 
-    background-color: var(--bg-color);
+/* CORREÇÃO: Esta nova regra usa o ID da página para remover o espaçamento
+  padrão do layout.css, permitindo que a caixa de entrada ocupe a tela toda.
+*/
+#caixa-entrada-page.main-content-wrapper {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Impede a rolagem do wrapper principal */
 }
+
 .main-header { 
     display: flex; 
     justify-content: space-between; 
@@ -51,7 +54,7 @@
     flex-grow: 1; 
     padding: 25px; 
     display: flex; 
-    height: calc(100vh - 71px);
+    height: calc(100vh - 71px); /* A altura é calculada a partir da altura da viewport menos a do header */
 }
 .inbox-layout { 
     display: grid; 
@@ -176,16 +179,31 @@
     border-bottom: 1px solid var(--border-color); 
     display: flex; 
     justify-content: space-between; 
-    align-items: flex-start; 
+    align-items: center; 
     flex-shrink: 0;
+}
+.btn-back-to-list {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    margin-right: 15px;
+    cursor: pointer;
+}
+.sender-details {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-grow: 1;
 }
 .sender-details h3 { 
     font-size: 1.2rem; 
-    margin-bottom: 5px; 
+    margin-bottom: 0; 
 }
 .sender-details p { 
     color: var(--text-light); 
     font-size: 0.9rem; 
+    margin-bottom: 0;
 }
 .view-actions { 
     display: flex; 
@@ -248,4 +266,41 @@
     text-align: center;
     padding: 20px;
     color: var(--text-light);
+}
+
+@media (max-width: 768px) {
+    .inbox-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .message-view, .message-view-placeholder {
+        display: none;
+    }
+
+    .inbox-layout.mobile-view-message .message-list {
+        display: none;
+    }
+    .inbox-layout.mobile-view-message .message-view {
+        display: flex;
+    }
+
+    .btn-back-to-list {
+        display: inline-block;
+    }
+
+    .view-header {
+        align-items: center;
+        padding: 15px;
+    }
+    
+    .view-header .sender-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .main-content {
+        padding: 10px;
+        height: calc(100vh - 61px);
+    }
 }
