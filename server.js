@@ -110,6 +110,21 @@ app.get('/api/auth/status', checkCombinedAuthStatus, (req, res) => {
     }
 });
 
+// ROTA PARA VERIFICAR SE O E-MAIL DE UM ALUNO JÁ EXISTE
+app.post('/api/alunos/check-email', async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ message: 'E-mail é obrigatório.' });
+    }
+    try {
+        const aluno = await db('alunos').where({ email }).first();
+        res.json({ exists: !!aluno });
+    } catch (err) {
+        console.error("Erro ao verificar e-mail:", err);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+});
+
 // ROTA DE CADASTRO DE ALUNO
 app.post('/api/alunos/cadastro', async (req, res) => {
     const { nome, email, senha } = req.body;
@@ -322,17 +337,28 @@ app.put('/api/sobre', authenticateProfessor, async (req, res) => {
 });
 
 // API: MENSAGENS
-app.post('/api/mensagens', async (req, res) => {
+app.post('/api/mensagens', checkCombinedAuthStatus , async (req, res) => {
     const { assunto, corpo, nome, email } = req.body;
 
     if (!assunto || !corpo || !nome || !email) {
         return res.status(400).json({ message: "Todos os campos (nome, email, assunto e mensagem) são obrigatórios." });
     }
     try {
+        if (!req.aluno) {
+            const alunoExistente = await db('alunos').where({ email }).first();
+            // Se o e-mail digitado pertence a um aluno já cadastrado, retornamos um erro específico.
+            if (alunoExistente) {
+                return res.status(409).json({ // 409 Conflict
+                    error: 'EMAIL_EXISTS_LOGIN_REQUIRED',
+                    message: "Este e-mail já pertence a uma conta. Por favor, faça o login para enviar a mensagem."
+                });
+            }
+        }
+
         const novaMensagem = {
-            aluno_id: null, // Nenhuma conta de aluno associada
-            remetente_nome: nome,
-            remetente_email: email,
+            aluno_id: req.aluno ? req.aluno.id : null, 
+            remetente_nome: req.aluno ? req.aluno.nome : nome, // Usa os dados do token se logado
+            remetente_email: req.aluno ? req.aluno.email : email,
             assunto,
             corpo
         };
