@@ -13,11 +13,14 @@ const multer = require('multer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const authenticateProfessor = require('./middleware/authenticateProfessor');
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 const authenticateAluno = require('./middleware/authenticateAluno');
 const JWT_SECRET = 'R!d1sRIbeir0';
 const JWT_SECRET_ALUNO = 'R!d1sRIbeir0!';
 const JWT_SECRET_ALUNO_RESET = 'R!d1sRIbeir0!-nova_senha'
+
+// --- CONFIGURAÇÃO DO SENDGRID (NOVO) ---
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // --- 2. VERIFICAÇÃO INICIAL DO BANCO DE DADOS ---
 const dbPath = path.resolve(__dirname, 'database/portal.db');
@@ -221,7 +224,37 @@ app.post('/api/alunos/forgot-password', async (req, res) => {
         console.log(resetLink);
         console.log('----------------------------------------------------');
         // Fim da simulação
+        // --- ENVIO REAL DO EMAIL COM SENDGRID ---
+        const msg = {
+            to: email, // O email do aluno que solicitou
+            from: {
+                name: 'Portal do Professor',
+                email: process.env.SENDER_EMAIL_VERIFIED // O email que você verificou no SendGrid
+            },
+            subject: 'Redefinição de Senha - Portal do Professor',
+            html: `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                    <h2>Redefinição de Senha</h2>
+                    <p>Olá,</p>
+                    <p>Recebemos uma solicitação para redefinir a senha da sua conta. Se você não fez essa solicitação, pode ignorar este e-mail.</p>
+                    <p>Para criar uma nova senha, clique no link abaixo:</p>
+                    <p style="text-align: center;">
+                        <a href="${resetLink}" style="background-color: #0d6efd; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Redefinir Minha Senha</a>
+                    </p>
+                    <p>Este link é válido por <strong>1 hora</strong>.</p>
+                    <p>Atenciosamente,<br>Equipe do Portal do Professor</p>
+                </div>
+            `
+        };
 
+        try {
+            await sgMail.send(msg);
+            console.log(`Email de redefinição enviado para: ${email} via SendGrid`);
+        } catch (emailError) {
+            console.error(`Falha ao enviar email via SendGrid para ${email}:`, emailError.response.body);
+        }
+        // --- FIM DO ENVIO COM SENDGRID ---
+        
         res.json({ success: true, message: 'Se um e-mail correspondente for encontrado, um link para redefinição de senha será enviado.' });
 
     } catch (err) {
