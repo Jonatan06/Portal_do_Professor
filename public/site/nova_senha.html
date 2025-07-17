@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Redefinir Senha - Portal do Aluno</title>
+    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="/css/toast.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="aluno-login-page">
+    <div id="toast-container"></div>
+    <div class="login-container">
+        <div class="login-promo-panel">
+            <div class="promo-content">
+                <i class="promo-icon fas fa-key"></i>
+                <h1>Redefinir Senha</h1>
+                <p>Crie uma nova senha segura para sua conta.</p>
+            </div>
+        </div>
+        <div class="login-form-panel">
+            <div class="form-wrapper">
+                <h2>Crie sua nova senha</h2>
+                <form id="reset-form">
+                    <div class="input-group">
+                        <label for="new-password">Nova Senha</label>
+                        <div class="input-field">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="new-password" required placeholder="Digite a nova senha">
+                        </div>
+                        <div class="password-strength-container">
+                            <div class="strength-bar-wrapper">
+                                <div id="strengthBar" class="strength-bar"></div>
+                            </div>
+                            <p id="strengthText" class="password-strength-text">Sua senha deve ter no mínimo 6 caracteres.</p>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="confirm-password">Confirmar Nova Senha</label>
+                        <div class="input-field">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="confirm-password" required placeholder="Confirme a nova senha">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="login-button">Salvar Nova Senha</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="/js/toast.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const resetForm = document.getElementById('reset-form');
+            const token = new URLSearchParams(window.location.search).get('token');
+
+            if (!token) {
+                showToast('Link inválido. Nenhum token encontrado.', 'error');
+                resetForm.querySelector('button').disabled = true;
+                return;
+            }
+
+            resetForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+
+                if (newPassword !== confirmPassword) {
+                    return showToast('As senhas não coincidem.', 'error');
+                }
+                if (newPassword.length < 6) {
+                    return showToast('A senha deve ter no mínimo 6 caracteres.', 'error');
+                }
+
+                try {
+                    const response = await fetch('/api/alunos/nova_senha', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: token, senha: newPassword })
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message);
+                    
+                    showToast(data.message, 'success');
+                    setTimeout(() => window.location.href = '/login', 2000);
+
+                } catch (error) {
+                    showToast(error.message, 'error');
+                }
+            });
+            // --- LÓGICA PARA FORÇA DA SENHA (ADAPTADA) ---
+        const newPasswordInput = document.getElementById('new-password'); // MUDANÇA AQUI
+        const strengthBar = document.getElementById('strengthBar');
+        const strengthText = document.getElementById('strengthText');
+
+        if (newPasswordInput && strengthBar && strengthText) {
+            newPasswordInput.addEventListener('input', updatePasswordStrength);
+        }
+
+        function updatePasswordStrength() {
+            const password = newPasswordInput.value; // MUDANÇA AQUI
+            let feedback = "Sua senha deve ter no mínimo 6 caracteres.";
+            let barWidth = 0;
+            let barClass = "";
+            let textClass = "";
+
+            const hasLowercase = /[a-z]/.test(password);
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasNumbers = /[0-9]/.test(password);
+            const hasSymbols = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/.test(password);
+
+            if (password.length === 0) {
+                feedback = "Sua senha deve ter no mínimo 6 caracteres.";
+                barWidth = 0; barClass = ""; textClass = "";
+            } else if (password.length < 6) {
+                feedback = "Muito curta. Mínimo 6 caracteres.";
+                barWidth = 10; barClass = "strength-weak"; textClass = "weak";
+            } else {
+                if (hasUppercase && hasLowercase && hasNumbers) {
+                    feedback = "Forte!";
+                    barWidth = 100; barClass = "strength-strong"; textClass = "strong";
+                } else if ((hasUppercase && hasLowercase) || (hasUppercase && hasNumbers) || (hasLowercase && hasNumbers)) {
+                    feedback = "Média. Tente misturar letras e números.";
+                    barWidth = 60; barClass = "strength-medium"; textClass = "medium";
+                } else {
+                    feedback = "Fraca. Adicione letras maiúsculas/minúsculas e números.";
+                    barWidth = 30; barClass = "strength-weak"; textClass = "weak";
+                }
+
+                if (hasSymbols && password.length >= 8) {
+                    barWidth = Math.min(100, barWidth + 20);
+                    if (barClass === "strength-medium") {
+                        feedback = "Boa senha com símbolos!";
+                    } else if (barClass === "strength-strong") {
+                        feedback = "Excelente!";
+                    }
+                }
+            }
+            
+            strengthBar.style.width = `${barWidth}%`;
+            strengthBar.className = `strength-bar ${barClass}`;
+
+            strengthText.textContent = feedback;
+            strengthText.className = `password-strength-text ${textClass}`;
+        }
+    });
+    </script>
+</body>
+</html>

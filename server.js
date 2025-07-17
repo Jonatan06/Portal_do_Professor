@@ -13,9 +13,11 @@ const multer = require('multer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const authenticateProfessor = require('./middleware/authenticateProfessor');
-const JWT_SECRET = 'R!d1sRIbeir0';
+const nodemailer = require('nodemailer');
 const authenticateAluno = require('./middleware/authenticateAluno');
+const JWT_SECRET = 'R!d1sRIbeir0';
 const JWT_SECRET_ALUNO = 'R!d1sRIbeir0!';
+const JWT_SECRET_ALUNO_RESET = 'R!d1sRIbeir0!-nova_senha'
 
 // --- 2. VERIFICAÇÃO INICIAL DO BANCO DE DADOS ---
 const dbPath = path.resolve(__dirname, 'database/portal.db');
@@ -189,6 +191,69 @@ app.post('/api/alunos/profile/picture', authenticateAluno, imageUpload.single('a
     } catch (err) {
         console.error("Erro ao fazer upload da foto de perfil do aluno:", err);
         res.status(500).json({ message: `Erro interno ao processar a imagem: ${err.message}` });
+    }
+});
+
+app.post('/api/alunos/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    try {
+        const aluno = await db('alunos').where({ email }).first();
+
+        // IMPORTANTE: Por segurança, sempre retorne uma mensagem de sucesso,
+        // mesmo que o email não exista. Isso impede que pessoas mal-intencionadas
+        // descubram quais emails estão cadastrados no seu sistema.
+        if (!aluno) {
+            return res.json({ success: true, message: 'Se um e-mail correspondente for encontrado, um link para redefinição de senha será enviado.' });
+        }
+
+        // Gera um token de reset com validade de 1 hora
+        const resetToken = jwt.sign({ id: aluno.id }, JWT_SECRET_ALUNO_RESET, { expiresIn: '1h' });
+
+        // Cria o link que será enviado no email
+        const resetLink = `http://localhost:3001/nova_senha.html?token=${resetToken}`;
+
+        // --- SIMULAÇÃO DE ENVIO DE EMAIL ---
+        // Em um projeto real, você configuraria o 'transporter' do nodemailer
+        // com suas credenciais (Gmail, SendGrid, etc.) e chamaria transporter.sendMail()
+        console.log('----------------------------------------------------');
+        console.log('SIMULAÇÃO DE ENVIO DE EMAIL PARA:', email);
+        console.log('Link para resetar a senha (copie e cole no navegador):');
+        console.log(resetLink);
+        console.log('----------------------------------------------------');
+        // Fim da simulação
+
+        res.json({ success: true, message: 'Se um e-mail correspondente for encontrado, um link para redefinição de senha será enviado.' });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Erro no servidor.' });
+    }
+});
+
+// --- ROTA 2: ATUALIZAÇÃO DA SENHA ---
+app.post('/api/alunos/nova_senha', async (req, res) => {
+    const { token, senha } = req.body;
+
+    if (!token || !senha) {
+        return res.status(400).json({ message: 'Token e nova senha são obrigatórios.' });
+    }
+
+    try {
+        // Verifica se o token é válido e não expirou, usando a chave secreta de reset
+        const decoded = jwt.verify(token, JWT_SECRET_ALUNO_RESET);
+
+        // Criptografa a nova senha
+        const salt = await bcrypt.genSalt(10);
+        const senhaHash = await bcrypt.hash(senha, salt);
+
+        // Atualiza a senha do aluno no banco de dados
+        await db('alunos').where({ id: decoded.id }).update({ senha: senhaHash });
+
+        res.json({ success: true, message: 'Senha atualizada com sucesso! Você já pode fazer o login.' });
+
+    } catch (err) {
+        // Se o token for inválido ou expirado, o jwt.verify vai lançar um erro
+        res.status(400).json({ message: 'O link para redefinição de senha é inválido ou expirou. Por favor, solicite um novo.' });
     }
 });
 
@@ -1031,6 +1096,9 @@ app.get('/contato', (req, res) => res.sendFile(path.join(__dirname, 'public', 's
 app.get('/post', (req, res) => res.sendFile(path.join(__dirname, 'public', 'site', 'post.html')));
 app.get('/portfolio-detalhe', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'site', 'portfolio-detalhe.html'));
+});
+app.get('/nova_senha.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'site', 'nova_senha.html'));
 });
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin', 'index.html'));

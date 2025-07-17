@@ -101,6 +101,33 @@
             }
         });
 
+        const forgotPasswordLink = document.querySelector('.forget');
+
+        forgotPasswordLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            const email = prompt("Por favor, digite o e-mail da sua conta para redefinir a senha:");
+
+            if (!email) { // Se o usuário cancelar ou deixar em branco
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/alunos/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await response.json();
+                
+                // Mostra a mensagem de sucesso do servidor (que é genérica por segurança)
+                showToast(data.message, 'info');
+
+            } catch (error) {
+                showToast('Ocorreu um erro. Tente novamente.', 'error');
+            }
+        });
+
         // --- Lógica para Mostrar/Esconder Senha (Login do Aluno) ---
         const toggleLoginPassword = document.getElementById('toggleLoginPassword');
         const loginPasswordInput = document.getElementById('login-senha');
