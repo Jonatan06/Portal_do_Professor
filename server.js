@@ -3,6 +3,8 @@
 // ||         SERVER.JS (VERSÃO CORRIGIDA)      ||
 // ===============================================
 
+require('dotenv').config();
+
 // --- 1. IMPORTAÇÃO DOS MÓDULOS ---
 const express = require('express');
 const path = require('path');
