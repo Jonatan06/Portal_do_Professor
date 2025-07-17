@@ -161,11 +161,11 @@ app.post('/api/alunos/login', async (req, res) => {
     try {
         const aluno = await db('alunos').where({ email }).first();
         if (!aluno) {
-            return res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
+            return res.status(401).json({ success: false, message: 'Email inválido.' });
         }
         const senhaCorreta = await bcrypt.compare(senha, aluno.senha);
         if (!senhaCorreta) {
-            return res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
+            return res.status(401).json({ success: false, message: 'Senha inválida.' });
         }
         const token = jwt.sign(
             { id: aluno.id, nome: aluno.nome, email: aluno.email, imagem_url: aluno.imagem_url, role: 'aluno' },

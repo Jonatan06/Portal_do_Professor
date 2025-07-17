@@ -96,6 +96,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             // --- FIM DA LÓGICA ATUALIZADA ---
             
+                // if (eventsOfTheDay.length > 0) {
+                //     const eventCount = eventsOfTheDay.length;
+                //     // Cria o HTML para a "badge" com o número de eventos
+                //     pinsHTML = `<div class="event-counter">${eventCount}</div>`;
+
+                //     // A funcionalidade de tooltip e a classe 'has-event' continuam úteis
+                //     tooltipText = eventsOfTheDay.map(e => e.title).join(' | ');
+                //     classes += ' has-event';
+                // }
+
+
             calendarBody.insertAdjacentHTML('beforeend', 
                 `<div class="${classes}" data-date="${dateStr}" ${tooltipText ? `data-tooltip="${tooltipText}"` : ''}>
                     ${day}${pinsHTML}
