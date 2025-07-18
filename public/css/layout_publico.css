@@ -266,3 +266,97 @@ body.aluno-logado #btn-area-professor {
 .nav-welcome {
   cursor: pointer; /* Indica que o nome é clicável */
 }
+
+/* --- ESTILOS PADRONIZADOS PARA MODAL DE CONFIRMAÇÃO (CORRIGIDO) --- */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.55);
+  display: none; /* Alterado de 'flex' para 'none' para o JS controlar */
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  opacity: 0;
+  /* Removido pointer-events para simplificar. A opacidade já cuida disso. */
+  transition: opacity 0.3s ease;
+}
+
+/* O seu JS adiciona a classe 'active', então vamos usá-la aqui! */
+.modal-overlay.active {
+  display: flex; /* O JS já faz isso, mas é bom garantir */
+  opacity: 1;
+}
+
+.modal-content {
+  background: white; /* Agora o fundo branco será aplicado! */
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+  transform: scale(0.95);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Animação de entrada */
+.modal-overlay.active .modal-content {
+  transform: scale(1);
+}
+
+.modal-content .modal-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #343a40;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.modal-content .modal-text {
+  color: #6c757d;
+  margin-bottom: 25px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+/* Reutilizando classes de botões já existentes */
+#confirm-logout-modal .btn {
+  padding: 10px 25px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+#confirm-logout-modal .btn:hover {    
+  transform: translateY(-2px);
+}
+#confirm-logout-modal .btn-secondary {
+  background-color: #f1f3f5;
+  color: #495057;
+  border: 1px solid #ced4da;
+}
+#confirm-logout-modal .btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
