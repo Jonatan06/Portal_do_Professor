@@ -1,374 +1,298 @@
 /* public/css/layout.css - O nosso layout padrão e consistente */
 
 :root {
-    --cor-primaria: #0d6efd;
-    --cor-fundo-sidebar: #ffffff;
-    --cor-fundo-main: #f4f7fc; /* Fundo principal mais suave */
-    --cor-borda: #e9ecef;
-    --cor-texto-sidebar: #34495e;
-    --cor-texto-sidebar-hover: #0d6efd;
-    --cor-badge: #e74c3c;
-    --cor-sombra: rgba(0,0,0,0.05);
+  --cor-primaria: #0d6efd;
+  --cor-fundo-sidebar: #ffffff;
+  --cor-fundo-main: #f4f7fc; /* Fundo principal mais suave */
+  --cor-borda: #e9ecef;
+  --cor-texto-sidebar: #34495e;
+  --cor-texto-sidebar-hover: #0d6efd;
+  --cor-badge: #e74c3c;
+  --cor-sombra: rgba(0, 0, 0, 0.05);
 }
 
 /* Reset básico e configuração do corpo */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
-    display: flex; /* Estrutura principal com sidebar e conteúdo */
-    background-color: var(--cor-fundo-main);
-    color: var(--cor-texto-sidebar);
+  font-family: "Poppins", sans-serif;
+  display: flex; /* Estrutura principal com sidebar e conteúdo */
+  background-color: var(--cor-fundo-main);
+  color: var(--cor-texto-sidebar);
 }
 
 /* --- Estilo da Sidebar (Barra Lateral) --- */
 .sidebar {
-    width: 260px;
-    flex-shrink: 0; /* Impede que a sidebar encolha */
-    background-color: var(--cor-fundo-sidebar);
-    height: 100vh;
-    position: fixed; /* MUDANÇA: Para controle de exibição */
-    top: 0;
-    left: 0;
-    padding: 20px;
-    border-right: 1px solid var(--cor-borda);
-    display: flex;
-    flex-direction: column;
-    z-index: 1100; /* Para ficar sobre o conteúdo */
-    transform: translateX(0);
-    transition: transform 0.3s ease-in-out;
+  width: 260px;
+  flex-shrink: 0; /* Impede que a sidebar encolha */
+  background-color: var(--cor-fundo-sidebar);
+  height: 100vh;
+  position: fixed; /* MUDANÇA: Para controle de exibição */
+  top: 0;
+  left: 0;
+  padding: 20px;
+  border-right: 1px solid var(--cor-borda);
+  display: flex;
+  flex-direction: column;
+  z-index: 1100; /* Para ficar sobre o conteúdo */
+  transform: translateX(0);
+  transition: transform 0.3s ease-in-out;
 }
 
 .sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--cor-borda);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--cor-borda);
 }
 
-.sidebar-header i { font-size: 24px; color: var(--cor-primaria); }
-.sidebar-header h1 { font-size: 18px; font-weight: 600; }
-.sidebar-nav { flex-grow: 1; }
-.sidebar-nav ul { list-style: none; }
+.sidebar-header i {
+  font-size: 24px;
+  color: var(--cor-primaria);
+}
+.sidebar-header h1 {
+  font-size: 18px;
+  font-weight: 600;
+}
+.sidebar-nav {
+  flex-grow: 1;
+}
+.sidebar-nav ul {
+  list-style: none;
+}
 
 .sidebar-nav a {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 12px 10px;
-    margin-bottom: 5px;
-    border-radius: 8px;
-    text-decoration: none;
-    color: var(--cor-texto-sidebar);
-    font-weight: 500;
-    transition: background-color 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 10px;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--cor-texto-sidebar);
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .sidebar-nav a:hover {
-    background-color: #ecf0f1;
-    color: var(--cor-texto-sidebar-hover);
+  background-color: #ecf0f1;
+  color: var(--cor-texto-sidebar-hover);
 }
 
 .sidebar-nav a.active {
-    background-color: var(--cor-primaria);
-    color: white;
-    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+  background-color: var(--cor-primaria);
+  color: white;
+  box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
 }
 
-.sidebar-nav a .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+.sidebar-nav a .nav-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
 
 .sidebar-nav .notification-badge {
-    margin-left: auto;
-    background-color: var(--cor-badge);
-    color: white;
-    font-size: 11px;
-    font-weight: 600;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  margin-left: auto;
+  background-color: var(--cor-badge);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Botão extra na sidebar */
 .sidebar-view-public-btn {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
-    padding: 10px;
-    border-radius: 6px;
-    background-color: #ecf0f1;
-    color: var(--cor-texto-sidebar);
-    font-weight: 500;
-    text-decoration: none;
-    transition: background-color 0.2s;
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 6px;
+  background-color: #ecf0f1;
+  color: var(--cor-texto-sidebar);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s;
 }
 .sidebar-view-public-btn:hover {
-    background-color: #e0e6e9;
+  background-color: #e0e6e9;
 }
 
 /* --- Wrapper do Conteúdo Principal (Área à Direita) --- */
 .main-content-wrapper {
-    flex-grow: 1; /* Ocupa todo o espaço restante */
-    height: 100vh;
-    overflow-y: auto; /* Adiciona scroll apenas nesta área */
-    padding: 30px;
-    margin-left: 260px; /* MUDANÇA: Espaço para a sidebar */
-    transition: margin-left 0.3s ease-in-out;
+  flex-grow: 1; /* Ocupa todo o espaço restante */
+  height: 100vh;
+  overflow-y: auto; /* Adiciona scroll apenas nesta área */
+  padding: 30px;
+  margin-left: 260px; /* MUDANÇA: Espaço para a sidebar */
+  transition: margin-left 0.3s ease-in-out;
 }
 
 /* --- ESTILOS RESPONSIVOS ADICIONADOS --- */
 
 /* Esconde o menu hamburguer em telas grandes */
 .mobile-menu-toggle {
-    display: none;
+  display: none;
 }
 
 @media (max-width: 992px) {
-    .sidebar {
-        transform: translateX(-100%); /* Esconde a sidebar fora da tela */
-    }
+  .sidebar {
+    transform: translateX(-100%); /* Esconde a sidebar fora da tela */
+  }
 
-    .sidebar.active {
-        transform: translateX(0);
-        box-shadow: 5px 0 15px rgba(0,0,0,0.1);
-    }
+  .sidebar.active {
+    transform: translateX(0);
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+  }
 
-    .main-content-wrapper {
-        margin-left: 0; /* Remove a margem quando a sidebar está escondida */
-    }
+  .main-content-wrapper {
+    margin-left: 0; /* Remove a margem quando a sidebar está escondida */
+  }
 
-    /* Estilo do botão do menu hamburguer */
-    .mobile-menu-toggle {
-        display: block;
-        position: fixed;
-        top: 15px;
-        left: 15px;
-        z-index: 1200; /* Acima da sidebar */
-        background-color: var(--cor-branco);
-        border: 1px solid var(--cor-borda);
-        border-radius: 50%;
-        width: 45px;
-        height: 45px;
-        font-size: 24px;
-        color: var(--cor-texto-principal);
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
+  /* Estilo do botão do menu hamburguer */
+  .mobile-menu-toggle {
+    display: block;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1200; /* Acima da sidebar */
+    background-color: var(--cor-branco);
+    border: 1px solid var(--cor-borda);
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 24px;
+    color: var(--cor-texto-principal);
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
 
-    /* Fundo escuro quando a sidebar está ativa no mobile */
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.4);
-        z-index: 1099;
-    }
-
-    .sidebar.active + .sidebar-overlay {
-        display: block;
-    }
-}
-
-
-/* --- ESTILOS PADRONIZADOS PARA MODAL DE CONFIRMAÇÃO --- */
-/* .modal-overlay {
+  /* Fundo escuro quando a sidebar está ativa no mobile */
+  .sidebar-overlay {
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.55);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1099;
+  }
+
+  .sidebar.active + .sidebar-overlay {
+    display: block;
+  }
 }
 
-.modal-overlay:not(.hidden) {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.confirmation-modal-content {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.25);
-    text-align: center;
-    max-width: 420px;
-    width: 90%;
-    transform: scale(0.95) translateY(10px);
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.modal-overlay:not(.hidden) .confirmation-modal-content {
-    transform: scale(1) translateY(0);
-}
-
-.confirmation-modal-content .modal-title {
-    font-size: 22px;
-    font-weight: 600;
-    color: #343a40;
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-.confirmation-modal-content #modal-text {
-    color: #6c757d;
-    margin-bottom: 25px;
-    font-size: 16px;
-    line-height: 1.6;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-}
-
-/* --- BOTÕES PADRONIZADOS --- */
-/* .btn {
-    padding: 10px 25px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 15px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.btn.btn-secondary {
-    background-color: #f1f3f5;
-    color: #495057;
-    border: 1px solid #ced4da;
-}
-.btn.btn-secondary:hover {
-    background-color: #e9ecef;
-    border-color: #ced4da;
-    box-shadow: none;
-}
-
-.btn.btn-danger {
-    background-color: #dc3545;
-    color: white;
-}
-.btn.btn-danger:hover {
-    background-color: #c82333;
-} */ 
-
-/* --- Modal de Confirmação de Logout --- */
+/* --- ESTILOS PADRONIZADOS PARA MODAL DE CONFIRMAÇÃO --- */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: none; /* Começa escondido */
+  background-color: rgba(0, 0, 0, 0.55);
+  display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 2000; /* Z-index alto para ficar sobre tudo */
+  z-index: 2000;
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.3s ease;
 }
-.modal-overlay.active {
-  display: flex; /* Mostra o modal */
+
+.modal-overlay:not(.hidden) {
   opacity: 1;
+  pointer-events: auto;
 }
-.modal-content {
-  background-color: #fff;
-  padding: 25px 30px;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  width: 90%;
-  max-width: 450px;
+
+.confirmation-modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
   text-align: center;
-  position: relative;
-  transform: scale(0.95);
-  transition: transform 0.3s ease;
+  max-width: 420px;
+  width: 90%;
+  transform: scale(0.95) translateY(10px);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.modal-overlay.active .modal-content {
-  transform: scale(1);
+
+.modal-overlay:not(.hidden) .confirmation-modal-content {
+  transform: scale(1) translateY(0);
 }
-.modal-title {
-  font-size: 1.5rem;
+
+.confirmation-modal-content .modal-title {
+  font-size: 22px;
   font-weight: 600;
-  color: #333;
+  color: #343a40;
   margin-top: 0;
   margin-bottom: 10px;
 }
-.modal-text {
-  font-size: 1rem;
-  color: #555;
+
+.confirmation-modal-content #modal-text {
+  color: #6c757d;
   margin-bottom: 25px;
+  font-size: 16px;
+  line-height: 1.6;
 }
-.modal-close-btn {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  background: none;
-  border: none;
-  font-size: 2rem;
-  color: #888;
-  cursor: pointer;
-  line-height: 1;
-}
-.modal-close-btn:hover {
-  color: #333;
-}
+
 .modal-actions {
   display: flex;
   justify-content: center;
   gap: 15px;
 }
-.modal-actions .btn {
+
+/* --- BOTÕES PADRONIZADOS --- */
+.btn {
   padding: 10px 25px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
+  border-radius: 6px;
+  text-decoration: none;
   font-weight: 500;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s ease-in-out;
 }
-.modal-actions .btn:active {
-  transform: scale(0.98);
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
-.modal-actions .btn-secondary {
-  background-color: #f0f0f0;
-  color: #555;
-  border: 1px solid #ccc;
+
+.btn.btn-secondary {
+  background-color: #f1f3f5;
+  color: #495057;
+  border: 1px solid #ced4da;
 }
-.modal-actions .btn-secondary:hover {
-  background-color: #e0e0e0;
+.btn.btn-secondary:hover {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  box-shadow: none;
 }
-.modal-actions .btn-danger {
-  background-color: #e74c3c;
+
+.btn.btn-danger {
+  background-color: #dc3545;
   color: white;
 }
-.modal-actions .btn-danger:hover {
-  background-color: #c0392b;
+.btn.btn-danger:hover {
+  background-color: #c82333;
 }
+
+
+/* --- Modal de Confirmação de Logout --- */
+

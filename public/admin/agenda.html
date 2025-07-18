@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +15,7 @@
     <link rel="stylesheet" href="/css/toast.css">
     <link rel="stylesheet" href="/css/tooltip.css">
 </head>
+
 <body>
     <div id="toast-container"></div>
 
@@ -28,9 +30,11 @@
                 <li><a href="perfil.html"><i class="fas fa-user nav-icon"></i> <span>Perfil</span></a></li>
                 <li><a href="blog_admin.html"><i class="fas fa-blog nav-icon"></i> <span>Blog</span></a></li>
                 <li><a href="materiais.html"><i class="fas fa-folder nav-icon"></i> <span>Materiais</span></a></li>
-                <li><a href="agenda.html" class="active"><i class="fas fa-calendar-alt nav-icon"></i> <span>Agenda</span></a></li>
+                <li><a href="agenda.html" class="active"><i class="fas fa-calendar-alt nav-icon"></i>
+                        <span>Agenda</span></a></li>
                 <li><a href="portfolio.html"><i class="fas fa-briefcase nav-icon"></i> <span>Portfólio</span></a></li>
-                <li><a href="caixa_entrada.html"><i class="fas fa-envelope nav-icon"></i> <span>Caixa de Entrada</span></a></li>
+                <li><a href="caixa_entrada.html"><i class="fas fa-envelope nav-icon"></i> <span>Caixa de
+                            Entrada</span></a></li>
                 <li><a href="sobre.html"><i class="fas fa-info-circle nav-icon"></i> <span>Sobre</span></a></li>
             </ul>
         </nav>
@@ -83,7 +87,7 @@
         </div>
     </main>
 
-    <div class="modal-overlay hidden" id="event-modal">
+    <div class="modal-overlay" id="event-modal">
         <div class="modal-content">
             <header class="modal-header">
                 <h2 id="modal-title">Adicionar Evento</h2>
@@ -96,7 +100,7 @@
                     <input type="text" id="event-title" placeholder="Um título curto..." required maxlength="20">
                     <div class="char-counter" id="title-char-counter">0/20</div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="event-date">Data</label>
@@ -107,7 +111,7 @@
                         <input type="time" id="event-time">
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="event-type">Tipo de Evento</label>
                     <select id="event-type">
@@ -120,7 +124,8 @@
 
                 <div class="form-group">
                     <label for="event-observation">Observação</label>
-                    <textarea id="event-observation" rows="3" placeholder="Máximo de 30 caracteres..." maxlength="30"></textarea>
+                    <textarea id="event-observation" rows="3" placeholder="Máximo de 30 caracteres..."
+                        maxlength="30"></textarea>
                     <div class="char-counter" id="observation-char-counter">0/30</div>
                 </div>
 
@@ -132,27 +137,27 @@
 
                         <input type="radio" id="color-green" name="event_color" value="#198754">
                         <label for="color-green" style="--event-color: #198754;"></label>
-                        
+
                         <input type="radio" id="color-yellow" name="event_color" value="#ffc107">
                         <label for="color-yellow" style="--event-color: #ffc107;"></label>
-                        
+
                         <input type="radio" id="color-red" name="event_color" value="#dc3545">
                         <label for="color-red" style="--event-color: #dc3545;"></label>
-                        
+
                         <input type="radio" id="color-purple" name="event_color" value="#6f42c1">
                         <label for="color-purple" style="--event-color: #6f42c1;"></label>
                     </div>
                 </div>
 
                 <footer class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="delete-event-btn" style="display: none; margin-right: auto;">Apagar</button>
+                    <button type="button" class="btn btn-danger" id="delete-event-btn"
+                        style="display: none; margin-right: auto;">Apagar</button>
                     <button type="submit" class="btn btn-primary">Salvar</button>
                 </footer>
             </form>
         </div>
     </div>
-    
-    <div id="confirmation-modal" class="modal-overlay hidden">
+    <div class="modal-overlay" id="confirmation-modal">
         <div class="confirmation-modal-content">
             <h3 class="modal-title">Confirmar Ação</h3>
             <p id="modal-text">Você tem certeza?</p>
@@ -162,10 +167,10 @@
             </div>
         </div>
     </div>
-
     <script src="/js/toast.js"></script>
     <script src="/js/tooltip.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/agenda.js"></script>
 </body>
+
 </html>
