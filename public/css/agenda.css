@@ -229,7 +229,7 @@
 
 /* Modal */
 /* Modal (CORRIGIDO E PADRONIZADO) */
-.modal-overlay {
+#event-modal.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -239,35 +239,34 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 2000;
-  opacity: 0; /* Começa invisível */
-  visibility: hidden; /* Começa inacessível para cliques */
-  transition: opacity 0.3s ease, visibility 0s 0.3s; /* Animação suave */
+  z-index: 2000; /* Z-index um pouco menor que o do logout */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0s 0.3s;
 }
 
-.modal-overlay.active {
-  opacity: 1; /* Fica visível */
-  visibility: visible; /* Fica acessível */
-  transition: opacity 0.3s ease, visibility 0s 0s;
+/* A classe .active do seu JS vai ativar estes estilos */
+#event-modal.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease;
 }
 
-/* Adiciona a animação de "zoom in" ao conteúdo do modal */
-.modal-overlay .modal-content {
-  transform: scale(0.95);
-  transition: transform 0.3s ease;
-}
-.modal-overlay.active .modal-content {
-  transform: scale(1);
-}
-
-.modal-content {
+#event-modal .modal-content {
   background: var(--white);
   padding: 25px;
   border-radius: 12px;
   width: 90%;
   max-width: 450px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
 }
+
+#event-modal.modal-overlay.active .modal-content {
+  transform: scale(1);
+}
+  
 .modal-header {
   display: flex;
   justify-content: space-between;
