@@ -1,0 +1,106 @@
+/* /public/css/modal.css (VERSÃO FINAL E UNIFICADA) */
+
+/* --- 1. Estilos para o Modal de Formulário (Agenda) --- */
+/* (Esta parte permanece a mesma) */
+#event-modal.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0s 0.3s;
+}
+#event-modal.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease;
+}
+#event-modal .modal-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+#event-modal.modal-overlay.active .modal-content {
+  transform: scale(1);
+}
+
+/* --- 2. Estilos para TODOS os Modais de Confirmação (Logout, Apagar, etc.) --- */
+
+/* O fundo escuro (overlay) para ambos os modais de confirmação */
+#confirm-logout-modal.modal-overlay,
+#confirmation-modal.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(33, 37, 41, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+/* A classe .hidden controla a visibilidade de AMBOS */
+#confirm-logout-modal.hidden,
+#confirmation-modal.hidden {
+  display: none !important;
+}
+
+/* Estilo GENÉRICO para a caixa branca de conteúdo de confirmação */
+.confirmation-modal-content {
+  background: white;
+  padding: 30px 35px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+  position: relative;
+}
+
+/* Estilos dos elementos internos que são iguais em todos os modais de confirmação */
+.confirmation-modal-content .modal-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #343a40;
+  margin: 0 0 10px 0;
+}
+.confirmation-modal-content #modal-text,
+.confirmation-modal-content .modal-text { /* Aceita ambos */
+  color: #6c757d;
+  margin-bottom: 25px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.confirmation-modal-content .modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+.confirmation-modal-content .modal-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #aaa;
+  line-height: 1;
+}
+.confirmation-modal-content .modal-close-btn:hover {
+    color: #333;
+}   
