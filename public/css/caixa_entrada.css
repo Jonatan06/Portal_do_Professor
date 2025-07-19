@@ -46,13 +46,10 @@
 .btn.btn-secondary {
   background-color: #ecf0f1;
   color: #34495e;
-  padding: 8px 15px;
+ padding: 10px 25px;
   border-radius: 6px;
-  text-decoration: none;
   font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 15px;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
