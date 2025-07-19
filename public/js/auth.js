@@ -1,81 +1,21 @@
-// // public/js/auth.js (PARA O PAINEL DO PROFESSOR)
-
-// /**
-//  * Pega o token de autenticação do professor do localStorage.
-//  */
-// function getToken() {
-//     return localStorage.getItem('authToken');
-// }
-
-// /**
-//  * Remove os dados de login do professor e redireciona para a página de login.
-//  */
-// function logout() {
-//     localStorage.removeItem('authToken');
-//     localStorage.removeItem('professorLogado'); // Limpa também os dados do professor
-//     window.location.href = '/admin/index.html'; // Redireciona para a página de login correta
-// }
-
-// /**
-//  * Protege uma página. Se não houver token, redireciona para o login.
-//  * Deve ser chamada no início de cada script de página protegida.
-//  */
-// function protectPage() {
-//     const token = getToken();
-//     if (!token) {
-//         // Usa o showToast em vez do alert nativo
-//         showToast("Acesso negado. Por favor, faça o login.", 'error');
-//         setTimeout(() => {
-//             window.location.href = '/admin/index.html';
-//         }, 1500);
-//     }
-// }
-
-// /**
-//  * Intercepta TODAS as chamadas `fetch` do painel de admin
-//  * e adiciona automaticamente o token de autenticação no cabeçalho.
-//  * Isso é essencial para que suas requisições à API sejam autorizadas.
-//  */
-// const originalFetch = window.fetch;
-// window.fetch = function (url, options) {
-//     const token = getToken();
-    
-//     const newOptions = options ? { ...options } : {};
-//     newOptions.headers = newOptions.headers || {};
-    
-//     // Adiciona o token ao cabeçalho para todas as requisições da API do painel
-//     if (token && url.startsWith('/api/')) {
-//         newOptions.headers['x-auth-token'] = token;
-//     }
-
-//     return originalFetch(url, newOptions).catch(error => {
-//         console.error('Fetch Error:', error);
-//         showToast('Erro de conexão com o servidor.', 'error');
-//         return Promise.reject(error);
-//     });
-// };
-
-function getToken() {
-    return localStorage.getItem('authToken');
-}
+// public/js/auth.js (VERSÃO FINAL E ROBUSTA)
 
 /**
- * Remove os dados de login do professor e redireciona para a página de login.
- * Esta função agora é chamada pelo modal de confirmação.
+ * Pega o token de autenticação do professor do localStorage.
  */
-function logout() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('professorLogado'); // Limpa também os dados do professor
-    window.location.href = '/admin/index.html'; // Redireciona para a página de login correta
+function getToken() {
+    return localStorage.getItem('authToken');
 }
 
 /**
  * Protege uma página. Se não houver token, redireciona para o login.
  */
 function protectPage() {
-    const token = getToken();
-    if (!token) {
-        showToast("Acesso negado. Por favor, faça o login.", 'error');
+    if (!getToken()) {
+        // A função showToast deve existir no seu /js/toast.js
+        if (typeof showToast === 'function') {
+            showToast("Acesso negado. Por favor, faça o login.", 'error');
+        }
         setTimeout(() => {
             window.location.href = '/admin/index.html';
         }, 1500);
@@ -83,76 +23,70 @@ function protectPage() {
 }
 
 /**
- * Intercepta TODAS as chamadas `fetch` do painel de admin
- * e adiciona automaticamente o token de autenticação no cabeçalho.
+ * Intercepta TODAS as chamadas `fetch` para adicionar o token de autenticação.
  */
 const originalFetch = window.fetch;
 window.fetch = function (url, options) {
     const token = getToken();
-    
-    const newOptions = options ? { ...options } : {};
+    const newOptions = { ...options };
     newOptions.headers = newOptions.headers || {};
-    
     if (token && url.startsWith('/api/')) {
         newOptions.headers['x-auth-token'] = token;
     }
-
     return originalFetch(url, newOptions).catch(error => {
         console.error('Fetch Error:', error);
-        showToast('Erro de conexão com o servidor.', 'error');
+        if (typeof showToast === 'function') {
+            showToast('Erro de conexão com o servidor.', 'error');
+        }
         return Promise.reject(error);
     });
 };
 
+
 /**
- * =================================================================
- * LÓGICA DO MODAL DE LOGOUT (NOVA LÓGICA)
- * =================================================================
+ * LÓGICA DO MODAL DE LOGOUT E INICIALIZAÇÃO DA PÁGINA
+ * Roda depois que todo o HTML da página foi carregado.
  */
 document.addEventListener('DOMContentLoaded', () => {
-    // Procura o botão de logout em qualquer página do painel
+    // 1. Encontra os elementos essenciais na página atual.
     const logoutButton = document.getElementById('logout-button');
-    
-    // Procura os elementos do modal que adicionamos no HTML
-    const modal = document.getElementById('confirm-logout-modal');
-    const cancelButton = document.getElementById('cancel-logout-btn');
-    const confirmButton = document.getElementById('confirm-logout-btn');
-    const closeBtn = modal ? modal.querySelector('.modal-close-btn') : null;
+    const logoutModal = document.getElementById('confirm-logout-modal');
 
-    // Se não encontrar o modal na página, não faz nada.
-    if (!modal || !logoutButton) {
-        return;
+    // 2. VERIFICAÇÃO DE SEGURANÇA: Só continua se o botão e o modal existirem.
+    if (logoutButton && logoutModal) {
+
+        const closeModalBtn = logoutModal.querySelector('.modal-close-btn');
+        const cancelLogoutBtn = document.getElementById('cancel-logout-btn');
+        const confirmLogoutBtn = document.getElementById('confirm-logout-btn');
+
+        // LÓGICA PARA MOSTRAR O MODAL
+        logoutButton.addEventListener('click', (event) => {
+            // **A CORREÇÃO CRÍTICA ESTÁ AQUI**
+            // Impede a ação padrão (como navegar para '#')
+            event.preventDefault(); 
+            // Impede que outros scripts que escutam este mesmo clique sejam acionados.
+            event.stopPropagation(); 
+
+            logoutModal.classList.remove('hidden');
+        });
+
+        // LÓGICA PARA ESCONDER O MODAL
+        const hideModal = () => {
+            logoutModal.classList.add('hidden');
+        };
+
+        closeModalBtn.addEventListener('click', hideModal);
+        cancelLogoutBtn.addEventListener('click', hideModal);
+
+        // LÓGICA DE CONFIRMAÇÃO DO LOGOUT
+        // A ação de sair só existe aqui dentro.
+        confirmLogoutBtn.addEventListener('click', () => {
+            console.log("Logout confirmado. Redirecionando...");
+            
+            // Lógica de logout
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('professorLogado');
+            window.location.href = '/admin/index.html';
+        });
     }
-
-    // Função para abrir o modal com animação
-    const openModal = () => {
-        modal.classList.add('active');
-    };
-
-    // Função para fechar o modal com animação
-    const closeModal = () => {
-        modal.classList.remove('active');
-    };
-
-    // Adiciona o evento de clique ao botão principal de "Sair"
-    logoutButton.addEventListener('click', (e) => {
-        e.preventDefault(); // Impede o link de navegar
-        openModal();        // Abre o modal de confirmação
-    });
-
-    // Eventos dos botões do modal
-    if (confirmButton) {
-        // Se clicar em "Sim, Sair", chama a função de logout
-        confirmButton.addEventListener('click', logout);
-    }
-
-    if (cancelButton) cancelButton.addEventListener('click', closeModal);
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    
-    // Fecha o modal se o usuário clicar fora da caixa de diálogo
-    modal.addEventListener('click', (event) => {
-        if (event.target === modal) {
-            closeModal();
-        }
-    });
 });

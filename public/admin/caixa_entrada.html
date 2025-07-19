@@ -43,7 +43,7 @@
             </h1>
             <div class="header-actions">
                 <span class="user-info">Professor</span>
-                <a href="#" id="logout-button-inbox" class="btn btn-secondary">
+                <a href="#" id="logout-button" class="btn btn-secondary">
                     <i class="fas fa-sign-out-alt"></i> Sair
                 </a>
             </div>
@@ -86,18 +86,17 @@
             </div>
         </div>
     </main>
-
-    <div id="confirmation-modal" class="modal-overlay hidden">
+      <div id="confirm-logout-modal" class="modal-overlay hidden">
         <div class="confirmation-modal-content">
-            <h3 class="modal-title">Confirmar Ação</h3>
-            <p id="modal-text">Você tem certeza?</p>
+            <button class="modal-close-btn" aria-label="Fechar">×</button>
+            <h2 class="modal-title">Confirmar Saída</h2>
+            <p class="modal-text">Tem certeza que deseja sair da sua conta e retornar à tela inicial?</p>
             <div class="modal-actions">
-                <button id="modal-cancel-btn" class="btn btn-secondary">Cancelar</button>
-                <button id="modal-confirm-btn" class="btn btn-danger">Confirmar</button>
+                <button id="cancel-logout-btn" class="btn btn-secondary">Cancelar</button>
+                <button id="confirm-logout-btn" class="btn btn-danger">Sim, Sair</button>
             </div>
         </div>
     </div>
-    
     <script src="/js/toast.js"></script>
     <script src="/js/tooltip.js"></script>
     <script src="/js/auth.js"></script>

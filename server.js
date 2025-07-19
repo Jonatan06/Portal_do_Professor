@@ -301,11 +301,11 @@ app.post('/api/auth/login', async (req, res) => {
     try {
         const professor = await db('perfil').where({ email }).first();
         if (!professor) {
-            return res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
+            return res.status(401).json({ success: false, message: 'Email inválido.' });
         }
         const senhaCorreta = await bcrypt.compare(senha, professor.senha);
         if (!senhaCorreta) {
-            return res.status(401).json({ success: false, message: 'Email ou senha inválidos.' });
+            return res.status(401).json({ success: false, message: 'Senha inválida.' });
         }
         
         const payload = { 
