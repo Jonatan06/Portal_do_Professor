@@ -145,10 +145,46 @@ document.addEventListener('DOMContentLoaded', () => {
     loadUpcomingEvents();
 
     const logoutButton = document.getElementById('logout-button');
-    if(logoutButton) {
+    const confirmLogoutModal = document.getElementById('confirm-logout-modal');
+    const cancelLogoutBtn = document.getElementById('cancel-logout-btn');
+    const confirmLogoutBtn = document.getElementById('confirm-logout-btn');
+    const closeModalButton = confirmLogoutModal.querySelector('.modal-close-btn');
+
+    function logout() {
+        if (confirmLogoutModal) {
+            confirmLogoutModal.classList.add('active');
+        }
+    }
+
+    if (logoutButton) {
         logoutButton.addEventListener('click', (e) => {
             e.preventDefault();
             logout();
         });
+    }
+
+    function hideLogoutModal() {
+        if (confirmLogoutModal) {
+            confirmLogoutModal.classList.remove('active');
+        }
+    }
+
+    if (confirmLogoutBtn) {
+        confirmLogoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('userToken');
+            sessionStorage.removeItem('userToken');
+
+            window.location.href = '/'; 
+        });
+    }
+
+    // Botão "Cancelar": apenas fecha o modal
+    if (cancelLogoutBtn) {
+        cancelLogoutBtn.addEventListener('click', hideLogoutModal);
+    }
+    
+    // Botão "X" para fechar o modal
+    if(closeModalButton) {
+        closeModalButton.addEventListener('click', hideLogoutModal);
     }
 });
